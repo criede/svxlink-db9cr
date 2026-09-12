@@ -16,6 +16,7 @@ Offene Aufgaben für svxlink-db9cr. Die folgenden Punkte dienen als erste Planun
 
 ## Dokumentation
 
+- [x] Daily-Debian-Paket für Raspberry Pi OS arm64 direkt als Prerelease bereitstellen.
 - [x] Täglichen Upstream-Sync als GitHub-Actions-Workflow implementieren.
 - [ ] Erledigte Änderungen laufend in `CHANGELOG.MD` eintragen.
 - [ ] Aufgaben bei Abschluss abhaken und neue Aufgaben konkret beschreiben.

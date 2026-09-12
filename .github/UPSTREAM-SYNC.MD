@@ -25,6 +25,28 @@ nicht. Technische Fehler brechen den Lauf weiterhin ab. Bei zwischenzeitlichen
 Änderungen am Zielbranch wird kein Force-Push ausgeführt; der Workflow kann
 anschließend erneut starten.
 
+## Daily-Paket für Raspberry Pi OS
+
+Nach jedem erfolgreichen Sync läuft ein nativer arm64-Build in einem
+`debian:trixie-slim`-Container. Ziel ist Raspberry Pi OS 64 Bit auf Debian 13
+Trixie. Gebaut wird exakt der vom Sync ausgegebene Commit, auch wenn keine neuen
+Upstream-Commits vorhanden waren. Der Server-Build enthält kein Qtel und keine
+Sprachdateien; diese müssen passend zur Station installiert werden.
+
+Die Debian-Version folgt dem Schema
+`26.05.1+daily20260912.42.1.g0123456789ab-1~trixie`: Projektversion aus
+`src/versions`, UTC-Datum, Workflow-Laufnummer, Versuch und Commit-Kürzel.
+Sie steigt innerhalb einer Projektversion mit jedem neuen Daily-Lauf an;
+die nächste höhere Projektversion sortiert danach. `Release` als CMake-Bautyp
+bedeutet nur optimierten Maschinencode, keine stabile Veröffentlichung.
+
+Nach Paketprüfung und Installationstest in einem frischen Trixie-Container
+werden `.deb` und `SHA256SUMS` direkt mit der GitHub CLI in ein eigenes Daily-
+Prerelease hochgeladen. Der Tag verweist auf den gebauten Commit. Das Prerelease
+wird nicht als „Latest“ markiert. Es gibt keine Actions-Artefakte und keinen
+Build-Cache; temporäre Dateien werden nach dem Upload entfernt. Fehlgeschlagene
+Builds veröffentlichen kein neues Prerelease. Die Hardware wird in CI nicht getestet.
+
 ## Einrichtung
 
 1. Den Workflow auf den Standardbranch des GitHub-Repositories pushen.

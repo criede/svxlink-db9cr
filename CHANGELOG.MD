@@ -18,6 +18,9 @@ Vorhandene Versionshinweise des Projekts befinden sich unter `src/doc/`.
 
 ### Hinzugefügt
 
+- Nativer arm64-Daily-Build für Raspberry Pi OS auf Debian-Trixie-Basis nach dem
+  Sync, mit Debian-Versionsnummer, Installationstest und direktem Upload von
+  `.deb` und Prüfsummen in ein GitHub-Prerelease ohne Actions-Artefakte.
 - Täglicher GitHub-Actions-Workflow zum Merge von `sm0svx/svxlink:master` nach
   `master`, mit manuellem Start und automatischer Konfliktauflösung zugunsten
   eigener Änderungen auf `master`.
