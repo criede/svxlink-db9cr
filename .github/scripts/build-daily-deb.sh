@@ -19,7 +19,7 @@ version="${base_version}+daily$(date -u +%Y%m%d).${GITHUB_RUN_NUMBER}.${GITHUB_R
 dpkg --validate-version "$version"
 
 cmake -S /source/src -B /build \
-  -DCMAKE_BUILD_TYPE=Release -DUSE_QT=OFF -DDO_INSTALL_CHOWN=OFF \
+  -DCMAKE_BUILD_TYPE=Release -DUSE_QT=OFF -DWITH_SYSTEMD=ON -DDO_INSTALL_CHOWN=OFF \
   -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SYSCONFDIR=/etc \
   -DCMAKE_INSTALL_LOCALSTATEDIR=/var \
   -DSYSTEMD_CONFIGURATIONS_FILES_DIR=/usr/lib/systemd/system \
