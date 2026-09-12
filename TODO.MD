@@ -16,5 +16,6 @@ Offene Aufgaben für svxlink-db9cr. Die folgenden Punkte dienen als erste Planun
 
 ## Dokumentation
 
+- [x] Täglichen Upstream-Sync als GitHub-Actions-Workflow implementieren.
 - [ ] Erledigte Änderungen laufend in `CHANGELOG.MD` eintragen.
 - [ ] Aufgaben bei Abschluss abhaken und neue Aufgaben konkret beschreiben.

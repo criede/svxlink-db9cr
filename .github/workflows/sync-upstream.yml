@@ -1,0 +1,68 @@
+name: Sync upstream
+
+on:
+  schedule:
+    - cron: '17 2 * * *' # 02:17 UTC, 03:17 CET / 04:17 CEST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream-master
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'criede/svxlink-db9cr'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out target branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: master
+          fetch-depth: 0
+          token: ${{ secrets.UPSTREAM_SYNC_TOKEN || github.token }}
+
+      - name: Merge upstream master
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git remote add upstream https://github.com/sm0svx/svxlink.git
+          git fetch --no-tags upstream master
+
+          if git merge-base --is-ancestor upstream/master HEAD; then
+            echo 'Already up to date.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # Prefer our conflicting hunks, while merging non-conflicting upstream changes.
+          if ! git merge --no-edit -X ours upstream/master; then
+            # A failed merge without MERGE_HEAD is an error, not a resolvable conflict.
+            git rev-parse --verify MERGE_HEAD >/dev/null
+            if [[ -z "$(git diff --name-only --diff-filter=U)" ]]; then
+              echo '::error::Merge failed without unresolved conflicts.'
+              exit 1
+            fi
+
+            # Resolve remaining structural conflicts (e.g. modify/delete) from HEAD.
+            # Missing paths in HEAD represent deletions that must also be preserved.
+            while IFS= read -r -d '' path; do
+              if git cat-file -e "HEAD:$path" 2>/dev/null; then
+                git --literal-pathspecs restore --source=HEAD --staged --worktree -- "$path"
+              else
+                git --literal-pathspecs rm -f -- "$path"
+              fi
+              printf 'Resolved conflict in favor of master: %s\n' "$path"
+            done < <(git diff --name-only --diff-filter=U -z)
+
+            git diff --quiet --diff-filter=U
+            git commit --no-edit
+          fi
+
+          # Never force-push: concurrent changes on master must be preserved.
+          git push origin HEAD:refs/heads/master
+          echo 'Merged sm0svx/svxlink master into master.' >> "$GITHUB_STEP_SUMMARY"
