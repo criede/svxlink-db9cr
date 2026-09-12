@@ -126,8 +126,10 @@ RtlTcp::RtlTcp(const string &remote_host, uint16_t remote_port)
   con.disconnected.connect(mem_fun(*this, &RtlTcp::disconnected));
   con.connect();
 
-  reconnect_timer.expired.connect(
-      hide(mem_fun(con, &Async::TcpClient<>::connect)));
+  reconnect_timer.expired.connect(sigc::track_obj(
+        [this](Async::Timer*) {
+          con.connect();
+        }, *this));
 } /* RtlTcp::RtlTcp */
 
 
@@ -265,8 +267,12 @@ int RtlTcp::dataReceived(Async::TcpConnection *con, void *buf, int count)
     char *ptr = reinterpret_cast<char *>(buf);
     if (strncmp(ptr, "RTL0", 4) != 0)
     {
-      cout << "*** ERROR: Expected magic RTL0\n";
-      exit(1);
+      std::cout << "*** ERROR: Expected magic RTL0 from RtlTcp server at "
+                << displayName() << ". Disconnecting."
+                << std::endl;
+      this->con.disconnect();
+      disconnected(con, TcpConnection::DR_PROTOCOL_ERROR);
+      return -1;
     }
     setTunerType(
       static_cast<TunerType>(ntohl(*reinterpret_cast<uint32_t *>(ptr+4))));

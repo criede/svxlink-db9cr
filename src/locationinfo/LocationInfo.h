@@ -6,7 +6,7 @@
 
 \verbatim
 SvxLink - A Multi Purpose Voice Services System for Ham Radio Use
-Copyright (C) 2003-2015 Tobias Blomberg / SM0SVX
+Copyright (C) 2003-2025 Tobias Blomberg / SM0SVX
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -36,9 +36,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  ****************************************************************************/
 
 #include <string>
-#include <vector>
 #include <list>
-#include <sys/time.h>
+#include <chrono>
 
 
 /****************************************************************************
@@ -48,6 +47,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  ****************************************************************************/
 
 #include <AsyncConfig.h>
+#include <AsyncTimer.h>
+#include <AsyncPty.h>
 #include <EchoLinkStationData.h>
 
 
@@ -57,7 +58,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  ****************************************************************************/
 
-#include "AprsPty.h"
 
 
 /****************************************************************************
@@ -110,16 +110,58 @@ class AprsClient;
 class LocationInfo
 {
   public:
-    static LocationInfo* instance()
+    using Clock     = std::chrono::steady_clock;
+    using Timepoint = Clock::time_point;
+
+    struct Coordinate
     {
-       if (!_instance)
-        return NULL; // illegal pointer, if not initialized
-       return _instance;
+      unsigned int  deg {0};
+      unsigned int  min {0};
+      unsigned int  sec {0};
+      char          dir {'N'};
+    };
+
+    struct Cfg
+    {
+      unsigned int binterval    {10}; // Beacon interval in minutes
+      unsigned int frequency    {0};
+      std::string  freq_sep     {"/"};
+      unsigned int power        {0};
+      unsigned int tone         {0};
+      unsigned int height       {10};
+      unsigned int gain         {0};
+      int          beam_dir     {-1};
+      unsigned int range        {0};
+      char         range_unit   {'m'};
+
+      Coordinate  lat_pos;
+      Coordinate  lon_pos;
+
+      std::string objectname;
+      std::string sourcecall;
+      std::string logincall;
+      std::string loginssid;
+      std::string statscall;
+      std::string mycall;
+      std::string prefix;
+      std::string path          {"TCPIP*"};
+      std::string comment       {"SvxLink Node"};
+      std::string destination   {"APSVX1"};
+      bool        debug         {false};
+      std::string filter;
+      std::string symbol        {"S0"};
+      int         tx_offset_khz {10000};
+      bool        narrow        {false};
+    };
+
+    static LocationInfo* instance(void)
+    {
+      return _instance;
     }
 
-    static bool has_instance()
+    static bool has_instance(void)
     {
-        return _instance;
+      return _instance != nullptr;
     }
 
     static void deleteInstance(void)
@@ -128,97 +170,59 @@ class LocationInfo
       _instance = 0;
     }
 
-    struct Coordinate
-    {
-       explicit Coordinate(char d = 'N') : deg(0), min(0), sec(0), dir(d) {};
+    static bool initialize(Async::Config& cfg, const std::string& cfg_name);
 
-        unsigned int deg, min, sec;
-        char dir;
-    };
-
-    std::string getCallsign();
-
-    struct AprsStatistics
-    {
-      std::string logic_name;
-      unsigned    rx_on_nr;
-      unsigned    tx_on_nr;
-      float       rx_sec;
-      float       tx_sec;
-      struct timeval last_rx_sec;
-      struct timeval last_tx_sec;
-      bool tx_on;
-      bool squelch_on;
-
-      AprsStatistics(void) : rx_on_nr(0), tx_on_nr(0), rx_sec(0), tx_sec(0),
-                             last_rx_sec(), last_tx_sec(), tx_on(false),
-                             squelch_on(false) {}
-      void reset(void)
-      {
-        rx_on_nr = 0;
-        tx_on_nr = 0;
-        rx_sec = 0;
-        tx_sec = 0;
-        last_tx_sec.tv_sec = 0;
-        last_rx_sec.tv_sec = 0;
-        last_tx_sec.tv_usec = 0;
-        last_rx_sec.tv_usec = 0;
-      }
-    };
-
-    typedef std::map<std::string, AprsStatistics> aprs_struct;
-    aprs_struct aprs_stats;
-
-    struct Cfg
-    {
-      Cfg() : interval(600000), frequency(0), power(0), tone(0), height(10),
-              gain(0), beam_dir(-1), range(0), range_unit('m'), lat_pos('N'),
-              lon_pos('E') {};
-
-      unsigned int interval;
-      unsigned int frequency;
-      unsigned int power;
-      unsigned int tone;
-      unsigned int height;
-      unsigned int gain;
-      int          beam_dir;
-      unsigned int range;
-      char         range_unit;
-
-      Coordinate  lat_pos;
-      Coordinate  lon_pos;
-
-      std::string mycall;
-      std::string prefix;
-      std::string path;
-      std::string comment;
-    };
-
-    static bool initialize(const Async::Config &cfg, const std::string &cfg_name);
+    LocationInfo(void);
+    LocationInfo(const LocationInfo&) = delete;
+    ~LocationInfo(void);
 
     void updateDirectoryStatus(EchoLink::StationData::Status new_status);
     void igateMessage(const std::string& info);
     void update3rdState(const std::string& call, const std::string& info);
     void updateQsoStatus(int action, const std::string& call,
                          const std::string& name,
-			 std::list<std::string>& call_list);
+                         const std::list<std::string>& calls);
     bool getTransmitting(const std::string &name);
-    void setTransmitting(const std::string &name, struct timeval tv, bool state);
-    void setReceiving(const std::string &name, struct timeval tv, bool state);
+    void setTransmitting(const std::string& name, bool is_transmitting,
+                         Timepoint tp=Clock::now());
+    void setReceiving(const std::string& name, bool is_receiving,
+                      const Timepoint& tp=Clock::now());
 
   private:
     static LocationInfo* _instance;
-    LocationInfo() : sequence(0), aprs_stats_timer(0), sinterval(0) {}
-    LocationInfo(const LocationInfo&);
-    ~LocationInfo(void) { delete aprs_stats_timer; };
 
-    typedef std::list<AprsClient*> ClientList;
+    using ClientList = std::list<AprsClient*>;
+    using Duration  = std::chrono::duration<double>;
+    struct AprsStatistics
+    {
+      unsigned    rx_on_nr        {0};
+      unsigned    tx_on_nr        {0};
+      Duration    rx_sec          {0};
+      Duration    tx_sec          {0};
+      Timepoint   last_rx_tp;
+      Timepoint   last_tx_tp;
+      bool        is_transmitting {false};
+      bool        is_receiving    {false};
 
-    Cfg         loc_cfg; // weshalb?
-    ClientList  clients;
-    int         sequence;
-    Async::Timer *aprs_stats_timer;
-    unsigned int sinterval;
+      void reset(void)
+      {
+        rx_on_nr = 0;
+        tx_on_nr = 0;
+        rx_sec = Duration::zero();
+        tx_sec = Duration::zero();
+      }
+    };
+    using AprsStatsMap = std::map<std::string, AprsStatistics>;
+
+    Cfg           loc_cfg; // weshalb?
+    ClientList    clients;
+    int           sequence          {0};
+    Async::Timer  aprs_stats_timer  {-1, Async::Timer::TYPE_PERIODIC};
+    unsigned int  sinterval         {10}; // Minutes
+    std::string   slogic;
+    Timepoint     last_tlm_metadata {-std::chrono::hours(1)};
+    AprsStatsMap  aprs_stats;
+    Async::Pty*   aprspty           {nullptr};
 
     bool parsePosition(const Async::Config &cfg, const std::string &name);
     bool parseLatitude(Coordinate &pos, const std::string &value);
@@ -230,10 +234,11 @@ class LocationInfo
     bool parseAntennaHeight(Cfg &cfg, const std::string value);
     bool parseClientStr(std::string &host, int &port, const std::string &val);
     bool parseClients(const Async::Config &cfg, const std::string &name);
-    void startStatisticsTimer(int interval);
-    void sendAprsStatistics(Async::Timer *t);
+    void startStatisticsTimer(int sinterval);
+    void sendAprsStatistics(void);
     void initExtPty(std::string ptydevice);
-    void mesReceived(std::string message);
+    void mesReceived(const void* buf, size_t len);
+    AprsStatistics& aprsStats(const std::string& logic_name);
 
 };  /* class LocationInfo */
 

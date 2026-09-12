@@ -6,7 +6,7 @@
 
 \verbatim
 SvxLink - A Multi Purpose Voice Services System for Ham Radio Use
-Copyright (C) 2003-2018 Tobias Blomberg / SM0SVX
+Copyright (C) 2003-2024 Tobias Blomberg / SM0SVX
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -179,10 +179,19 @@ class Rx : public sigc::trackable, public Async::AudioSource
 
     /**
      * @brief 	Set the mute state for this receiver
-     * @param 	mute_state The mute state to set for this receiver
+     * @param 	new_mute_state The mute state to set for this receiver
      */
-    virtual void setMuteState(MuteState new_mute_state) = 0;
-    
+    virtual void setMuteState(MuteState new_mute_state)
+    {
+      m_mute_state = new_mute_state;
+    }
+
+    /**
+     * @brief   Get the mute state for this receiver
+     * @return  Returns the current mute state for this receiver
+     */
+    virtual MuteState muteState(void) const { return m_mute_state; }
+
     /**
      * @brief 	Check the squelch status
      * @return	Return \em true if the squelch is open or else \em false
@@ -246,41 +255,41 @@ class Rx : public sigc::trackable, public Async::AudioSource
      * @brief 	A signal that indicates if the squelch is open or not
      * @param 	is_open \em True if the squelch is open or \em false if not
      */
-    sigc::signal<void, bool> squelchOpen;
-    
+    sigc::signal<void(bool)> squelchOpen;
+
     /**
      * @brief 	A signal that is emitted when a DTMF digit has been detected
      * @param 	digit The detected digit (0-9, A-D, *, #)
      * @param 	duration Tone duration in milliseconds
      */
-    sigc::signal<void, char, int> dtmfDigitDetected;
-    
+    sigc::signal<void(char, int)> dtmfDigitDetected;
+
     /**
      * @brief 	A signal that is emitted when a valid selcall sequence has been
                 detected
      * @param 	sequence the selcall sequence
      */
-    sigc::signal<void, std::string> selcallSequenceDetected;
+    sigc::signal<void(std::string)> selcallSequenceDetected;
 
     /**
      * @brief 	A signal that is emitted when a previously specified tone has
      *	      	been detected for the specified duration
      * @param 	fq The frequency of the tone
      */
-    sigc::signal<void, float> toneDetected;
-    
+    sigc::signal<void(float)> toneDetected;
+
     /**
      * @brief	A signal that is emitted when the signal level is updated
      * @param	siglev The new signal level
      */
-    sigc::signal<void, float> signalLevelUpdated;
+    sigc::signal<void(float)> signalLevelUpdated;
 
     /**
      * @brief   A signal that is emitted when digital data have been received
      * @param   frame The data frame that was received
      */
-    sigc::signal<void, std::vector<uint8_t>&> dataReceived;
-    
+    sigc::signal<void(std::vector<uint8_t>&)> dataReceived;
+
     /**
      * @brief	A signal that is emitted to publish a state update event
      * @param	event_name The name of the event
@@ -292,13 +301,13 @@ class Rx : public sigc::trackable, public Async::AudioSource
      * event name must be unique within SvxLink. The recommended format is
      * <context>:<name>, e.g. Rx:sql_state.
      */
-    sigc::signal<void, const std::string&,
-                 const std::string&> publishStateEvent;
-    
+    sigc::signal<void(const std::string&,
+                 const std::string&)> publishStateEvent;
+
     /**
      * @brief   A signal that is emitted when the ready state changes
      */
-    sigc::signal<void> readyStateChanged;
+    sigc::signal<void()> readyStateChanged;
 
   protected:
     /**
@@ -314,16 +323,19 @@ class Rx : public sigc::trackable, public Async::AudioSource
      */
     void setSquelchState(bool is_open, const std::string& info="");
 
+    void setAudioSourceHandler(Async::AudioSource* src);
+
   private:
-    std::string     m_name;
-    bool            m_verbose;
-    bool            m_sql_open;
-    Async::Config&  m_cfg;
-    Async::Timer*   m_sql_tmo_timer;
-    std::string     m_sql_info;
-    
-    void sqlTimeout(Async::Timer *t);
-    
+    std::string         m_name;
+    bool                m_verbose;
+    bool                m_sql_open;
+    Async::Config&      m_cfg;
+    //Async::Timer*       m_sql_tmo_timer;
+    std::string         m_sql_info;
+    MuteState           m_mute_state;
+
+    //void sqlTimeout(Async::Timer *t);
+
 };  /* class Rx */
 
 

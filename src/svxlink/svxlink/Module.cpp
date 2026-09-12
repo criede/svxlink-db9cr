@@ -9,7 +9,7 @@ should inherit the Module class and implement the abstract methods.
 
 \verbatim
 SvxLink - A Multi Purpose Voice Services System for Ham Radio Use
-Copyright (C) 2004-2008  Tobias Blomberg / SM0SVX
+Copyright (C) 2004-2025  Tobias Blomberg / SM0SVX
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -63,11 +63,11 @@ Module::~Module(void)
 
 bool Module::initialize(void)
 {
-  if (strcmp(compiledForVersion(), SVXLINK_VERSION) != 0)
+  if (strcmp(compiledForVersion(), SVXLINK_APP_VERSION) != 0)
   {
     cerr << "*** ERROR: This module is compiled for version "
          << compiledForVersion() << " of SvxLink but the running version "
-         << "of the SvxLink core is " << SVXLINK_VERSION << ".\n";
+         << "of the SvxLink core is " << SVXLINK_APP_VERSION << ".\n";
     return false;
   }
 

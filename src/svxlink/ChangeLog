@@ -1,4 +1,261 @@
- 1.8.0 -- ?? ??? ????
+ 1.10.1 -- 26 Jul 2026
+-----------------------
+
+* Security: RemoteTrx NetUplink unvalidated audio length (OOB read).
+  Credit: Mark Rose
+
+* Security: Emit warning if AUTH_KEY is unset in RemoteTrx NetUplink.
+  Suggested by: Mark Rose
+
+* Security: LocationInfo: Avoid buffer overflow in APRS message construction
+  Credit: Mark Rose
+
+* Security: SvxReflector: Fix use-after-free from stale cached JSON on
+  repeated MsgNodeInfo
+  Credit: Mark Rose
+
+* Security: SvxReflector: Reentrant delete client → use-after-free on
+  this via sendError() write-failure path
+  Credit: Mark Rose
+
+* Bugfix in ModuleMetarInfo: bkn///cb was not output if the altitude was
+  missing
+  By Adi/DL1HRC
+
+* Security: SvxReflector client: TCL command injection via server-supplied
+  talker callsign
+  Credit: Mark Rose
+
+* Security: NetRx: unvalidated MsgAudio length → out-of-bounds read
+  (network)
+  Credit: Mark Rose
+
+* Security: RemoteTrx NetUplink: server-initiated disconnect leaks the
+  connection object → unbounded resource exhaustion (network DoS)
+  Credit: Mark Rose
+
+* Bugfix: Fix memory handling problem in RemoteTrx
+
+* Security: RtlTcp: malformed rtl_tcp greeting triggers `exit(1)` → full
+  daemon denial of service
+  Credit: Mark Rose
+
+* Security: FRN module: unvalidated server-supplied list item count →
+  unbounded memory growth (DoS)
+  Credit: Mark Rose
+  Approved by: sh123
+
+
+
+ 1.10.0 -- 23 May 2026
+-----------------------
+
+* Improved announcements for reflector connection state. If the connection is
+  down when a talkgroup is active, a buzzing sound will be prepended to the
+  roger sound.
+
+* Writing to the logfile in SvxLink applications are now done from a separate
+  thread.  That will increase the accuracy of the timestamps in some
+  situations.  Previously multiple log rows could be lumped together in a
+  block where all rows had the same timestamp. That made it harder to debug
+  some timing critical problems.
+
+* Support for hidraw PTT and squelch for the CM119A audio chip added.
+
+* New config variable MACRO_PREFIX used to set a custom or no prefix for DTMF
+  macro commands.
+
+* New TCL event "siglev_updated" that is called when the siglev value is
+  updated on the receiver.
+
+* New configuration variable for RepeaterLogic, SQL_TIMEOUT, to set a soft
+  timeout on transmissions.
+
+* Handle module idle commands in ModulePropagationMonitor.
+
+* Bugfix in ModuleSelCallEnc: If an invalid selcall variant ID was specified
+  the module crashed.
+
+* Bugfix in ModuleTclVoiceMail: If no password was specified on login the
+  module crashed.
+
+* The SvxLink applications can now log to syslog by specifying
+  --logfile=syslog: (including the colon character).
+
+* New configuration variable ACTIVATE_ON_TG that can be used in a logic
+  linking configuration section to activate the link when a talkgroup is
+  activated in a logic core.
+
+* An APRS status message containing application name and version will now be
+  sent every 24 hours.
+
+* Improved TG inhibit activation in ReflectorLogic. When there is activity
+  (e.g. squelch open) in another logic core, and the talkgroup is indicated as
+  0, remote TG activation as well as local activity activation (e.g. CTCSS to
+  TG) is inhibited. Previously only remote activation was inhibited. By
+  default there now also is an announcement (e.g. "local") when the inhibited
+  state is entered and the usual selection timeout sound when the state is
+  existed.
+
+* Improved auto-QSY. The SvxReflector auto-QSY timer is now not started until
+  a talker has been active on the talkgroup. The auto-QSY procedure is
+  triggered at the first talker stop that occur after an auto-QSY timeout
+
+* Reduced CPU load for the http /status endpoint in SvxReflector.
+
+* SvxReflector security fix.
+
+* CTCSS_TO_TG_DELAY default value changed from 1000 to 0.
+
+* Bugfix in the receiver voter. Tone detections was not buffered, like other
+  signalling, until a receiver was selected.
+
+* Bugfixes in SwSel5Decoder. Thanks to Rui Barreiros for reporting.
+  - Potential buffer overflow fixed
+  - Last defined tone was never detected
+
+* Add support for GPIOD v2.
+  Thanks to Rui Barreiros for implementing this.
+
+* Add support for sigc++3
+
+* Add new config variable DTMF_IGNORE_WHEN_NOT_UP.
+
+* Changes in the reflector server command PTY commands based on PR from
+  Rui Barreiros:
+  - Implemented CA LS and CA RM
+  - Renamed CA PENDING to CA LSP and implemented it
+  - Added CA LSC to list certificates only
+  - Responses are now sent to the PTY when appropriate
+
+* New reflector server talkgroup configuration, ALLOW_MONITOR, to set which
+  callsigns are allowed to monitor a specific talkgroup.
+
+* SvxReflector Bugfix: Certificates that had passed their renewal time, but
+  was still valid, was never sent to a client.
+
+* Improved HIDRAW code
+  The HIDRAW squelch and PTT code have been made more resiliant so that it
+  can handle a device that disappear and then comes back. Previously it
+  would flood the log with error messages and never recover.
+
+
+
+ 1.9.1 -- 01 Jul 2025
+----------------------
+
+* Fix build errors for newer versions of gcc on some distros
+
+* Add documentation for SvxLink node reflector connection in the svxlink
+  manual page.
+
+* The systemd units for svxlink and svxreflector now make a recursive owner
+  change of the state directory (e.g. /var/lib/svxlink) to avoid owner
+  problems if an application by mistake is started as another user (e.g.
+  root).
+
+* Bugfix: Add offset to cert renewal timer to avoid a race
+
+* Bugfix: If there already is a renewed reflector certificate available for a
+  node, don't renew it again.
+
+* New LocationInfo config variable for APRS: FREQUENCY_SEPARATOR.
+
+
+
+ 1.9.0 -- 03 May 2025
+----------------------
+
+* Change reflector config at runtime.
+  Contribution from DL1HRC/Adi, following an idea from DJ1JAY/Jens to change
+  some SvxReflector parameters at runtime.
+
+* The reflector connection is now authenticated using X.509 certificates. Both
+  the server and the client requires authentication. The AUTH_KEY
+  authentication method that were previously used is deprecated. The
+  certificate generation process is mostly automated. The contents of the
+  certificate can be customized using the configuration variables with name
+  prefix CERT_. Default values are good in most cases. CERT_EMAIL may be good
+  to specify so that the SvxLink node owner can be contacted. Ask the
+  reflector sysop what the convention is.
+  Both the TCP and UDP connections are encrypted. The default is to use
+  the AES128 cipher in GCM mode.
+  The reflector server need to be updated to use this version of SvxLink on a
+  reflector client. If the server is older and only support the version 2
+  protocol, you must use TYPE=ReflectorV2 in the ReflectorLogic config.
+  All PKI (Public Key Infrastructure) files will be stored in the directory
+  given by the CERT_PKI_DIR configuration variable. The path defaults to
+  something like /var/lib/svxlink/pki but the exact default path depend on
+  build configuration. In any case, that path need to be created and made
+  writable for SvxLink. That should be done automatically by "make install".
+  Building SvxLink also require a new dependency on OpenSSL so the development
+  package for that library need to be installed (e.g. install package
+  libssl-dev if on a Debian based distro).
+
+* The SvxReflector now check the callsign for a connecting node against the
+  ACCEPT_CALLSIGN and REJECT_CALLSIGN configuration variables. That is done
+  for both AUTH_KEY connections and certificate connections.
+
+* It's now possible to apply LADSPA plugin audio processing to the transmitted
+  audio. Plugins are set up using the LADSPA_PLUGINS configuration variable.
+
+* Added a more verbose way to configure LADSPA plugins where the available
+  input controls are specified by name in their own configuration section.
+
+* Add --version command line option to applications svxlink, remotetrx,
+  devcal and svxreflector.
+
+* Add connection throttling to SvxReflector. The throttling is per IP. A token
+  bucket of size ten is used to throttle the connection rate. The bucket is
+  filled with one connection per ten seconds up until the bucket size is
+  reached.
+
+* New reflector PTY command:
+  NODE BLOCK <callsign> <blocktime seconds>
+  The node will be blocked until it has been silent for the number of
+  specified seconds.
+
+* LocationInfo APRS code reworked
+  - All packets changed destination to the SvxLink specific one, "APSVX1"
+  - An APRS object is now emitted for the base callsign
+  - SYMBOL for the base callsign object can be specified in the configuration
+  - Compatibility: Telemetry now emitted with the base callsign as from-address
+  - Compatibility: Telemetry now use EQNS message to scale values
+  - Compatibility: Removed the SvxLink logic name from telemetry packets
+  - The STATISTICS_LOGIC configuration variable must be used to specify the
+    name of the logic core from where the APRS telemetry should be taken.
+  - CALLSIGN can be specified without the EL/ER-prefix in which case no
+    Echolink object will be emitted
+  - SOURCE_CALLSIGN can be used to specify the source address
+  - LOGIN_CALLSIGN can be used to specify the APRS-IS login callsign
+  - PHG is now included in the object packets
+  - PATH should now normally be left unset in which case default is TCPIP*
+  - Extended frequency range implemented according to UNOFFICIAL APRS
+    Protocol Reference 1.2 Chapter 18
+  - If LocationInfo TONE is not set, Toff is sent
+  - Added NARROW config variable to indicate if a node is using narrow FM
+  - APRS packet parsing code added
+  - Received directed message packets are now acked
+  - FILTER can be specified in configuration
+  - TX_OFFSET (repeater shift) can be specified in configuration
+  - Limit the APRS comment to 36 characters as per protocol spec
+  - The DEBUG configuration variable can be set to print APRS packets
+  - TONE should now be specified including the decimal
+
+* Add commandline option --reset to svxlink and remotetrx. It was added to get
+  an easy way to reset all SvxLink hardware to initial state. The default
+  systemd unit will run the application with that option set after the main
+  application has exited.
+
+* Add command line option --quiet to svxlink and remotetrx. Suppress output of
+  info messages. Warning and error messages will still be output.
+
+* Bugfix in RemoteTrx: If the AUTH_KEY contained whitespace it ended up to be
+  completely empty, thus no authentication was enabled.
+
+
+
+ 1.8.0 -- 25 Feb 2024
 ----------------------
 
 * MetarInformation, more flexible airport announcement at the beginning of a
@@ -251,6 +508,46 @@
 
 * Now possible to set the jitter buffer delay on TX audio in RemoteTrx. This
   may be useful if experiencing choppy TX audio.
+
+* Bugfix: Receiver voter muting had a couple of bugs that showed up when using
+  the voter command PTY to disable/mute/enable receivers. It's unknown if
+  these bugs have also caused any other problems.
+
+* 1750 Hz tone burst detector accuracy requirement increased to +/- 25 Hz.
+
+* Bugfix: When using "open repeater on squelch close", the squelch rx id was
+  not set up before the TCL event handler send_rgr_sound was called directly
+  after repeater open. This caused playing the wrong roger sound.
+
+* Bugfix in ModuleEchoLink: The INCORRECT PASSWORD message was ignored.
+
+* New global TCL function "getVar" that makes it easier to get the value of a
+  variable that may be non-existent. If the variable does not exist a default
+  value is returned instead.
+
+* New configuration variable LOCAL_RGR_SOUND in ModuleEchoLink that is used to
+  enable/disable the playing of a roger beep locally when the remote station
+  stops talking.
+
+* Add support for using the CM108B chip for squelch and PTT.
+  Contributed by DL1HRC.
+
+* New configuration variable TG_SELECT_INHIBIT_TIMEOUT that is used to
+  separately control the TG select inhibit feature.
+
+* Bugfix for the 1750_MUTING configuration variable. Setting it to 0 did not
+  disable the feature. It had to be commented out.
+
+* It's now possible to use LADSPA plugins to shape received audio. Fore more
+  information have a look at the documentation for the LADSPA_PLUGINS
+  configuration variable.
+
+
+
+ 1.7.0-1 -- 10 Mar 2021
+------------------------
+
+* Bugfix in SvxReflector authentication code. Upgrade immediately.
 
 
 

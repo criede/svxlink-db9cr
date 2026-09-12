@@ -90,8 +90,8 @@ class SquelchCombine::Node
     virtual bool isOpen(void) const = 0;
     virtual std::string activityInfo(void) const = 0;
     virtual SquelchStates& squelchStates(SquelchStates& states) = 0;
-    sigc::signal<void, bool> squelchOpen;
-    sigc::signal<void, float> toneDetected;
+    sigc::signal<void(bool)> squelchOpen;
+    sigc::signal<void(float)> toneDetected;
 
   private:
     std::string m_name;
@@ -423,7 +423,7 @@ bool SquelchCombine::initialize(Async::Config& cfg,
     return false;
   }
 
-  std::cout << rx_name << " combined squelch structure: ";
+  std::cout << rx_name << ": Combined squelch structure is ";
   m_comb->print(std::cout);
   std::cout << std::endl;
 

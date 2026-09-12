@@ -1,9 +1,23 @@
- 1.2.5 -- ?? ??? ????
+ 1.3.0 -- 23 May 2026
+----------------------
+
+* Add support for Qt6 contributed by DL1JBE
+
+* Update italian translation contributed by Giovanni Scafora (giovanni69)
+
+
+
+ 1.2.5 -- 25 Feb 2024
 ----------------------
 
 * Bugfix: When a faulty bind address had been set up, Qtel just exited with a
   bit cryptic error message. Now it starts up with the possibility to use the
   configuration dialog to fix the problem.
+
+* Appstream adaptions from GitHub user "AsciiWolf"
+  - Added AppStream metainfo into files.
+  - Added png icon into files.
+  - Removed xpm icon from files.
 
 
 

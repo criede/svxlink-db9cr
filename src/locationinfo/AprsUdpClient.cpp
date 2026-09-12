@@ -6,7 +6,7 @@
 
 \verbatim
 SvxLink - A Multi Purpose Voice Services System for Ham Radio Use
-Copyright (C) 2003-2009 Tobias Blomberg / SM0SVX
+Copyright (C) 2003-2025 Tobias Blomberg / SM0SVX
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -89,10 +89,57 @@ using namespace EchoLink;
 
 /****************************************************************************
  *
- * Prototypes
+ * Public static functions
  *
  ****************************************************************************/
 
+char AprsUdpClient::getPowerParam(unsigned int power)
+{
+  return '0' + std::min(lrintf(sqrtf(power)), 9L);
+} /* AprsUdpClient::getPowerParam */
+
+
+char AprsUdpClient::getHeightParam(unsigned int height)
+{
+  return '0' + lrintf(logf(height / 10.0f) / logf(2.0f));
+} /* AprsUdpClient::getHeightParam */
+
+
+char AprsUdpClient::getGainParam(unsigned int gain)
+{
+  return '0' + ((gain < 10) ? gain : 9);
+} /* AprsUdpClient::getGainParam */
+
+
+char AprsUdpClient::getDirectionParam(int beam_dir)
+{
+  if (beam_dir < 0)
+  {
+    return '0';
+  }
+
+  auto param = lrintf((beam_dir % 360) / 45.0f);
+  if (param == 0)
+  {
+    return '8';
+  }
+
+  return '0' + param;
+} /* AprsUdpClient::getDirectionParam */
+
+
+std::string AprsUdpClient::phgStr(unsigned int power, unsigned int height,
+                                  unsigned int gain, int beam_dir)
+{
+  std::ostringstream phg;
+  phg << "PHG"
+      << getPowerParam(power)
+      << getHeightParam(height)
+      << getGainParam(gain)
+      << getDirectionParam(beam_dir)
+      ;
+  return phg.str();
+} /* AprsUdpClient::phgStr */
 
 
 /****************************************************************************
@@ -123,10 +170,14 @@ AprsUdpClient::AprsUdpClient(LocationInfo::Cfg &loc_cfg,
   : loc_cfg(loc_cfg), server(server), port(port), dns(0), beacon_timer(0),
     curr_status(StationData::STAT_UNKNOWN), num_connected(0)
 {
-   beacon_timer = new Timer(loc_cfg.interval, Timer::TYPE_PERIODIC);
-   beacon_timer->setEnable(false);
-   beacon_timer->expired.connect(
-     mem_fun(*this, &AprsUdpClient::sendLocationInfo));
+  if (!loc_cfg.prefix.empty())
+  {
+    beacon_timer = new Timer(loc_cfg.binterval * 60 * 1000,
+                             Timer::TYPE_PERIODIC);
+    beacon_timer->setEnable(false);
+    beacon_timer->expired.connect(
+        mem_fun(*this, &AprsUdpClient::sendLocationInfo));
+  }
 } /* AprsUdpClient::AprsUdpClient */
 
 
@@ -160,8 +211,9 @@ void AprsUdpClient::updateDirectoryStatus(StationData::Status status)
 } /* AprsUdpClient::updateDirectoryStatus */
 
 
-void AprsUdpClient::updateQsoStatus(int action, const string& call,
-  const string& info, list<string>& call_list)
+void AprsUdpClient::updateQsoStatus(int action, const std::string& call,
+                                    const std::string& info,
+                                    const std::list<std::string>& calls)
 {
     // Check if system is properly initialized
   if (!beacon_timer)
@@ -173,8 +225,8 @@ void AprsUdpClient::updateQsoStatus(int action, const string& call,
   beacon_timer->reset();
 
     // Update QSO connection status
-  num_connected = call_list.size();
-  curr_call = num_connected ? call_list.back() : "";
+  num_connected = calls.size();
+  curr_call = num_connected ? calls.back() : "";
 
     // Build and send the packet
   sendLocationInfo();
@@ -223,6 +275,7 @@ void AprsUdpClient::sendLocationInfo(Timer *t)
     char sdes_packet[256];
     int sdes_len = buildSdesPacket(sdes_packet);
 
+    //std::cout << "### AprsUdpClient::sendLocationInfo" << std::endl;
     sock.write(ip_addr, port, sdes_packet, sdes_len);
   }
 } /* AprsUdpClient::sendLocationInfo */
@@ -323,10 +376,13 @@ int AprsUdpClient::buildSdesPacket(char *p)
   addText(ap, tmp);
 
   *ap++ = RTCP_SDES_LOC;
-  sprintf(tmp, ")EL-%.6s!%s0PHG%d%d%d%d/%06d/%03d%6s%02d%02d\r\n",
+  sprintf(tmp, ")EL-%.6s!%s0PHG%c%c%c%c/%06d/%03d%6s%02d%02d\r\n",
                loc_cfg.mycall.c_str(), pos,
-               getPowerParam(), getHeightParam(), getGainParam(),
-               getDirectionParam(), loc_cfg.frequency, getToneParam(),
+               getPowerParam(loc_cfg.power),
+               getHeightParam(loc_cfg.height),
+               getGainParam(loc_cfg.gain),
+               getDirectionParam(loc_cfg.beam_dir),
+               loc_cfg.frequency, getToneParam(),
                info, utc.tm_hour, utc.tm_min);
   addText(ap, tmp);
 
@@ -375,41 +431,6 @@ int AprsUdpClient::getToneParam()
 {
   return (loc_cfg.tone < 1000) ? loc_cfg.tone : 0;
 } /* AprsUdpClient::getToneParam */
-
-
-int AprsUdpClient::getPowerParam()
-{
-  return lrintf(sqrt((float)loc_cfg.power));
-} /* AprsUdpClient::getPowerParam */
-
-
-int AprsUdpClient::getHeightParam()
-{
-  return lrintf(log((float)loc_cfg.height / 10.0) / log(2.0));
-} /* AprsUdpClient::getHeightParam */
-
-
-int AprsUdpClient::getGainParam()
-{
-  return (loc_cfg.gain < 10) ? loc_cfg.gain : 9;
-} /* AprsUdpClient::getGainParam */
-
-
-int AprsUdpClient::getDirectionParam()
-{
-  if (loc_cfg.beam_dir == 0 || loc_cfg.beam_dir > 360)
-  {
-    return 8;
-  }
-
-  if (loc_cfg.beam_dir < 0)
-  {
-    return 0;
-  }
-
-  return lrintf((float)loc_cfg.beam_dir / 45.0);
-
-} /* AprsUdpClient::getDirectionParam */
 
 
 /*

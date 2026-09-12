@@ -635,6 +635,12 @@ int Directory::handleCallList(char *buf, int len)
 	  get_call_list.clear();
 	  com_state = CS_IDLE;
 	  read_len = 3;
+
+          std::string errmsg("INCORRECT PASSWORD");
+          if (the_message.find(errmsg.c_str(), 0, errmsg.size()) == 0)
+          {
+            error_str = the_message;
+          }
 	}
 	else
 	{
@@ -841,11 +847,7 @@ void Directory::ctrlSockDisconnected(void)
       error(string("Directory server communications error: ")
             + strerror(errno));
       break;
-      
-    case Async::TcpClient<>::DR_RECV_BUFFER_OVERFLOW:
-      error("Directory server receiver buffer overflow!\n");
-      break;
-    
+
     case Async::TcpClient<>::DR_ORDERED_DISCONNECT:
       break;
   }

@@ -6,7 +6,7 @@
 
 \verbatim
 SvxLink - A Multi Purpose Voice Services System for Ham Radio Use
-Copyright (C) 2003-2009 Tobias Blomberg / SM0SVX
+Copyright (C) 2003-2026 Tobias Blomberg / SM0SVX
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -120,12 +120,12 @@ class AprsTcpClient : public AprsClient, public sigc::trackable
                    int port);
      ~AprsTcpClient(void);
 
-     void updateDirectoryStatus(EchoLink::StationData::Status status) {};
      void updateQsoStatus(int action, const std::string& call,
-       const std::string& info, std::list<std::string>& call_list);
-      void update3rdState(const std::string& call, const std::string& info);
-     void igateMessage(const std::string& info);
-
+                          const std::string& info,
+                          const std::list<std::string>& calls) override;
+     void update3rdState(const std::string& call,
+                         const std::string& info) override;
+     void igateMessage(const std::string& info) override;
 
   private:
     typedef std::vector<std::string> StrList;
@@ -135,29 +135,46 @@ class AprsTcpClient : public AprsClient, public sigc::trackable
     int			port;
     Async::TcpClient<>* con;
     Async::Timer        *beacon_timer;
+    Async::Timer        *status_timer;
     Async::Timer        *reconnect_timer;
     Async::Timer        *offset_timer;
 
     int			num_connected;
 
-    std::string		el_call;
-    std::string		el_prefix;
-    std::string		destination;
+    std::string         recv_buf;
+    std::string         current_status;
 
-    void  sendMsg(const char *aprsmsg);
-    void  posStr(char *pos);
+    static std::string qsoStatusMsg(int action, const std::string& call,
+                                    const std::string& info);
+    static std::string thirdPartyMsg(const std::string& call,
+                                     const std::string& info);
+
+    void  sendMsg(std::string aprsmsg);
+    std::string addrStr(const std::string& source) const;
+    std::string posStr(const std::string& symbol) const;
+    std::string timeStr(void) const;
+    std::string phgStr(void) const;
+    std::string toneStr(void) const;
+    std::string txOffsetStr(void) const;
+    std::string frequencyStr(void) const;
+    std::string rangeStr(void) const;
+    std::string addresseeStr(const std::string& call) const;
+    std::string prependSpaceIfNotEmpty(const std::string& str) const;
     void  sendAprsBeacon(Async::Timer *t);
+    void  sendAprsStatus(const std::string& src, const std::string& status);
 
     void  tcpConnected(void);
     void  aprsLogin(void);
-    short getPasswd(const std::string& call);
+    short getPasswd(const std::string& call) const;
 
+    void  decodeAprsPacket(std::string frame);
     int   tcpDataReceived(Async::TcpClient<>::TcpConnection *con, void *buf,
                           int count);
     void  tcpDisconnected(Async::TcpClient<>::TcpConnection *con,
                           Async::TcpClient<>::DisconnectReason reason);
     void  reconnectAprsServer(Async::Timer *t);
     void  startNormalSequence(Async::Timer *t);
+    void  disconnect(void);
 
 };  /* class AprsTcpClient */
 

@@ -1,17 +1,18 @@
 ##############################################################################
 # SvxLink - A Multi Purpose Voice Services System for Ham Radio Use
-# Copyright (C) 2003-2022 Tobias Blomberg / SM0SVX
-# 
+#
+# Copyright (C) 2003-2025 Tobias Blomberg / SM0SVX
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -20,7 +21,7 @@
 ##############################################################################
 # Project setup
 ##############################################################################
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.7...3.30)
 project(svxlink C CXX)
 #enable_testing()
 
@@ -161,6 +162,11 @@ if(NOT DEFINED SVX_SPOOL_INSTALL_DIR)
   set(SVX_SPOOL_INSTALL_DIR ${LOCAL_STATE_DIR}/spool/svxlink)
 endif(NOT DEFINED SVX_SPOOL_INSTALL_DIR)
 
+# Where to put SvxLink variable files
+if(NOT DEFINED SVX_LOCAL_STATE_DIR)
+  set(SVX_LOCAL_STATE_DIR ${LOCAL_STATE_DIR}/lib/svxlink)
+endif(NOT DEFINED SVX_LOCAL_STATE_DIR)
+
 # Where to install SvxLink architecture independent files
 if(NOT DEFINED SVX_SHARE_INSTALL_DIR)
   set(SVX_SHARE_INSTALL_DIR ${SHARE_INSTALL_PREFIX}/svxlink)
@@ -283,17 +289,35 @@ endfunction(install_if_not_exists)
 # Main execution starts here
 ##############################################################################
 
+add_subdirectory(include)
+
 configure_file(${CMAKE_SOURCE_DIR}/config.h.in
   ${CMAKE_BINARY_DIR}/config.h
   @ONLY
   )
 
 # Find the Sigc++ library
-find_package(SIGC2 REQUIRED)
-include_directories(${SIGC2_INCLUDE_DIRS})
-add_definitions(${SIGC2_DEFINITIONS})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIGC2_CXX_FLAGS}")
-set(LIBS ${LIBS} ${SIGC2_LIBRARIES})
+find_package(SIGC REQUIRED)
+include_directories(${SIGC_INCLUDE_DIRS})
+add_definitions(${SIGC_DEFINITIONS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIGC_CXX_FLAGS}")
+set(LIBS ${LIBS} ${SIGC_LIBRARIES})
+
+find_package(LADSPA)
+if(LADSPA_FOUND)
+  if(DEFINED LADSPA_VERSION_MAJOR)
+    include_directories(${LADSPA_INCLUDE_DIRS})
+    add_definitions(${LADSPA_DEFINITIONS})
+  else()
+    message(WARNING
+      "Found LADSPA but version could not be resolved. "
+      "Will proceed without LADSPA.")
+  endif()
+else(LADSPA_FOUND)
+  message("--   LADSPA is an optional dependency. The build will complete")
+  message("--   without it but support for loading LADSPA plugins will")
+  message("--   be unavailable.")
+endif(LADSPA_FOUND)
 
 # Find the chown utility
 include(FindCHOWN)
@@ -305,7 +329,6 @@ message(STATUS "SvxLink group = ${SVXLINK_GROUP}")
 
 # Add directories to build
 add_subdirectory(doc)
-add_subdirectory(include)
 add_subdirectory(async)
 add_subdirectory(misc)
 add_subdirectory(echolib)
@@ -319,26 +342,15 @@ endif(USE_QT)
 set(CPACK_SET_DESTDIR "ON")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
   "Advanced voice services system for ham radio use")
-execute_process(
-  COMMAND git describe --tags
-  COMMAND tr - .
-  COMMAND tr -d '\n'
-  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-  OUTPUT_VARIABLE CPACK_PACKAGE_VERSION
-  ERROR_QUIET)
-if (NOT CPACK_PACKAGE_VERSION)
-  set(CPACK_PACKAGE_VERSION "${VER_PROJECT}")
-endif()
+string(REPLACE "-" "." CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 message(STATUS "Package Version = ${CPACK_PACKAGE_VERSION}")
 set(CPACK_PACKAGE_DESCRIPTION
   "The SvxLink project develops an advanced voice services system for ham radio use. It can be run on a simplex frequency or act as a repeater controller.")
 set(CPACK_PACKAGE_VENDOR "SM0SVX")
-set(CPACK_PACKAGE_CONTACT
-  "SvxLink Community <svxlink-devel@lists.sourceforge.net>")
+set(CPACK_PACKAGE_CONTACT "SvxLink Community <svxlink@groups.io>")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/../COPYRIGHT")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/../README.adoc")
 
-#set(CPACK_GENERATOR "DEB")
 if (CPACK_GENERATOR STREQUAL "DEB")
   #set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsigc++-2.0-0v5, libgsm1, libpopt0, tcl, libgcrypt20, libspeex1, libasound2, libopus0, alsa-utils, vorbis-tools, libcurl4, rtl-sdr, libjsoncpp1")
   string(REPLACE " " "\n" CONFIG_FILES_NL "${CONFIG_FILES}")

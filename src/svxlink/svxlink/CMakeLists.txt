@@ -6,13 +6,14 @@ set(SVXLINK_SRCS
 
 # TCL event handler files to install in the events.d subdirectory
 set(SVXLINK_TCL_EVENT_FILES
-  RepeaterLogic.tcl SimplexLogic.tcl ReflectorLogic.tcl Module.tcl Logic.tcl
-  CW.tcl SelCall.tcl locale.tcl
+  Module.tcl CW.tcl SelCall.tcl locale.tcl LogicBase.tcl Logic.tcl
+  SimplexLogicType.tcl RepeaterLogicType.tcl ReflectorLogicType.tcl
+  ReflectorV2LogicType.tcl SimplexLogic.tcl RepeaterLogic.tcl ReflectorLogic.tcl
   )
 
 # Logic core plugins to build
 set(SVXLINK_LOGIC_CORES
-  Dummy Simplex Repeater Reflector
+  Dummy Simplex Repeater ReflectorV2 Reflector
   )
 
 # Find the popt library
@@ -42,10 +43,10 @@ set(LIBS ${LIBS} ${TCL_LIBRARY})
 include_directories(${TCL_INCLUDE_PATH})
 
 # Find the GCrypt library
-find_package(GCrypt REQUIRED)
-set(LIBS ${LIBS} ${GCRYPT_LIBRARIES})
-include_directories(${GCRYPT_INCLUDE_DIRS})
-add_definitions(${GCRYPT_DEFINITIONS})
+#find_package(GCrypt REQUIRED)
+#set(LIBS ${LIBS} ${GCRYPT_LIBRARIES})
+#include_directories(${GCRYPT_INCLUDE_DIRS})
+#add_definitions(${GCRYPT_DEFINITIONS})
 
 # Find the dl library - only for Linux, not required for FreeBSD
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -81,6 +82,7 @@ set(LIBS trx locationinfo asynccpp asyncaudio asynccore svxmisc ${LIBS})
 add_executable(svxlink ${SVXLINK_SRCS} ${VERSION_DEPENDS})
 target_link_libraries(svxlink ${LIBS})
 set_target_properties(svxlink PROPERTIES
+  ENABLE_EXPORTS on
   RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIRECTORY}
 )
 
@@ -112,6 +114,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/svxlink_gpio_down.in
 install(TARGETS svxlink DESTINATION ${BIN_INSTALL_DIR})
 install_mkdir(${SVX_SPOOL_INSTALL_DIR}/qso_recorder ${SVXLINK_USER}:${SVXLINK_GROUP})
 install_mkdir(${SVX_SHARE_INSTALL_DIR}/sounds)
+install_mkdir(${SVX_LOCAL_STATE_DIR}/pki ${SVXLINK_USER}:${SVXLINK_GROUP})
 install_if_not_exists(${CMAKE_CURRENT_BINARY_DIR}/svxlink.conf
   ${SVX_SYSCONF_INSTALL_DIR}
   )
@@ -120,7 +123,7 @@ install_if_not_exists(${CMAKE_CURRENT_BINARY_DIR}/gpio.conf
   )
 install_if_not_exists(node_info.json ${SVX_SYSCONF_INSTALL_DIR})
 install(FILES events.tcl DESTINATION ${SVX_SHARE_INSTALL_DIR})
-install(FILES ${SVXLINK_TCL_EVENT_FILES}
+install(FILES globals.tcl squelch_timeout.tcl ${SVXLINK_TCL_EVENT_FILES}
   DESTINATION ${SVX_SHARE_INSTALL_DIR}/events.d
   )
 install(PROGRAMS ${RUNTIME_OUTPUT_DIRECTORY}/svxlink_gpio_up

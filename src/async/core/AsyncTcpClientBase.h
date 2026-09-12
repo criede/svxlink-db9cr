@@ -260,9 +260,22 @@ class TcpClientBase : virtual public sigc::trackable
     /**
      * @brief 	A signal that is emitted when a connection has been established
      */
-    sigc::signal<void>       	      	  connected;
+    sigc::signal<void()>       	      	  connected;
 
   protected:
+    /**
+     * @brief   Check if the connection has been fully connected
+     * @return  Return \em true if the connection was successful
+     *
+     * This function return true when the connection has been fully
+     * established. It will continue to return true even after disconnection
+     * and will be reset at the moment when a new connection attempt is made.
+     */
+    //virtual bool successfulConnect(void)
+    //{
+    //  return m_successful_connect;
+    //}
+
     /**
      * @brief   Disconnect from the remote peer
      *
@@ -280,6 +293,7 @@ class TcpClientBase : virtual public sigc::trackable
      */
     virtual void connectionEstablished(void)
     {
+      //m_successful_connect = true;
       emitConnected();
     }
 
@@ -294,6 +308,7 @@ class TcpClientBase : virtual public sigc::trackable
     int       	      sock;
     FdWatch           wr_watch;
     Async::IpAddress  bind_ip;
+    //bool              m_successful_connect  = false;
 
     void dnsResultsReady(DnsLookup& dns_lookup);
     void connectToRemote(void);

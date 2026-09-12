@@ -6,7 +6,7 @@
 
 \verbatim
 SvxLink - A Multi Purpose Voice Services System for Ham Radio Use
-Copyright (C) 2003-2008 Tobias Blomberg / SM0SVX
+Copyright (C) 2003-2024 Tobias Blomberg / SM0SVX
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -173,15 +173,14 @@ class NetTrxTcpClient : public Async::TcpClient<>
      *        is ready for operation
      * @param is_ready  \em true when ready, \em false when not ready
      */
-    sigc::signal<void, bool> isReady;
-    
+    sigc::signal<void(bool)> isReady;
+
     /**
      * @brief A signal that is emitted when a message has been received
      * @param msg The received message
      */
-    sigc::signal<void, NetTrxMsg::Msg*> msgReceived;
-    
-    
+    sigc::signal<void(NetTrxMsg::Msg*)> msgReceived;
+
   protected:
     /**
      * @brief   Constructor
@@ -225,6 +224,8 @@ class NetTrxTcpClient : public Async::TcpClient<>
     DiscReason      disc_reason;
     
     NetTrxTcpClient(const NetTrxTcpClient&);
+    using TcpClientBase::operator=;
+    using TcpConnection::operator=;
     NetTrxTcpClient& operator=(const NetTrxTcpClient&);
     void tcpConnected(void);
     void tcpDisconnected(Async::TcpConnection *con,

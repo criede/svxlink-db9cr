@@ -6,7 +6,7 @@
 
 \verbatim
 Async - A library for programming event driven applications
-Copyright (C) 2003-2022 Tobias Blomberg / SM0SVX
+Copyright (C) 2003-2024 Tobias Blomberg / SM0SVX
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -277,7 +277,7 @@ class HttpServerConnection : public TcpConnection
      * @param   con     The connection object
      * @param   reason  The reason for the disconnect
      */
-    sigc::signal<void, HttpServerConnection *, DisconnectReason> disconnected;
+    sigc::signal<void(HttpServerConnection*, DisconnectReason)> disconnected;
 
     /**
      * @brief   A signal that is emitted when a HTTP request has been received
@@ -287,10 +287,10 @@ class HttpServerConnection : public TcpConnection
      * This signal is emitted when a HTTP request has been received on this
      * connection.
      */
-    sigc::signal<void, HttpServerConnection *, Request&> requestReceived;
+    sigc::signal<void(HttpServerConnection*, Request&)> requestReceived;
 
   protected:
-    sigc::signal<void, bool> sendBufferFull;
+    sigc::signal<void(bool)> sendBufferFull;
 
     /**
      * @brief   Disconnect from the remote peer
@@ -346,9 +346,10 @@ class HttpServerConnection : public TcpConnection
 
     HttpServerConnection(const HttpServerConnection&);
     HttpServerConnection& operator=(const HttpServerConnection&);
+    using TcpConnection::write;
     void handleStartLine(void);
     void handleHeader(void);
-    void onSendBufferFull(bool is_full);
+    //void onSendBufferFull(bool is_full);
     void disconnectCleanup(void);
     const char* codeToString(unsigned code);
 

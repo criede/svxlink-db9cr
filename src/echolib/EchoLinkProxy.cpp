@@ -6,7 +6,7 @@
 
 \verbatim
 EchoLib - A library for EchoLink communication
-Copyright (C) 2003-2013 Tobias Blomberg / SM0SVX
+Copyright (C) 2003-2026 Tobias Blomberg / SM0SVX
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -150,7 +150,9 @@ Proxy::Proxy(const string &host, uint16_t port, const string &callsign,
   con.disconnected.connect(mem_fun(*this, &Proxy::onDisconnected));
 
   reconnect_timer.setEnable(false);
-  reconnect_timer.expired.connect(hide(mem_fun(con, &TcpClient<>::connect)));
+  //reconnect_timer.expired.connect(hide(mem_fun(con, &TcpClient<>::connect)));
+  reconnect_timer.expired.connect(
+      sigc::mem_fun(*this, &Proxy::reconnect));
 
   cmd_timer.setEnable(false);
   cmd_timer.expired.connect(hide(mem_fun(*this, &Proxy::cmdTimeout)));
@@ -451,14 +453,14 @@ int Proxy::parseProxyMessageBlock(unsigned char *buf, int len)
     msg_len |= static_cast<uint32_t>(*buf++) << 16;
     msg_len |= static_cast<uint32_t>(*buf++) << 24;
 
-    int total_msg_size = MSG_HEADER_SIZE + msg_len;
-    if (len < total_msg_size)
+    if (msg_len > static_cast<uint32_t>(len - MSG_HEADER_SIZE))
     {
       break;
     }
 
     handleProxyMessageBlock(msg_type, remote_ip, msg_len, buf);
     buf += msg_len;
+    int total_msg_size = MSG_HEADER_SIZE + static_cast<int>(msg_len);
     len -= total_msg_size;
     total_processed += total_msg_size;
   }
@@ -682,6 +684,11 @@ void Proxy::cmdTimeout(void)
   reset();
 } /* Proxy::cmdTimeout */
 
+
+void Proxy::reconnect(Async::Timer*)
+{
+  con.connect();
+} /* Proxy::reconnect */
 
 
 /*

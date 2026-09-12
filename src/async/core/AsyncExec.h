@@ -131,6 +131,8 @@ another part of the application.
 class Exec : public sigc::trackable
 {
   public:
+    using Environment = std::vector<std::pair<std::string,std::string>>;
+
     /**
      * @brief 	Default constructor
      */
@@ -163,6 +165,35 @@ class Exec : public sigc::trackable
      * @param   arg The command line argument to add
      */
     void appendArgument(const std::string &arg);
+
+    /**
+     * @brief   Clear the environment
+     *
+     * This function is used to clear the environment. It must be called before
+     * calling run(). It will clear both the environment inherited from the
+     * parent process as well as any environment variables added using the
+     * addEnvironmentVar(s) functions.
+     */
+    void clearEnvironment(void);
+
+    /**
+     * @brief   Add an additional environment variable
+     * @param   name The name of the environment variable
+     * @param   val  The value of the environment variable
+     *
+     * This function is used to add a variable to the environment for the
+     * process to be executed. It must be done before calling run().
+     */
+    void addEnvironmentVar(const std::string& name, const std::string& val);
+
+    /**
+     * @brief   Add multiple environment variables
+     * @param   env The environment variables to add
+     *
+     * This function is used to add multiple variables to the environment for
+     * the process to be executed. It must be done before calling run().
+     */
+    void addEnvironmentVars(const Environment& env);
 
     /**
      * @brief   Modify the nice value for the child subprocess
@@ -280,7 +311,7 @@ class Exec : public sigc::trackable
      * This signal is emitted when a subprocess write to its stdout. The data
      * will be zero terminated.
      */
-    sigc::signal<void, const char *, int> stdoutData;
+    sigc::signal<void(const char*, int)> stdoutData;
 
     /**
      * @brief   A signal that is emitted when the subprocess write to stderr
@@ -290,17 +321,17 @@ class Exec : public sigc::trackable
      * This signal is emitted when a subprocess write to its stderr. The data
      * will be zero terminated.
      */
-    sigc::signal<void, const char *, int> stderrData;
+    sigc::signal<void(const char*, int)> stderrData;
 
     /**
      * @brief   A signal that is emitted when the subprocess close its stdout
      */
-    sigc::signal<void> stdoutClosed;
+    sigc::signal<void()> stdoutClosed;
 
     /**
      * @brief   A signal that is emitted when the subprocess close its stderr
      */
-    sigc::signal<void> stderrClosed;
+    sigc::signal<void()> stderrClosed;
 
     /**
      * @brief   A signal that is emitted when the subprocess exits
@@ -309,7 +340,7 @@ class Exec : public sigc::trackable
      * methods ifExited, ifSignaled, exitStatus and termSig may be used to
      * find out what caused the subprocess to exit.
      */
-    sigc::signal<void> exited;
+    sigc::signal<void()> exited;
     
   protected:
     
@@ -322,6 +353,7 @@ class Exec : public sigc::trackable
     static struct sigaction   old_sigact;
 
     std::vector<std::string>  args;
+    std::vector<std::string>  env;
     pid_t                     pid;
     Async::FdWatch            *stdout_watch;
     Async::FdWatch            *stderr_watch;
@@ -330,6 +362,7 @@ class Exec : public sigc::trackable
     int                       nice_value;
     Async::Timer              *timeout_timer;
     bool                      pending_term;
+    bool                      clear_env = false;
 
     static void handleSigChld(int signal_number, siginfo_t *info,
                               void *context);

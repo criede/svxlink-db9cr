@@ -6,7 +6,7 @@
 
 \verbatim
 Async - A library for programming event driven applications
-Copyright (C) 2003-2022 Tobias Blomberg / SM0SVX
+Copyright (C) 2003-2024 Tobias Blomberg / SM0SVX
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -134,10 +134,7 @@ class TcpPrioClient : public ConT, public TcpPrioClientBase
      * take host and port must be used.
      */
     explicit TcpPrioClient(size_t recv_buf_len = ConT::DEFAULT_RECV_BUF_LEN)
-      : ConT(recv_buf_len), TcpPrioClientBase(this)
-    {
-      initialize();
-    }
+      : ConT(recv_buf_len), TcpPrioClientBase(this) {}
 
     /**
      * @brief   Disallow copy construction
@@ -161,34 +158,23 @@ class TcpPrioClient : public ConT, public TcpPrioClientBase
      * disconnected, nothing will be done. The disconnected signal is not
      * emitted when this function is called
      */
-    virtual void disconnect(void)
+    virtual void disconnect(void) override
     {
       //std::cout << "### TcpPrioClient::disconnect" << std::endl;
       TcpPrioClientBase::disconnect();
     }
 
-    /**
-     * @brief   Mark connection as failed
-     *
-     * The application can use this function to mark a connection as failed so
-     * that when a reconnect is performed, the next server will be tried. If a
-     * connect is classified as successful, the same host will be tried again
-     * on reconnect.
-     */
-    //void markAsFailedConnect(void)
-    //{
-    //  //std::cout << "### TcpPrioClient::markAsFailedConnect" << std::endl;
-    //  m_successful_connect = false;
-    //}
-
   protected:
+    using ConT::operator=;
+    using TcpPrioClientBase::operator=;
+
     /**
      * @brief   Disconnect from the remote peer
      *
      * This function is used internally to close the connection to the remote
      * peer.
      */
-    virtual void closeConnection(void)
+    virtual void closeConnection(void) override
     {
       ConT::closeConnection();
       TcpPrioClientBase::closeConnection();
@@ -200,10 +186,9 @@ class TcpPrioClient : public ConT, public TcpPrioClientBase
      *
      * This function will be called when the connection has been terminated.
      */
-    virtual void onDisconnected(TcpConnection::DisconnectReason reason)
+    virtual void onDisconnected(TcpConnection::DisconnectReason reason) override
     {
       //std::cout << "### TcpPrioClient::onDisconnected:"
-      //          //<< " m_successful_connect=" << m_successful_connect
       //          << std::endl;
       ConT::onDisconnected(reason);
       TcpPrioClientBase::onDisconnected(reason);
@@ -218,22 +203,22 @@ class TcpPrioClient : public ConT, public TcpPrioClientBase
      * server. Note that the object should be a "normal" TcpClient and not a
      * TcpPrioClient.
      */
-    virtual TcpClientBase *newTcpClient(void)
+    virtual TcpClientBase* newTcpClient(void) override
     {
       return new TcpClient<ConT>;
     }
 
-    virtual void emitDisconnected(TcpConnection::DisconnectReason reason)
+    virtual void emitDisconnected(
+        TcpConnection::DisconnectReason reason) override
     {
       ConT::emitDisconnected(reason);
     }
 
   private:
-    //bool                      m_successful_connect  = false;
-
     TcpPrioClient<ConT>& operator=(TcpClient<ConT>&& other)
     {
-      //std::cout << "### TcpPrioClient::operator=(TcpClient<ConT>&&)" << std::endl;
+      //std::cout << "### TcpPrioClient::operator=(TcpClient<ConT>&&)"
+      //          << std::endl;
       *static_cast<TcpClientBase*>(this) =
         std::move(*static_cast<TcpClientBase*>(&other));
       return *this;

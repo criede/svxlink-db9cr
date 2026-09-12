@@ -6,7 +6,7 @@
 
 \verbatim
 SvxReflector - An audio reflector for connecting SvxLink Servers
-Copyright (C) 2003-2023 Tobias Blomberg / SM0SVX
+Copyright (C) 2003-2025 Tobias Blomberg / SM0SVX
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <string>
 #include <json/json.h>
+#include <sigc++/sigc++.h>
 #include <random>
 
 
@@ -47,7 +48,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <AsyncFramedTcpConnection.h>
 #include <AsyncTimer.h>
+#include <AsyncAtTimer.h>
 #include <AsyncConfig.h>
+#include <AsyncSslCertSigningReq.h>
+#include <AsyncSslX509.h>
 
 
 /****************************************************************************
@@ -108,34 +112,23 @@ This class represents one client connection. When a client connects, an
 instance of this class will be created that will persist for the lifetime of
 the client connection.
 */
-class ReflectorClient
+class ReflectorClient : public sigc::trackable
 {
   public:
     using ClientId = ReflectorUdpMsg::ClientId;
+    using ClientSrc = std::pair<Async::IpAddress, uint16_t>;
 
     typedef enum
     {
-      STATE_DISCONNECTED, STATE_EXPECT_PROTO_VER, STATE_EXPECT_AUTH_RESPONSE,
-      STATE_CONNECTED, STATE_EXPECT_DISCONNECT
+      STATE_EXPECT_DISCONNECT,
+      STATE_DISCONNECTED,
+      STATE_EXPECT_PROTO_VER,
+      STATE_EXPECT_START_ENCRYPTION,
+      STATE_EXPECT_SSL_CON_READY,
+      STATE_EXPECT_CSR,
+      STATE_EXPECT_AUTH_RESPONSE,
+      STATE_CONNECTED
     } ConState;
-
-    struct Rx
-    {
-      std::string name;
-      //char        id;
-      uint8_t     siglev;
-      bool        enabled;
-      bool        sql_open;
-      bool        active;
-    };
-    typedef std::map<char, Rx> RxMap;
-
-    struct Tx
-    {
-      std::string name;
-      bool        transmit;
-    };
-    typedef std::map<char, Tx> TxMap;
 
     class Filter
     {
@@ -175,6 +168,18 @@ class ReflectorClient
         }
       private:
         ProtoVerRange m_pv_range;
+    };
+
+    class ProtoVerLargerOrEqualFilter : public Filter
+    {
+      public:
+        ProtoVerLargerOrEqualFilter(const ProtoVer& min) : m_pv(min) {}
+        virtual bool operator ()(ReflectorClient *client) const
+        {
+          return (client->protoVer() >= m_pv);
+        }
+      private:
+        ProtoVer m_pv;
     };
 
     class TgFilter : public Filter
@@ -243,7 +248,21 @@ class ReflectorClient
      * @param   id The id of the client object to find
      * @return  Return the client object associated with the given id
      */
-    static ReflectorClient* lookup(ClientId id);
+    static ReflectorClient* lookup(const ClientId& id);
+
+    /**
+     * @brief   Get the client object associated with the given source addr
+     * @param   src The source address of the client object to find
+     * @return  Return the client object associated with the given source addr
+     */
+    static ReflectorClient* lookup(const ClientSrc& src);
+
+    /**
+     * @brief   Get the client object associated with the given callsign
+     * @param   cs The callsign of the client object to find
+     * @return  Return the client object associated with the given callsign
+     */
+    static ReflectorClient* lookup(const std::string& cs);
 
     /**
      * @brief   Remove all client objects
@@ -275,6 +294,24 @@ class ReflectorClient
     ClientId clientId(void) const { return m_client_id; }
 
     /**
+     * @brief   Get the local IP address associated with this connection
+     * @return  Returns an IP address
+     */
+    Async::IpAddress localHost(void) const
+    {
+      return m_con->localHost();
+    }
+
+    /**
+     * @brief   Get the local TCP port associated with this connection
+     * @return  Returns a port number
+     */
+    uint16_t localPort(void) const
+    {
+      return m_con->localPort();
+    }
+
+    /**
      * @brief   Return the remote IP address
      * @return  Returns the IP address of the client
      */
@@ -283,21 +320,41 @@ class ReflectorClient
       return m_con->remoteHost();
     }
 
+    uint16_t remotePort(void) const
+    {
+      return m_con->remotePort();
+    }
+
+    /**
+     * @brief   Return the remote UDP IP
+     * @return  Returns the source IP used by the client for UDP
+     */
+    const Async::IpAddress& remoteUdpHost(void) const
+    {
+      const auto& addr = m_client_src.first;
+      if (addr.isEmpty())
+      {
+        return remoteHost();
+      }
+      return addr;
+    }
+
     /**
      * @brief   Return the remote port number
-     * @return  Returns the local port number used by the client
+     * @return  Returns the source port used by the client for UDP
      */
     uint16_t remoteUdpPort(void) const { return m_remote_udp_port; }
 
     /**
-     * @brief   Set the remote port number
-     * @param   The port number used by the client
+     * @brief   Set the remote UDP source (IP, port)
+     * @param   src A ClientSrc
      *
-     * The Reflector use this function to set the port number used by the
-     * client so that UDP packets can be send to the client and check that
-     * incoming packets originate from the correct port.
+     * The Reflector use this function to set the (IP, port number) used by the
+     * client so that UDP packets can be sent to the client, incoming UDP
+     * packets can be associated with the correct client object and to check
+     * that incoming packets originate from the correct source.
      */
-    void setRemoteUdpPort(uint16_t port) { m_remote_udp_port = port; }
+    void setRemoteUdpSource(const ClientSrc& src);
 
     /**
      * @brief   Get the callsign for this connection
@@ -315,7 +372,12 @@ class ReflectorClient
      * used by the receiver to find out if a packet is out of order or if a
      * packet has been lost in transit.
      */
-    uint16_t nextUdpTxSeq(void) { return m_next_udp_tx_seq++; }
+    //uint16_t nextUdpTxSeq(void) { return m_next_udp_tx_seq++; }
+
+    /**
+     * @brief   Set the UDP RX sequence number
+     */
+    void setUdpRxSeq(UdpCipher::IVCntr seq) { m_next_udp_rx_seq = seq; }
 
     /**
      * @brief   Get the next expected UDP packet sequence number
@@ -324,7 +386,7 @@ class ReflectorClient
      * This function will return the next expected UDP sequence number, which
      * is simply the previously received sequence number plus one.
      */
-    uint16_t nextUdpRxSeq(void) { return m_next_udp_rx_seq; }
+    UdpCipher::IVCntr nextUdpRxSeq(void) { return m_next_udp_rx_seq; }
 
     /**
      * @brief   Send a TCP message to the remote end
@@ -394,41 +456,55 @@ class ReflectorClient
     std::vector<char> rxIdList(void) const
     {
       std::vector<char> ids;
-      ids.reserve(m_rx_map.size());
-      for (RxMap::const_iterator it=m_rx_map.begin(); it!=m_rx_map.end(); ++it)
+      ids.reserve(m_json_rx_map.size());
+      for (const auto& rx : m_json_rx_map)
       {
-        ids.push_back(it->first);
+        ids.push_back(rx.first);
       }
       return ids;
     }
-    bool rxExist(char rx_id) const
+    void setRxSiglev(char id, uint8_t siglev)
     {
-      return m_rx_map.find(rx_id) != m_rx_map.end();
+      setRxParam(id, "siglev", siglev);
     }
-    const std::string& rxName(char id) { return m_rx_map[id].name; }
-    void setRxSiglev(char id, uint8_t siglev) { m_rx_map[id].siglev = siglev; }
-    uint8_t rxSiglev(char id) { return m_rx_map[id].siglev; }
-    void setRxEnabled(char id, bool enab) { m_rx_map[id].enabled = enab; }
-    bool rxEnabled(char id) { return m_rx_map[id].enabled; }
-    void setRxSqlOpen(char id, bool open) { m_rx_map[id].sql_open = open; }
-    bool rxSqlOpen(char id) { return m_rx_map[id].sql_open; }
-    void setRxActive(char id, bool active) { m_rx_map[id].active = active; }
-    bool rxActive(char id) { return m_rx_map[id].active; }
-    //RxMap& rxMap(void) { return m_rx_map; }
-    //const RxMap& rxMap(void) const { return m_rx_map; }
+    void setRxEnabled(char id, bool enab) { setRxParam(id, "enabled", enab); }
+    void setRxSqlOpen(char id, bool open) { setRxParam(id, "sql_open", open); }
+    void setRxActive(char id, bool active) { setRxParam(id, "active", active); }
 
-    bool txExist(char tx_id) const
+    void setTxTransmit(char id, bool transmit)
     {
-      return m_tx_map.find(tx_id) != m_tx_map.end();
+      setTxParam(id, "transmit", transmit);
     }
-    void setTxTransmit(char id, bool transmit) { m_tx_map[id].transmit = transmit; }
-    bool txTransmit(char id) { return m_tx_map[id].transmit; }
 
-    const Json::Value& nodeInfo(void) const { return m_node_info; }
+    void updateIsTalker(void);
+
+    uint32_t udpCipherIVCntrNext() { return m_udp_cipher_iv_cntr++; }
+    std::vector<uint8_t> udpCipherIV(void) const;
+
+    void setUdpCipherIVRand(const std::vector<uint8_t>& iv_rand)
+    {
+      m_udp_cipher_iv_rand = iv_rand;
+    }
+    std::vector<uint8_t> udpCipherIVRand(void) const
+    {
+      return m_udp_cipher_iv_rand;
+    }
+
+    void setUdpCipherKey(const std::vector<uint8_t>& key)
+    {
+      m_udp_cipher_key = key;
+    }
+    std::vector<uint8_t> udpCipherKey(void) const { return m_udp_cipher_key; }
+
+    void certificateUpdated(Async::SslX509& cert);
 
   private:
     using ClientIdRandomDist  = std::uniform_int_distribution<ClientId>;
     using ClientMap           = std::map<ClientId, ReflectorClient*>;
+    using ClientSrcMap        = std::map<ClientSrc, ReflectorClient*>;
+    using ClientCallsignMap   = std::map<std::string, ReflectorClient*>;
+    using JsonRxMap           = std::map<char, Json::Value&>;
+    using JsonTxMap           = std::map<char, Json::Value&>;
 
     static const uint16_t MIN_MAJOR_VER = 0;
     static const uint16_t MIN_MINOR_VER = 6;
@@ -439,21 +515,24 @@ class ReflectorClient
     static const unsigned UDP_HEARTBEAT_RX_CNT_RESET  = 120;
 
     static const ClientId CLIENT_ID_MAX = std::numeric_limits<ClientId>::max();
+    static const ClientId CLIENT_ID_MIN = 1;
 
     static ClientMap            client_map;
+    static ClientSrcMap         client_src_map;
+    static ClientCallsignMap    client_callsign_map;
     static std::mt19937         id_gen;
     static ClientIdRandomDist   id_dist;
 
     Async::FramedTcpConnection* m_con;
-    unsigned char               m_auth_challenge[MsgAuthChallenge::CHALLENGE_LEN];
+    unsigned char               m_auth_challenge[MsgAuthChallenge::LENGTH];
     ConState                    m_con_state;
     Async::Timer                m_disc_timer;
     std::string                 m_callsign;
     ClientId                    m_client_id;
+    ClientSrc                   m_client_src;
     uint16_t                    m_remote_udp_port;
     Async::Config*              m_cfg;
-    uint16_t                    m_next_udp_tx_seq;
-    uint16_t                    m_next_udp_rx_seq;
+    UdpCipher::IVCntr           m_next_udp_rx_seq;
     Async::Timer                m_heartbeat_timer;
     unsigned                    m_heartbeat_tx_cnt;
     unsigned                    m_heartbeat_rx_cnt;
@@ -466,18 +545,26 @@ class ReflectorClient
     std::vector<std::string>    m_supported_codecs;
     uint32_t                    m_current_tg;
     std::set<uint32_t>          m_monitored_tgs;
-    RxMap                       m_rx_map;
-    TxMap                       m_tx_map;
-    Json::Value                 m_node_info;
+    JsonRxMap                   m_json_rx_map;
+    JsonTxMap                   m_json_tx_map;
+    std::vector<uint8_t>        m_udp_cipher_iv_rand;
+    std::vector<uint8_t>        m_udp_cipher_key;
+    UdpCipher::IVCntr           m_udp_cipher_iv_cntr;
+    Async::AtTimer              m_renew_cert_timer;
+    Json::Value*                m_status                {nullptr};
 
-    static ClientId newClient(ReflectorClient* client);
+    static ClientId newClientId(ReflectorClient* client);
 
     ReflectorClient(const ReflectorClient&);
     ReflectorClient& operator=(const ReflectorClient&);
+    void onSslConnectionReady(Async::TcpConnection *con);
     void onFrameReceived(Async::FramedTcpConnection *con,
                          std::vector<uint8_t>& data);
     void handleMsgProtoVer(std::istream& is);
+    void handleMsgCABundleRequest(std::istream& is);
+    void handleMsgStartEncryptionRequest(std::istream& is);
     void handleMsgAuthResponse(std::istream& is);
+    void handleMsgClientCsr(std::istream& is);
     void handleSelectTG(std::istream& is);
     void handleTgMonitor(std::istream& is);
     void handleNodeInfo(std::istream& is);
@@ -488,9 +575,38 @@ class ReflectorClient
     void handleMsgError(std::istream& is);
     void sendError(const std::string& msg);
     void onDiscTimeout(Async::Timer *t);
+    void disconnectCleanup(Async::FramedTcpConnection::DisconnectReason reason);
     void disconnect(void);
+    void onRemoteDisconnected(Async::FramedTcpConnection *con,
+                           Async::FramedTcpConnection::DisconnectReason reason);
     void handleHeartbeat(Async::Timer *t);
     std::string lookupUserKey(const std::string& callsign);
+    void connectionAuthenticated(const std::string& callsign);
+    bool sendClientCert(const Async::SslX509& cert);
+    void sendAuthChallenge(void);
+    void renewClientCertificate(void);
+    void setMonitoredTGs(const std::set<uint32_t>& tgs);
+    void setTg(uint32_t tg);
+
+    template <typename T>
+    void setRxParam(char id, const std::string& name, const T& value)
+    {
+      auto it = m_json_rx_map.find(id);
+      if (it != m_json_rx_map.end())
+      {
+        (it->second)[name] = value;
+      }
+    }
+
+    template <typename T>
+    void setTxParam(char id, const std::string& name, const T& value)
+    {
+      auto it = m_json_tx_map.find(id);
+      if (it != m_json_tx_map.end())
+      {
+        (it->second)[name] = value;
+      }
+    }
 
 };  /* class ReflectorClient */
 

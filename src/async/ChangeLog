@@ -1,4 +1,61 @@
- 1.7.0 -- ?? ??? ????
+ 1.9.1 -- 26 Jul 2026
+----------------------
+
+* Security: Async HTTP server: unbounded request-line/header accumulation may
+  lead to memory-exhaustion DoS.
+  Credit: Mark Rose <markrose@markrose.ca>
+
+* Security: Audio decoders: attacker-sized stack VLA from encoded-frame
+  length → stack exhaustion (network) lead to memory-exhaustion DoS.
+  Credit: Mark Rose <markrose@markrose.ca>
+
+
+
+ 1.9.0 -- 23 May 2026
+----------------------
+
+* Async::AudioStreamStateDetector facelift
+
+* Add support for sigc++3
+
+* Add support for Qt6 contributed by DL1JBE
+
+
+
+ 1.8.1 -- 01 Jul 2025
+----------------------
+
+* Bugfix in Async::TcpConnection: Illegal cast of pointer to receive buffer.
+
+* Async::Config: Now specifically handling the "char" case for getValue.
+
+
+
+ 1.8.0 -- 03 May 2025
+----------------------
+
+* Code cleanup of Async::Pty, fixing a small memory leak.
+
+* TLS connection support added. Build require OpenSSL development files.
+
+* Async::Exec: Now possible to set up environment variables.
+
+* Async::Config now have a mechanism for subscribing to changes for specific
+  configuration variables.
+
+* Add connection rate throttling, using token buckets, to Async::TcpServer.
+
+* Async::Config bugfix: Add parameter missing_ok to the string specific
+  getValue function.
+
+* Async::AudioDevice: Reopen the audio device on failure
+
+* Async::DnsLookup: The addresses method will now return the list of hosts in
+  random order for each call.
+
+
+
+ 1.7.0 -- 25 Feb 2024
 ----------------------
 
 * ASYNC_AUDIO_ALSA_ZEROFILL is now enabled by default.
@@ -63,6 +120,12 @@
   not allowed to call the connect function if already connected.
 
 * Async::Plugin: A new class for loading code as plugins.
+
+* Bugfix Async::HttpServerConnection: EOL handling failed with newer
+  compilers.
+
+* New class Async::AudioLADSPAPlugin which enable the use of LADSPA plugins to
+  process audio.
 
 
 
