@@ -5,6 +5,15 @@ Vorhandene Versionshinweise des Projekts befinden sich unter `src/doc/`.
 
 ## Unveröffentlicht
 
+### Geändert
+
+- Upstream-CodeQL im eigenen Repository deaktiviert: automatische Trigger
+  entfernt und Ausführung auf das Upstream-Repository beschränkt.
+- Projektregel: In Workflows nur aktuell gepflegte Node.js-Laufzeiten verwenden,
+  einschließlich der internen Laufzeit eingebundener Actions.
+- CodeQL-Workflow auf Checkout v6 und CodeQL Action v4 mit Node.js 24 umgestellt
+  und Berechtigungen zum Hochladen der Analyseergebnisse explizit festgelegt.
+
 ### Hinzugefügt
 
 - Täglicher GitHub-Actions-Workflow zum Merge von `sm0svx/svxlink:master` nach
