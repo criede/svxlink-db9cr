@@ -40,6 +40,8 @@ zu dokumentieren.
 
 - Vom Upstream übernommene Actions in `criede/svxlink-db9cr` deaktiviert halten.
 - Der eigene Workflow `Sync upstream` bleibt aktiviert.
+- Beim Sync `.github/workflows/` vollständig auf dem eigenen Stand erhalten;
+  keine neuen, geänderten oder gelöschten Workflow-Dateien vom Upstream übernehmen.
 
 ## Dateiname
 

@@ -40,7 +40,7 @@ jobs:
           fi
 
           # Prefer our conflicting hunks, while merging non-conflicting upstream changes.
-          if ! git merge --no-edit -X ours upstream/master; then
+          if ! git merge --no-commit --no-ff -X ours upstream/master; then
             # A failed merge without MERGE_HEAD is an error, not a resolvable conflict.
             git rev-parse --verify MERGE_HEAD >/dev/null
             if [[ -z "$(git diff --name-only --diff-filter=U)" ]]; then
@@ -60,8 +60,12 @@ jobs:
             done < <(git diff --name-only --diff-filter=U -z)
 
             git diff --quiet --diff-filter=U
-            git commit --no-edit
           fi
+
+          # Keep our workflow definitions exactly, including local additions/deletions.
+          # --no-ff above ensures this happens before committing even a fast-forward.
+          git restore --source=HEAD --staged --worktree -- .github/workflows
+          git commit --no-edit
 
           # Never force-push: concurrent changes on master must be preserved.
           git push origin HEAD:refs/heads/master

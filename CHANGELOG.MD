@@ -7,6 +7,8 @@ Vorhandene Versionshinweise des Projekts befinden sich unter `src/doc/`.
 
 ### Geändert
 
+- Upstream-Sync übernimmt dauerhaft keine Änderungen an `.github/workflows/`;
+  eigene Workflow-Dateien bleiben vollständig erhalten, auch bei Fast-Forwards.
 - Upstream-CodeQL im eigenen Repository deaktiviert: automatische Trigger
   entfernt und Ausführung auf das Upstream-Repository beschränkt.
 - Projektregel: In Workflows nur aktuell gepflegte Node.js-Laufzeiten verwenden,
