@@ -59,10 +59,17 @@ add_library(${LIBNAME} SHARED ${LIBSRC} ${QTHEADERS_MOC})
 set_target_properties(${LIBNAME} PROPERTIES VERSION ${VER_LIBASYNC}
                       SOVERSION ${VER_LIBASYNC_SOVERSION})
 target_link_libraries(${LIBNAME} ${LIBS})
+# FindSIGC(2).cmake appends "--std=c++11" (or c++17, depending on the
+# libsigc++ version found) to the global CMAKE_CXX_FLAGS, which Qt6 (needs
+# C++17) may otherwise inherit as c++11. target_compile_options are placed
+# after directory-level flags on the compile command line, so this wins
+# over that regardless of which one was appended.
+target_compile_options(${LIBNAME} PRIVATE -std=c++17)
 if (BUILD_STATIC_LIBS)
   add_library(${LIBNAME}_static STATIC ${LIBSRC})
   set_target_properties(${LIBNAME}_static PROPERTIES OUTPUT_NAME ${LIBNAME})
   target_link_libraries(${LIBNAME}_static ${LIBS})
+  target_compile_options(${LIBNAME}_static PRIVATE -std=c++17)
 endif(BUILD_STATIC_LIBS)
 
 # Install files

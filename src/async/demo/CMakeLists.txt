@@ -65,6 +65,9 @@ if(USE_QT)
   foreach(prog ${QTPROGS})
     add_executable(${prog} ${prog}.cpp)
     target_link_libraries(${prog} ${LIBS} asyncaudio asynccore asyncqt)
+    # See async/qt/CMakeLists.txt: FindSIGC(2).cmake may force the global
+    # CXX flags to c++11, which breaks Qt6 (needs C++17).
+    target_compile_options(${prog} PRIVATE -std=c++17)
   endforeach(prog)
 endif(USE_QT)
 
