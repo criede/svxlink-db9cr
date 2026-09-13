@@ -1,0 +1,24 @@
+Architectures: arm64
+Codename: bookworm
+Components: main
+Date: Sun, 13 Sep 2026 10:18:56 +0000
+Description: SvxLink DB9CR daily packages (bookworm)
+Label: SvxLink DB9CR
+Origin: SvxLink DB9CR
+Suite: bookworm
+MD5Sum:
+ ca020a05d000d8b5971eb9ac0d463887              207 Release
+ 7071ef51d1b209c02b7c51dc9bc5f49a             1188 main/binary-arm64/Packages
+ 8ba700184c87612d0b029f11b17b62eb              698 main/binary-arm64/Packages.gz
+SHA1:
+ ac8cca9f5ca84d8729c17b09fec487d9b016a371              207 Release
+ c4dbafc46ceebcc37714055403b3b64b791e37eb             1188 main/binary-arm64/Packages
+ 915cd61a9c74167a287de2e1f83385c9f0fd2994              698 main/binary-arm64/Packages.gz
+SHA256:
+ 9424465687e75770688285a76750d71b14ba16a64426fc1b5e1400e50e74071e              207 Release
+ 5b0a71ef3858abbea6079d25751d944dc86cb56fe9ca764eaa01a1bf3a56ff6e             1188 main/binary-arm64/Packages
+ edc149911378afcc7fbe1640fbb8278e2e931266424bebe148cbb0c53565f96e              698 main/binary-arm64/Packages.gz
+SHA512:
+ a0183c446dbecf0061aba29f1b3def84a71e20a30724d0a574d83101e78b56021daec787fd2d58e65999c3de8832d9259517128d5da5a2f481688b672b99f870              207 Release
+ 5f002228a55574584ec27a3b289a8cb197d9d70cf6d73667e17ec28719ea57a7f2fb8b22511358f3af09538917f76499b7813955095a1b4034612dc9166ef675             1188 main/binary-arm64/Packages
+ 143942508cb8664405e903388796ff73e900ca10c9408f352289378a84a8a5e2745e21e6d5bc83ceaff252deb5ecabe38240155be8bec4c3811b0e3f1eea7af2              698 main/binary-arm64/Packages.gz
