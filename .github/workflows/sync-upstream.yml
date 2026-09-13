@@ -47,6 +47,26 @@ jobs:
           if git merge-base --is-ancestor upstream/master HEAD; then
             echo 'Already up to date.' >> "$GITHUB_STEP_SUMMARY"
             echo 'changed=false' >> "$GITHUB_OUTPUT"
+
+            # GitHub disables scheduled workflows in public repositories
+            # after 60 days with no repository activity (a push resets
+            # this; merely running a workflow does not). Since the build
+            # is skipped whenever upstream has nothing new, this repo
+            # could otherwise go quiet for as long as upstream does. Push
+            # a trivial heartbeat commit well before that deadline so the
+            # schedule never gets silently disabled during a genuinely
+            # quiet upstream period.
+            last_commit_age_days=$(( ($(date -u +%s) - $(git log -1 --format=%ct)) / 86400 ))
+            if [[ "$last_commit_age_days" -ge 25 ]]; then
+              date -u +%Y-%m-%dT%H:%M:%SZ > .github/HEARTBEAT
+              git add .github/HEARTBEAT
+              git commit \
+                -m "chore: heartbeat commit to keep the schedule active" \
+                -m "GitHub disables scheduled workflows in public repositories after 60 days without any repository activity. The build here is skipped whenever sm0svx/svxlink has nothing new, so this repo could otherwise go quiet for as long as upstream does. This commit has no other effect; it exists solely to reset that clock with margin to spare."
+              git push origin HEAD:refs/heads/master
+              echo 'Pushed a heartbeat commit (no repository activity for 25+ days).' >> "$GITHUB_STEP_SUMMARY"
+            fi
+
             exit 0
           fi
 

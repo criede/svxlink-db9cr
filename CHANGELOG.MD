@@ -36,7 +36,12 @@ project's existing release notes are located under `src/doc/`.
   remaining queued legs immediately instead of repeating the same
   failure across all of them, and marks the run failed.
 - The scheduled sync now skips the build entirely when upstream had
-  nothing new to merge; a manual run always builds regardless.
+  nothing new to merge; a manual run always builds regardless. To
+  compensate, a trivial heartbeat commit (`.github/HEARTBEAT`) is pushed
+  whenever `master`'s last commit is 25+ days old, since GitHub disables
+  scheduled workflows in public repositories after 60 days with no
+  repository push, and this repo could otherwise go quiet for as long as
+  upstream does.
 - `index.html` now links a live GitHub compare view against upstream
   master and `CHANGELOG.MD`, instead of only linking the source repo,
   so what is actually different from upstream is transparent without

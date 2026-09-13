@@ -430,6 +430,17 @@ scheduled workflows may initially be disabled. Re-enable them under
 **Actions** if needed. The schedule requires the file to be on the default
 branch.
 
+Only a push (by anyone or anything, including `github-actions[bot]`) counts
+as activity for that 60-day clock — a scheduled workflow simply running,
+without pushing anything, does not reset it. Since the build above is
+skipped whenever upstream has nothing new, this repository could
+otherwise go quiet for as long as `sm0svx/svxlink` does. To guard against
+that, the "Merge upstream master" step pushes a trivial heartbeat commit
+(updates `.github/HEARTBEAT` with the current timestamp, no other effect)
+whenever `master`'s last commit is 25 or more days old — comfortably
+before the 60-day deadline, and only on days there was otherwise nothing
+to push.
+
 ## Sources
 
 - [GitHub: Events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)
