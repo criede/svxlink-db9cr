@@ -1,0 +1,43 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Architectures: arm64
+Codename: trixie
+Components: main
+Date: Sun, 13 Sep 2026 10:04:07 +0000
+Description: SvxLink DB9CR daily packages (trixie)
+Label: SvxLink DB9CR
+Origin: SvxLink DB9CR
+Suite: trixie
+MD5Sum:
+ 6c8036e73e703f5abd8ac0d3ced2090f              201 Release
+ 26baf932dde6a01c73f2c07f6854e8e6             1180 main/binary-arm64/Packages
+ 4ca6339bc678fc9881bb6373ea1228fe              696 main/binary-arm64/Packages.gz
+SHA1:
+ ca7a957591de2cd7fe7d788b12a9541b23c158ef              201 Release
+ a710b109e56001e5139b733ad3f535c46aa716e8             1180 main/binary-arm64/Packages
+ ca14bca73b7d40286cce873934dc6be3a66003b7              696 main/binary-arm64/Packages.gz
+SHA256:
+ 802886344dc909a03003eda9beeab1466f003965d5f3208a516b0abcd3a44ed1              201 Release
+ 067d7486b10951545155ea4fd91a66276c2a56ddb70f986bb6222636f02b11a6             1180 main/binary-arm64/Packages
+ 07a38ce717dca4cee9b25b758dfca90396019dce0e57f2e1ffe48318646629c0              696 main/binary-arm64/Packages.gz
+SHA512:
+ 1e5677ff5bc1165918c59cbede221f67aac24c362954df7c86c53fc2e8ab1296c1a5aa13b34a07a44c8e9ce6095a8bf8eaa76d1dd16c05f0c2a9b7e043048a3e              201 Release
+ 263f421a55e9a36b260bbc5ddde52725093ef77dbfc4761768c8c561d125ed685a4f9704760bf8fd0aa180436d173cdfa638a08ed33f4c259331f4016700e5dc             1180 main/binary-arm64/Packages
+ 00412f2470b7954cc459d5d4e2dfcd526f58830ddbba30b6791cca221aa8baff91ac0780e8898b6bf219efbcfbd13123571cdb64146f421c8d93f9d205202d7c              696 main/binary-arm64/Packages.gz
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE6c/pRn0AMUirk+usTtRPU1HYGEQFAmqmdRcACgkQTtRPU1HY
+GESKUBAAld+H0L41USGG5WKsxpbZau8smOY55UDDj/PPAZCvVqxbI4TlPKxqD6dO
+2U3SNwYcjdLcBoEXX6tOjIcNCtM329HMJE4tBUWKkkhQ2QQh3hgaaatJF6JD6BCk
+CkyICM/VgphlnYKecx27VgwEwchZjZ7FCrZuH4vgnMBxyL4lvkLu+ZvV9UVac17U
+487JPVZACS4gJfhmp0obbDWeyHlVpYM6aYN6kXmuXFMwVfFK7HvlS52MKwt8pCRk
+NbhEDFbzAkb7PyvO7Lx5Fde8b28YvB28Rj7PkoYvkILmmecYvsVpfWEayWrEI4rC
+O63Vxl4Bk5OUErEiwdxQ8fOkpbOfO+F2a5iCViBiADtk7vXykxumHSK+MpDfIz20
+4rBQ1icNrBxCfrn8qugPWJ/ZnWSFpdpAryuErRVVzb7xeHcxdMgXZoBr181mg6k1
+A39xzBEd4UrsEUmKvn5RTqwQXfiRJhK3Zcr82cCgZd74DT8w+/OUO0vutOaTkOVs
+yG5WGJpiuAg88f0enA6U+xkqUucICRDeaifqyWsHn3+Q2+kEqxL4Y9HYYignzh0m
+h9+ZSwHoFyfH+FHcyf2HxlMruGsr41MscKXX2AaEbO4L4ZyjELsEHeGVc274PFYa
+pkVvxu2xHPdpuyIUcGYSo5JGjPk3zaTmVlkaYAnnb4IBP9EZRsI=
+=ATbB
+-----END PGP SIGNATURE-----

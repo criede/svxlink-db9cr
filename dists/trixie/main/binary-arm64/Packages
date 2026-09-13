@@ -1,0 +1,17 @@
+Package: svxlink
+Version: 26.05.1+daily20260913.8.1.gc6c2e3c7c38e-1~trixie
+Architecture: arm64
+Maintainer: SvxLink Community <svxlink@groups.io>
+Installed-Size: 13512
+Depends: adduser, libc-bin, alsa-utils, vorbis-tools, tcl8.6, libasound2t64 (>= 1.0.16), libc6 (>= 2.38), libcurl4t64 (>= 7.16.2), libgcc-s1 (>= 4.0), libgcrypt20 (>= 1.11.0), libgpiod3 (>= 2.1), libgsm1 (>= 1.0.18), libjsoncpp26 (>= 1.9.6), libogg0 (>= 1.1.4~dfsg), libopus0 (>= 1.1), libpopt0 (>= 1.14), librtlsdr0, libsigc++-2.0-0v5 (>= 2.8.0), libspeex1 (>= 1.2~), libssl3t64 (>= 3.0.0), libstdc++6 (>= 14), libtcl8.6 (>= 8.6.0)
+Conflicts: svxlink-server, svxreflector, remotetrx
+Filename: pool/trixie/main/s/svxlink/svxlink_26.05.1+daily20260913.8.1.gc6c2e3c7c38e-1~trixie_arm64.deb
+Size: 3404544
+MD5sum: 646552cbf72cf87b4dc292b303df2b9f
+SHA1: faa0f769b9ba71e5aed60616445906beaa491eec
+SHA256: 2c0eff85a8a10d550029b3117547624667ad596734193563e676f85ef6912a30
+Section: devel
+Priority: optional
+Description: Advanced voice services system for ham radio use
+ The SvxLink project develops an advanced voice services system for ham radio use. It can be run on a simplex frequency or act as a repeater controller.
+
