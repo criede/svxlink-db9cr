@@ -84,10 +84,11 @@ instead if a reload does not seem to pick up a change (some settings, such
 as which logic cores or sound devices are loaded, may need a full restart).</p>
 
 <h2>Installing an older version</h2>
-<p>Every version ever published stays available in the pool (see
-"Retention" in
+<p>Recent versions stay available in the pool for a while after being
+superseded (daily for a week, weekly for a month, monthly for a year --
+see "Retention" in
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
-so a bad daily build can always be rolled back:</p>
+so a bad daily build can usually be rolled back:</p>
 <pre><code>apt list -a svxlink   # or qtel; lists every version still in the repository
 sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
 sudo apt-mark hold svxlink   # optional: stop "apt upgrade" pulling it forward again
