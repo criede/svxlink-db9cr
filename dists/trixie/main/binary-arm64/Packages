@@ -1,15 +1,15 @@
 Package: svxlink
-Version: 26.05.1+daily20260913.9.1.g2b6054348ab1-1~trixie
+Version: 26.05.1+daily20260913.10.1.ga94086671ade-1~trixie
 Architecture: arm64
 Maintainer: SvxLink Community <svxlink@groups.io>
 Installed-Size: 13512
 Depends: adduser, libc-bin, alsa-utils, vorbis-tools, tcl8.6, libasound2t64 (>= 1.0.16), libc6 (>= 2.38), libcurl4t64 (>= 7.16.2), libgcc-s1 (>= 4.0), libgcrypt20 (>= 1.11.0), libgpiod3 (>= 2.1), libgsm1 (>= 1.0.18), libjsoncpp26 (>= 1.9.6), libogg0 (>= 1.1.4~dfsg), libopus0 (>= 1.1), libpopt0 (>= 1.14), librtlsdr0, libsigc++-2.0-0v5 (>= 2.8.0), libspeex1 (>= 1.2~), libssl3t64 (>= 3.0.0), libstdc++6 (>= 14), libtcl8.6 (>= 8.6.0)
 Conflicts: svxlink-server, svxreflector, remotetrx
-Filename: pool/trixie/main/s/svxlink/svxlink_26.05.1+daily20260913.9.1.g2b6054348ab1-1~trixie_arm64.deb
-Size: 3404630
-MD5sum: 974a109a89823aacccb35d3faad2bdb5
-SHA1: a15c3c8120f6b9e4ced01d982a2d65b21c93ef2d
-SHA256: c1960041305d998171647bab1039818ed3359a97cff190c565dc4419b2cb0204
+Filename: pool/trixie/main/s/svxlink/svxlink_26.05.1+daily20260913.10.1.ga94086671ade-1~trixie_arm64.deb
+Size: 3404648
+MD5sum: f493ab20fee669c03de0dd4957823df8
+SHA1: 7670709caab35c3d05d3e554b6eee46157737bb7
+SHA256: af3504de62315af46e5d02195925ea61f7be4c44ad69bd07cab8310945419a30
 Section: devel
 Priority: optional
 Description: Advanced voice services system for ham radio use
