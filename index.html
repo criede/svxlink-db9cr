@@ -73,6 +73,26 @@ codename in <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> to one of
 the supported ones instead. Afterwards, a regular <code>sudo apt upgrade</code>
 picks up new daily builds automatically.</p>
 
+<h2>Applying configuration changes</h2>
+<p>After editing <code>/etc/svxlink/svxlink.conf</code> (or any
+<code>/etc/svxlink/svxlink.d/*.conf</code> module file) on a running
+station, reload it without dropping an active session:</p>
+<pre><code>sudo systemctl reload svxlink.service</code></pre>
+<p class="note">This sends <code>SIGHUP</code>, which SvxLink re-reads its
+configuration on. Use <code>sudo systemctl restart svxlink.service</code>
+instead if a reload does not seem to pick up a change (some settings, such
+as which logic cores or sound devices are loaded, may need a full restart).</p>
+
+<h2>Installing an older version</h2>
+<p>Every version ever published stays available in the pool (see
+"Retention" in
+<a href="https://github.com/criede/svxlink-db9cr/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
+so a bad daily build can always be rolled back:</p>
+<pre><code>apt list -a svxlink   # or qtel; lists every version still in the repository
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt-mark hold svxlink   # optional: stop "apt upgrade" pulling it forward again
+# sudo apt-mark unhold svxlink   # later, to resume automatic updates</code></pre>
+
 <h2>Packages</h2>
 <table>
 <tr><th>Package</th><th>Contains</th></tr>

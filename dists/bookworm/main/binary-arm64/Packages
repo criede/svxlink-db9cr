@@ -1,13 +1,13 @@
 Package: qtel
-Version: 26.05.1+daily20260913.24.1.g2f4427531cc4-1~bookworm
+Version: 26.05.1+daily20260913.27.1.g6b8b8b5d7160-1~bookworm
 Architecture: arm64
 Maintainer: SvxLink Community <svxlink@groups.io>
-Depends: svxlink (= 26.05.1+daily20260913.24.1.g2f4427531cc4-1~bookworm), libc6 (>= 2.34), libgcc-s1 (>= 3.0), libgsm1 (>= 1.0.18), libqt6core5compat6 (>= 6.2.1), libqt6core6 (>= 6.4.0), libqt6gui6 (>= 6.1.2), libqt6network6 (>= 6.4.0), libqt6widgets6 (>= 6.1.2), libsigc++-2.0-0v5 (>= 2.8.0), libstdc++6 (>= 5.2)
-Filename: pool/bookworm/main/q/qtel/qtel_26.05.1+daily20260913.24.1.g2f4427531cc4-1~bookworm_arm64.deb
-Size: 169776
-MD5sum: 48f9af5c684c2cf15e92236a81916646
-SHA1: ebcc858f829ebc6bcb114733f3ba40191b068037
-SHA256: 92404a7e04dfc627278b271bf3aebecc4cb5a54859a66c390f5df9dfadbc5126
+Depends: svxlink (= 26.05.1+daily20260913.27.1.g6b8b8b5d7160-1~bookworm), libc6 (>= 2.34), libgcc-s1 (>= 3.0), libgsm1 (>= 1.0.18), libqt6core5compat6 (>= 6.2.1), libqt6core6 (>= 6.4.0), libqt6gui6 (>= 6.1.2), libqt6network6 (>= 6.4.0), libqt6widgets6 (>= 6.1.2), libsigc++-2.0-0v5 (>= 2.8.0), libstdc++6 (>= 5.2)
+Filename: pool/bookworm/main/q/qtel/qtel_26.05.1+daily20260913.27.1.g6b8b8b5d7160-1~bookworm_arm64.deb
+Size: 169288
+MD5sum: b4933b8f9ef68434b9f4b7e67ceb870d
+SHA1: 09d601c4a019351ea00a3f247c79fd3be999a9b1
+SHA256: 4a9e81b89099d69f2f0e565edd8b80c479381d2ab8b90c96662ef429f2304c28
 Section: hamradio
 Priority: optional
 Description: Graphical EchoLink client for SvxLink
@@ -16,17 +16,17 @@ Description: Graphical EchoLink client for SvxLink
  same version, since it shares that package's echolib/async libraries.
 
 Package: svxlink
-Version: 26.05.1+daily20260913.10.1.ga94086671ade-1~bookworm
+Version: 26.05.1+daily20260913.27.1.g6b8b8b5d7160-1~bookworm
 Architecture: arm64
 Maintainer: SvxLink Community <svxlink@groups.io>
-Installed-Size: 13600
-Depends: adduser, libc-bin, alsa-utils, vorbis-tools, tcl8.6, libasound2 (>= 1.0.16), libc6 (>= 2.35), libcurl4 (>= 7.16.2), libgcc-s1 (>= 4.0), libgcrypt20 (>= 1.10.0), libgpiod2 (>= 1.1), libgsm1 (>= 1.0.18), libjsoncpp25 (>= 1.9.5), libogg0 (>= 1.1.4~dfsg), libopus0 (>= 1.1), libpopt0 (>= 1.14), librtlsdr0 (>= 0.6.0), libsigc++-2.0-0v5 (>= 2.8.0), libspeex1 (>= 1.2~), libssl3 (>= 3.0.0), libstdc++6 (>= 11), libtcl8.6 (>= 8.6.0)
-Conflicts: svxlink-server, svxreflector, remotetrx
-Filename: pool/bookworm/main/s/svxlink/svxlink_26.05.1+daily20260913.10.1.ga94086671ade-1~bookworm_arm64.deb
-Size: 3419676
-MD5sum: f4c9367e1b70e4b1ff5b602db8d938d7
-SHA1: 50513b9b31d1bcfa28ef471530d098465bd6ce8f
-SHA256: d2b8d2edc382d8facccdfd4b0187cd58c5fd1bd4d9a4112927317a2b459a1922
+Installed-Size: 18757
+Depends: adduser, libc-bin, alsa-utils, vorbis-tools, tcl8.6, libasound2 (>= 1.0.16), libc6 (>= 2.35), libcurl4 (>= 7.16.2), libgcc-s1 (>= 4.0), libgcrypt20 (>= 1.10.0), libgpiod2 (>= 1.1), libgsm1 (>= 1.0.18), libjsoncpp25 (>= 1.9.5), libogg0 (>= 1.1.4~dfsg), libopus0 (>= 1.1), libpopt0 (>= 1.14), libsigc++-2.0-0v5 (>= 2.8.0), libspeex1 (>= 1.2~), libssl3 (>= 3.0.0), libstdc++6 (>= 11), libtcl8.6 (>= 8.6.0), libusb-1.0-0 (>= 2:1.0.21)
+Conflicts: svxlink-server, svxreflector, remotetrx, librtlsdr0, rtl-sdr
+Filename: pool/bookworm/main/s/svxlink/svxlink_26.05.1+daily20260913.27.1.g6b8b8b5d7160-1~bookworm_arm64.deb
+Size: 4892972
+MD5sum: e89e21caa9ba28d507679a3517cb1896
+SHA1: b9e6a7b074ef55c9d2ba1b2658a02acacc86deaf
+SHA256: f61e1a998d36bb4d0004b27fd61dafb86c97d77e9ee0586d75c8fb5143633052
 Section: devel
 Priority: optional
 Description: Advanced voice services system for ham radio use
