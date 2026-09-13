@@ -22,6 +22,18 @@ and Debian. These are daily builds from the latest source, not stable
 releases &mdash; see the
 <a href="https://github.com/criede/svxlink-db9cr">source repository</a> for details.</p>
 
+<h2>Upstream &amp; local changes</h2>
+<p>This is a daily-synced fork of
+<a href="https://github.com/sm0svx/svxlink">sm0svx/svxlink</a>, the
+original SvxLink project, with local packaging and feature additions
+layered on top (RTL-SDR, SipLogic, the separate <code>qtel</code> package,
+this APT repository, and more &mdash; see
+<a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>
+for the full list). To see exactly what is different from upstream at any
+point in time, without relying on a snapshot here going stale, compare
+live on GitHub:
+<a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;this fork's master</a>.</p>
+
 <h2>Quickstart</h2>
 <p>Run on the target system (detects the right codename/architecture automatically):</p>
 <pre><code># Import the public signing key
@@ -35,12 +47,21 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
   sudo tee /etc/apt/sources.list.d/svxlink-db9cr.list
 
 sudo apt update
-sudo apt install svxlink</code></pre>
+sudo apt install svxlink
+# Optional graphical EchoLink client (needs a desktop environment):
+# sudo apt install qtel</code></pre>
 <p class="note">If <code>apt update</code> reports a 404 for this source, your
 system's codename isn't built yet (see the table below) &mdash; edit the
 codename in <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> to one of
 the supported ones instead. Afterwards, a regular <code>sudo apt upgrade</code>
 picks up new daily builds automatically.</p>
+
+<h2>Packages</h2>
+<table>
+<tr><th>Package</th><th>Contains</th></tr>
+<tr><td><code>qtel</code></td><td>Graphical EchoLink client (Qt6). Requires a desktop environment and the <code>svxlink</code> package of the exact same version (shares its echolib/async libraries).</td></tr>
+<tr><td><code>svxlink</code></td><td>Server components (svxlink, remotetrx, svxreflector, logic cores, Tcl event scripts). Built with: RTL-SDR direct-USB support (bundled RTL-SDR Blog librtlsdr/rtl_tcp fork for current V3/V4 dongles; conflicts with the distro librtlsdr0/rtl-sdr), the contributed SipLogic logic core (bundled PJSIP/pjproject, statically linked), GPIO via libgpiod, and Speex/Opus/LADSPA audio codec and plugin support. Installs a systemd service. Does not include Qtel or sound packs.</td></tr>
+</table>
 
 <h2>Supported systems</h2>
 <table>
@@ -52,5 +73,11 @@ picks up new daily builds automatically.</p>
 <h2>Signing key</h2>
 <p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; imported automatically by the
 quickstart commands above.</p>
+
+<h2>Browse repository files</h2>
+<p><a href="dists/">dists/</a> (per-suite indices, Release files, Packages
+lists) &middot; <a href="pool/">pool/</a> (the actual <code>.deb</code>
+files) &middot; <a href="https://github.com/criede/svxlink-db9cr">source
+repository</a> on GitHub.</p>
 </body>
 </html>
