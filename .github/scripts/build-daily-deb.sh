@@ -72,7 +72,7 @@ Daily development build of svxlink-db9cr, not a stable release.
 - Radio hardware and audio operation have not been tested by CI.
 
 Install with \`sudo apt install ./svxlink_*.deb\` after downloading the package,
-or via the APT repository, see UPSTREAM-SYNC.MD.
+or via the APT repository: https://criede.github.io/svxlink-db9cr/
 Configure the station and install the appropriate sound pack before starting SvxLink.
 EOF
 cd /output

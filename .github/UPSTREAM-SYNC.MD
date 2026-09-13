@@ -61,7 +61,9 @@ suite/architecture, so the legs do not overwrite each other). The tag
 points to the built commit. No prerelease is marked as "Latest". There are
 no Actions artifacts and no build cache; temporary files are removed after
 the upload. A failed leg does not publish a new prerelease and, thanks to
-`fail-fast: false`, does not block the other legs.
+`fail-fast: false`, does not block the other legs. Old prereleases are
+pruned by the separate `cleanup-old-releases` job once all legs have
+finished — see "Retention" below.
 
 The `.github/scripts/build-daily-deb.sh` script determines the
 architecture (`dpkg --print-architecture`) and distribution codename
@@ -111,9 +113,9 @@ The `.github/scripts/publish-apt-repo.sh` script handles placing the file
 in the pool, rebuilding `Packages`/`Packages.gz` with `dpkg-scanpackages`,
 rebuilding and signing `Release`/`InRelease` with `apt-ftparchive` and
 `gpg` respectively, and keeping the public key available as `pubkey.gpg`.
-So that the `gh-pages` branch does not grow without bound, only the last
-14 daily versions are kept per package/suite/architecture (`RETENTION`
-parameter in the script); older `.deb` files are removed before rebuilding
+So that the `gh-pages` branch does not grow without bound, older `.deb`
+files are pruned per package/suite/architecture using the same retention
+policy as the daily releases (see "Retention" below) before rebuilding
 the index. A failed build does not publish anything here either.
 
 ### Signing key
@@ -161,6 +163,35 @@ exports it freshly from the imported private key on every run to
 `pubkey.gpg` in the repository root. A key change (e.g. after expiry or
 compromise) automatically produces a new `pubkey.gpg`; users then need to
 import the key again (see below).
+
+### Retention
+
+Both the daily GitHub prereleases and the packages kept in the APT
+repository's pool follow the same grandfather-father-son retention policy,
+implemented once in `.github/scripts/gfs-retention.sh` and applied
+independently per series (per suite for releases; per
+package/suite/architecture for the pool) so every currently maintained
+suite always keeps its own recent history:
+
+| Age                | Kept                          |
+|--------------------|--------------------------------|
+| < 1 week            | every daily build              |
+| 1 week – 1 month    | the newest build per ISO week  |
+| 1 month – 1 year    | the newest build per month     |
+| ≥ 1 year            | nothing                        |
+
+For the pool, pruning happens as part of `publish-apt-repo.sh` on every
+run, right after the new package is added and before the index is
+rebuilt. For releases, a separate `cleanup-old-releases` job runs once
+per workflow run, after all `daily-deb` matrix legs have finished
+(`if: always()`, so it still runs even if a leg failed); it lists all
+`daily-*` releases, groups them by suite (the last segment of the tag),
+and deletes each release together with its tag
+(`gh release delete <tag> --yes --cleanup-tag`) if it falls outside the
+window for its suite. The build date is parsed from the
+`+daily<YYYYMMDD>` marker in the version string; anything that does not
+match this shape is left untouched rather than risk deleting something
+unrelated.
 
 ## Installing on Raspberry Pi OS and Debian
 

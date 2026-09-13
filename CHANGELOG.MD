@@ -27,10 +27,15 @@ project's existing release notes are located under `src/doc/`.
 - GPG-signed APT repository published to the `gh-pages` branch after each
   daily build, laid out per suite/architecture (`dists/<suite>/...`,
   `pool/<suite>/...`) so further Debian/Ubuntu versions and architectures
-  can be added later; old versions are pruned per package/suite/architecture.
-  The repository's `index.html` is a self-contained quickstart (codename/
-  architecture auto-detection, supported-systems table) rather than a link
-  to the maintainer-facing `UPSTREAM-SYNC.MD`.
+  can be added later. The repository's `index.html` is a self-contained
+  quickstart (codename/architecture auto-detection, supported-systems
+  table) rather than a link to the maintainer-facing `UPSTREAM-SYNC.MD`.
+- Shared grandfather-father-son retention (`.github/scripts/gfs-retention.sh`):
+  daily builds are kept for a week, weekly for a month, monthly for a year,
+  nothing older, applied per suite. Old APT pool packages are pruned as
+  part of publishing; old daily GitHub prereleases (and their tags) are
+  deleted by a new `cleanup-old-releases` job that runs once per workflow
+  run after all `daily-deb` legs finish.
 - TCL event handling scripts (`events.tcl`, `events.d/*.tcl`,
   `modules.d/*.tcl`) are now installed as dpkg conffiles, like the existing
   `.conf` files, so a package upgrade no longer silently overwrites a file

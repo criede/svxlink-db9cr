@@ -231,3 +231,22 @@ jobs:
         run: |
           docker run --rm -v "$RUNNER_TEMP/daily-deb:/output" \
             "debian:${{ matrix.suite }}-slim" sh -c 'find /output -mindepth 1 -delete'
+
+  cleanup-old-releases:
+    name: Prune old daily releases
+    needs: daily-deb
+    if: always() && github.repository == 'criede/svxlink-db9cr'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
+        with:
+          persist-credentials: false
+
+      - name: Prune daily releases outside the retention window
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: bash .github/scripts/prune-daily-releases.sh

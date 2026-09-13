@@ -24,13 +24,15 @@ set -euo pipefail
 #   GPG_KEY_FPR   Fingerprint (or key ID) of the imported signing key.
 # Optional:
 #   COMPONENT     Archive component. Default: "main".
-#   RETENTION     Number of package versions to keep per suite/component/
-#                 architecture/package. Older ones are pruned so the branch
-#                 does not grow without bound. Default: 14.
+#
+# Older packages are pruned per suite/component/architecture/package using
+# the grandfather-father-son policy in gfs-retention.sh (daily for a week,
+# weekly for a month, monthly for a year, nothing older), so the branch
+# does not grow without bound.
 
 : "${REPO_DIR:?}" "${DEB_FILE:?}" "${SUITE:?}" "${ARCH:?}" "${GPG_KEY_FPR:?}"
 COMPONENT="${COMPONENT:-main}"
-RETENTION="${RETENTION:-14}"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 test -f "$DEB_FILE"
 pkg_name=$(dpkg-deb -f "$DEB_FILE" Package)
@@ -45,19 +47,32 @@ pool_dir="$REPO_DIR/pool/$SUITE/$COMPONENT/$letter/$pkg_name"
 mkdir -p "$pool_dir"
 cp "$DEB_FILE" "$pool_dir/"
 
-# Prune older versions of this package for this suite/arch, keeping the
-# $RETENTION most recently published ones.
+# Prune older versions of this package for this suite/arch according to
+# the grandfather-father-son retention policy. The build date is taken
+# from the "+daily<YYYYMMDD>" marker in the version string; files without
+# that marker are left untouched.
 shopt -s nullglob
-existing=("$pool_dir"/"${pkg_name}"_*_"${ARCH}".deb)
-if [[ "${#existing[@]}" -gt "$RETENTION" ]]; then
-  # Oldest first; drop everything but the newest $RETENTION.
-  mapfile -t sorted_oldest_first < <(ls -t "${existing[@]}" | tac)
-  drop_count=$(( ${#sorted_oldest_first[@]} - RETENTION ))
-  for ((i = 0; i < drop_count; i++)); do
-    echo "Pruning old package: ${sorted_oldest_first[$i]}"
-    rm -f -- "${sorted_oldest_first[$i]}"
-  done
+today="$(date -u +%Y%m%d)"
+dated_pairs=""
+for f in "$pool_dir"/"${pkg_name}"_*_"${ARCH}".deb; do
+  base="$(basename "$f")"
+  if [[ "$base" =~ \+daily([0-9]{8}) ]]; then
+    dated_pairs="${dated_pairs}${BASH_REMATCH[1]} ${base}"$'\n'
+  fi
+done
+
+keep_set=""
+if [[ -n "$dated_pairs" ]]; then
+  keep_set="$(printf '%s' "$dated_pairs" | bash "$script_dir/gfs-retention.sh" "$today")"
 fi
+
+for f in "$pool_dir"/"${pkg_name}"_*_"${ARCH}".deb; do
+  base="$(basename "$f")"
+  if [[ "$base" =~ \+daily([0-9]{8}) ]] && ! grep -qxF "$base" <<< "$keep_set"; then
+    echo "Pruning old package (outside retention window): $base"
+    rm -f -- "$f"
+  fi
+done
 
 dists_dir="$REPO_DIR/dists/$SUITE"
 binary_dir="$dists_dir/$COMPONENT/binary-$ARCH"
