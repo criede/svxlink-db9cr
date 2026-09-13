@@ -174,8 +174,11 @@ EOF
 # require tagging every install() call across the whole project), so Qtel
 # gets its own full build + install into a private root instead, from which
 # only its own files are copied into a hand-assembled qtel package.
+# qt6-tools-dev provides the Qt6LinguistToolsConfig.cmake package config
+# (needed by qtel/translations/CMakeLists.txt's find_package(Qt6LinguistTools)),
+# and pulls in qt6-tools-dev-tools (lupdate/lrelease binaries) itself.
 apt-get install -y --no-install-recommends \
-  qt6-base-dev qt6-base-dev-tools qt6-l10n-tools libqt6core5compat6-dev
+  qt6-base-dev qt6-base-dev-tools qt6-tools-dev libqt6core5compat6-dev
 
 cmake -S /source/src -B /build-qtel \
   -DCMAKE_BUILD_TYPE=Release -DUSE_QT=ON -DWITH_SYSTEMD=OFF -DDO_INSTALL_CHOWN=OFF \

@@ -45,7 +45,11 @@ jobs:
       # commits and pushes to the shared gh-pages branch; running matrix
       # legs in parallel would race on that push.
       max-parallel: 1
-      fail-fast: false
+      # fail-fast (the default): a failing leg is almost always the same
+      # bug hitting every other leg too (they all run the same script), so
+      # cancel the remaining queued legs immediately instead of burning CI
+      # time repeating the same failure, and mark the whole run failed.
+      fail-fast: true
       matrix:
         include:
           # Currently maintained Debian-based releases (Debian and

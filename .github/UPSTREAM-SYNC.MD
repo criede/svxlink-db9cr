@@ -144,10 +144,14 @@ with the GitHub CLI into its own daily prerelease (tag and title include
 suite/architecture, so the legs do not overwrite each other). The tag
 points to the built commit. No prerelease is marked as "Latest". There are
 no Actions artifacts and no build cache; temporary files are removed after
-the upload. A failed leg does not publish a new prerelease and, thanks to
-`fail-fast: false`, does not block the other legs. Old prereleases are
-pruned by the separate `cleanup-old-releases` job once all legs have
-finished — see "Retention" below.
+the upload. A failed leg does not publish a new prerelease. `fail-fast`
+is on (the default): a failing leg almost always means the same bug in
+the shared script would hit every other leg too, so remaining queued
+legs are cancelled immediately and the whole run is marked failed,
+rather than burning CI time repeating the same failure four times.
+`cleanup-old-releases` and `deploy-pages` still run afterwards
+(`if: always()`) regardless, to publish/prune whatever legs did
+complete — see "Retention" below.
 
 The `.github/scripts/build-daily-deb.sh` script determines the
 architecture (`dpkg --print-architecture`) and distribution codename

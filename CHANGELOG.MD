@@ -32,6 +32,9 @@ project's existing release notes are located under `src/doc/`.
   writes; GitHub no longer serves it directly, and no longer runs its own
   internal `pages-build-deployment` workflow for it, which had been
   observed pinned to a deprecated Node.js version outside our control.
+- Matrix `fail-fast` turned on (was off): a failing leg cancels the
+  remaining queued legs immediately instead of repeating the same
+  failure across all of them, and marks the run failed.
 
 ### Added
 
