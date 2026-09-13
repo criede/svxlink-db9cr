@@ -58,6 +58,10 @@ dpkg --validate-version "$version"
 # above) into the package's own staging tree during CPack's install phase,
 # so it ships as part of the svxlink package itself rather than depending on
 # (or colliding with) any system-wide librtlsdr/rtl-sdr installation.
+# /build is created here explicitly: it is otherwise only created as a side
+# effect of the "cmake -S -B /build" configure call further down, which
+# races with writing into it.
+mkdir -p /build
 cat > /build/bundle-extra-libs.cmake <<CMAKE_EOF
 file(GLOB rtlsdr_libs "/usr/local/lib/librtlsdr.so*" "/usr/local/lib/*/librtlsdr.so*")
 file(MAKE_DIRECTORY "\$ENV{DESTDIR}/usr/lib/${multiarch}")
