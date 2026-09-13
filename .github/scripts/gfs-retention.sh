@@ -32,7 +32,11 @@ while IFS=' ' read -r entry_date id; do
   entry_epoch=$(date -u -d "$entry_date" +%s)
   age_days=$(( (today_epoch - entry_epoch) / 86400 ))
   if (( age_days < 7 )); then
-    bucket="d:$entry_date"
+    # Keep every entry unconditionally, even several from the same day
+    # (e.g. re-runs, or manual workflow_dispatch testing): bucket per
+    # entry rather than per day, so there is nothing here to deduplicate.
+    printf '%s\n' "$id"
+    continue
   elif (( age_days < 30 )); then
     bucket="w:$(date -u -d "$entry_date" +%G-%V)"
   elif (( age_days < 365 )); then
@@ -40,7 +44,13 @@ while IFS=' ' read -r entry_date id; do
   else
     continue
   fi
-  # Keep only the newest entry per bucket.
+  # Keep only the newest entry per bucket. Note: if two entries share the
+  # exact same date, this keeps whichever was read first rather than a
+  # true "latest" (comparing dates alone cannot break that tie) -- with
+  # same-day entries no longer reaching here from the daily zone above,
+  # that only remains a real possibility across a full week/month of
+  # otherwise-normal, at-most-one-per-day runs, so it is not worth the
+  # extra complexity of comparing versions to resolve.
   if [[ -z "${bucket_best_date[$bucket]:-}" ]] || [[ "$entry_date" > "${bucket_best_date[$bucket]}" ]]; then
     bucket_best_date["$bucket"]="$entry_date"
     bucket_best_id["$bucket"]="$id"

@@ -242,10 +242,9 @@ The `.github/scripts/publish-apt-repo.sh` script handles placing the file
 in the pool, rebuilding `Packages`/`Packages.gz` with `dpkg-scanpackages`,
 rebuilding and signing `Release`/`InRelease` with `apt-ftparchive` and
 `gpg` respectively, and keeping the public key available as `pubkey.gpg`.
-So that the `gh-pages` branch does not grow without bound, older `.deb`
-files are pruned per package/suite/architecture using the same retention
-policy as the daily releases (see "Retention" below) before rebuilding
-the index. A failed build does not publish anything here either.
+Every published version stays in the pool indefinitely, unlike the
+daily releases (see "Retention" below) — the pool is the actual rollback
+path. A failed build does not publish anything here either.
 
 ### Signing key
 
@@ -295,32 +294,66 @@ import the key again (see below).
 
 ### Retention
 
-Both the daily GitHub prereleases and the packages kept in the APT
-repository's pool follow the same grandfather-father-son retention policy,
-implemented once in `.github/scripts/gfs-retention.sh` and applied
-independently per series (per suite for releases; per
-package/suite/architecture for the pool) so every currently maintained
-suite always keeps its own recent history:
+The daily GitHub prereleases and the packages kept in the APT
+repository's pool are retained differently on purpose: the pool is meant
+to be a real rollback path (`apt install pkg=<old-version>` only works
+for as long as that exact version is still listed in the suite's
+`Packages` index), so it keeps **every** version ever published,
+indefinitely — `publish-apt-repo.sh` only ever adds to the pool, never
+removes from it. A pool with many versions of the same package is normal
+for a Debian archive; `dpkg-scanpackages`/apt handle it without issue.
+
+The daily GitHub prereleases, which mainly exist as a build artifact
+store rather than an install path, still follow a grandfather-father-son
+retention policy, implemented in `.github/scripts/gfs-retention.sh` and
+applied per suite (the last segment of the tag) so every currently
+maintained suite keeps its own recent history:
 
 | Age                | Kept                          |
 |--------------------|--------------------------------|
-| < 1 week            | every daily build              |
+| < 1 week            | every build                    |
 | 1 week – 1 month    | the newest build per ISO week  |
 | 1 month – 1 year    | the newest build per month     |
 | ≥ 1 year            | nothing                        |
 
-For the pool, pruning happens as part of `publish-apt-repo.sh` on every
-run, right after the new package is added and before the index is
-rebuilt. For releases, a separate `cleanup-old-releases` job runs once
-per workflow run, after all `daily-deb` matrix legs have finished
-(`if: always()`, so it still runs even if a leg failed); it lists all
-`daily-*` releases, groups them by suite (the last segment of the tag),
-and deletes each release together with its tag
+"Every build" in the under-a-week row is literal: `gfs-retention.sh`
+buckets that range per *entry*, not per day, so several builds sharing
+the exact same date (repeated `workflow_dispatch` runs on one day,
+manual testing, a retry) are all kept rather than collapsed to one.
+An earlier version bucketed by day even there, comparing dates to decide
+which of two same-day entries was "newest" — a comparison that can never
+tell two identical dates apart, so it silently kept whichever entry was
+processed first and dropped every other same-day build, including same-day
+re-runs meant to supersede a broken one. The weekly/monthly rows still
+bucket by ISO week / calendar month and so retain that same limitation
+for entries that happen to share an exact date within a week or month,
+but that only matters at all for a suite with more than one build on the
+same calendar day, which does not happen in normal single-run-per-day
+operation.
+
+A separate `cleanup-old-releases` job runs once per workflow run, after
+all `daily-deb` matrix legs have finished (`if: always()`, so it still
+runs even if a leg failed); it lists all `daily-*` releases, groups them
+by suite, and deletes each release together with its tag
 (`gh release delete <tag> --yes --cleanup-tag`) if it falls outside the
 window for its suite. The build date is parsed from the
 `+daily<YYYYMMDD>` marker in the version string; anything that does not
 match this shape is left untouched rather than risk deleting something
-unrelated.
+unrelated. Since a pruned release's `.deb` remains available and
+installable through the APT repository regardless, nothing is actually
+lost when an old prerelease is deleted — only the GitHub Releases page
+listing shrinks.
+
+Keeping the pool unbounded means the `gh-pages` branch, and the size of
+the published site, grow indefinitely over time (roughly proportional to
+daily build count × package sizes × number of suite/architecture
+combinations — a few GB per year at the current scope). This is a
+deliberate trade-off for rollback capability on a public repository,
+where GitHub Actions/Pages usage itself is free regardless of volume; if
+the branch or site size ever becomes a problem, reintroducing the same
+`gfs-retention.sh` call in `publish-apt-repo.sh` that was used here
+before (see git history) brings the pool back in line with the release
+retention above.
 
 ## Installing on Raspberry Pi OS and Debian
 
@@ -357,9 +390,27 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 
 sudo apt update
 sudo apt install svxlink
+
+# Mandatory before the first start: configure the station, radio and audio.
+# The packaged file is only a template and must be adapted to the setup.
+sudo editor /etc/svxlink/svxlink.conf
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now svxlink.service
+systemctl status svxlink.service
+journalctl -u svxlink.service -f
+
 # Optional graphical EchoLink client (needs a desktop environment):
 # sudo apt install qtel
 ```
+
+After changing `/etc/svxlink/svxlink.conf` or a module config under
+`/etc/svxlink/svxlink.d/` on a running station, `sudo systemctl reload
+svxlink.service` applies it (sends `SIGHUP`, which SvxLink re-reads its
+configuration on) without dropping an active session; fall back to
+`sudo systemctl restart svxlink.service` if a change does not seem to
+take effect (loaded logic cores/modules or sound devices may need a full
+restart).
 
 If the detected codename is not (yet) part of the matrix, `apt update`
 reports a 404 for the affected source; in that case, either set the
@@ -371,7 +422,21 @@ latest daily version for the installed system. These are daily development
 builds, not stable releases — see the notes above on scope and test
 coverage.
 
-## Admin customizations to the TCL event scripts
+### Rolling back to an older build
+
+Since the pool keeps every version ever published (see "Retention"
+above), a bad daily build can be rolled back to any earlier one. List
+the available versions, then install a specific one explicitly (`apt`
+will offer to downgrade):
+
+```sh
+apt list -a svxlink   # substitute qtel to roll that package back instead
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+```
+
+To pin a package at that version so `apt upgrade` does not pull it
+forward again until you decide to, add `apt-mark hold svxlink` (and
+`apt-mark unhold svxlink` later to resume automatic updates).
 
 The TCL files under `/usr/share/svxlink` (`events.tcl`, `events.d/*.tcl`,
 `modules.d/*.tcl`) are installed as dpkg `conffiles`, just like the `.conf`

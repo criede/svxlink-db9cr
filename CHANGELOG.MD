@@ -7,9 +7,27 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- The APT repository pool now keeps every published version indefinitely
+  instead of pruning it with the same grandfather-father-son policy as
+  the daily GitHub prereleases: `apt install pkg=<old-version>` only
+  works for as long as that version is still listed in the pool, so it
+  is the one place old builds need to stay reachable to actually roll
+  back to them. The daily prereleases keep the GFS policy unchanged.
+- Fixed a `gfs-retention.sh` bug where several builds sharing the exact
+  same date (repeated manual `workflow_dispatch` runs on one day, a
+  retry) were collapsed down to just one, since the "keep the newest per
+  bucket" comparison could never tell two identical dates apart and
+  silently kept whichever entry it processed first. Builds under a week
+  old are no longer bucketed by day at all -- every one of them is kept,
+  matching what the policy already claimed to do. This had been quietly
+  losing same-day rebuilds' releases and (before the pool retention
+  change above) pool packages during this session's testing.
 - The APT repository Quickstart now requires editing
   `/etc/svxlink/svxlink.conf` before first start and documents how to enable,
-  start, inspect and follow the logs of `svxlink.service` with systemd.
+  start, inspect and follow the logs of `svxlink.service` with systemd,
+  how to apply a configuration change with `systemctl reload` (SvxLink
+  reloads on `SIGHUP`), and how to install/pin an older version for
+  rollback.
 - Upstream sync permanently excludes changes to `.github/workflows/`;
   own workflow files are fully preserved, even on fast-forwards.
 - Upstream CodeQL disabled in the own repository: automatic triggers
