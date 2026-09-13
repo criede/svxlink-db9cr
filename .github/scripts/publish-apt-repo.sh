@@ -112,7 +112,7 @@ cat > "$REPO_DIR/index.html" <<EOF
 <p><strong>Documentation:</strong>
 <a href="${docs_url}">UPSTREAM-SYNC.MD</a>
 &mdash; setup, signing key rotation and
-<a href="${docs_url}#einbindung-in-raspberry-pi-os">Raspberry Pi OS install instructions</a>.</p>
+<a href="${docs_url}#einbindung-auf-raspberry-pi-os-und-debian">install instructions for Raspberry Pi OS and Debian</a>.</p>
 <p>Public signing key: <a href="pubkey.gpg">pubkey.gpg</a></p>
 <p>Available suites/architectures:</p>
 <ul>

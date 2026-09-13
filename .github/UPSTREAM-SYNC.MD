@@ -25,44 +25,67 @@ nicht. Technische Fehler brechen den Lauf weiterhin ab. Bei zwischenzeitlichen
 Änderungen am Zielbranch wird kein Force-Push ausgeführt; der Workflow kann
 anschließend erneut starten.
 
-## Daily-Paket für Raspberry Pi OS
+## Daily-Paket für Raspberry Pi OS und Debian
 
-Nach jedem erfolgreichen Sync läuft ein nativer arm64-Build in einem
-`debian:trixie-slim`-Container. Ziel ist Raspberry Pi OS 64 Bit auf Debian 13
-Trixie. Gebaut wird exakt der vom Sync ausgegebene Commit, auch wenn keine neuen
-Upstream-Commits vorhanden waren. Der Server-Build enthält kein Qtel und keine
-Sprachdateien; diese müssen passend zur Station installiert werden.
+Nach jedem erfolgreichen Sync läuft der Job `daily-deb` als Matrix über alle
+aktuell gepflegten Debian-basierten Zielversionen, je in einem nativen
+`debian:<suite>-slim`-Container:
+
+| Suite      | Debian-Version    | Architektur | Deckt ab |
+|------------|-------------------|-------------|----------|
+| `bookworm` | Debian 12 (oldstable) | `arm64` | Raspberry Pi OS Bookworm, Debian 12 |
+| `trixie`   | Debian 13 (stable)    | `arm64` | Raspberry Pi OS Trixie, Debian 13 |
+
+Debian und Raspberry Pi OS teilen sich pro Codename dieselbe Paketbasis
+(gleiche Bibliotheksversionen, gleiches ABI); ein Build pro Suite/Architektur
+deckt daher beide gleichzeitig ab, eine gesonderte „Raspberry Pi OS“-Variante
+ist nicht nötig. Sobald eine dieser Debian-Versionen den Support-Status
+wechselt (z. B. eine neue Debian-Version stable wird), wird die Matrix in
+`.github/workflows/sync-upstream.yml` entsprechend angepasst — ältere
+Einträge entfernt, neue ergänzt.
+
+Die Matrix-Läufe laufen absichtlich sequenziell (`max-parallel: 1`), da der
+Publish-Schritt in den gemeinsamen `gh-pages`-Branch committet und ein
+paralleler Push dort race-anfällig wäre. Gebaut wird in jedem Leg exakt der
+vom Sync ausgegebene Commit, auch wenn keine neuen Upstream-Commits vorhanden
+waren. Der Server-Build enthält kein Qtel und keine Sprachdateien; diese
+müssen passend zur Station installiert werden.
 
 Die Debian-Version folgt dem Schema
 `26.05.1+daily20260912.42.1.g0123456789ab-1~trixie`: Projektversion aus
-`src/versions`, UTC-Datum, Workflow-Laufnummer, Versuch und Commit-Kürzel.
-Sie steigt innerhalb einer Projektversion mit jedem neuen Daily-Lauf an;
-die nächste höhere Projektversion sortiert danach. `Release` als CMake-Bautyp
-bedeutet nur optimierten Maschinencode, keine stabile Veröffentlichung.
+`src/versions`, UTC-Datum, Workflow-Laufnummer, Versuch, Commit-Kürzel und
+Ziel-Suite. Sie steigt innerhalb einer Projektversion mit jedem neuen
+Daily-Lauf an; die nächste höhere Projektversion sortiert danach. `Release`
+als CMake-Bautyp bedeutet nur optimierten Maschinencode, keine stabile
+Veröffentlichung.
 
-Nach Paketprüfung und Installationstest in einem frischen Trixie-Container
-werden `.deb` und `SHA256SUMS` direkt mit der GitHub CLI in ein eigenes Daily-
-Prerelease hochgeladen. Der Tag verweist auf den gebauten Commit. Das Prerelease
-wird nicht als „Latest“ markiert. Es gibt keine Actions-Artefakte und keinen
-Build-Cache; temporäre Dateien werden nach dem Upload entfernt. Fehlgeschlagene
-Builds veröffentlichen kein neues Prerelease. Die Hardware wird in CI nicht getestet.
+Nach Paketprüfung und Installationstest in einem frischen Container der
+jeweiligen Suite werden `.deb` und `SHA256SUMS` pro Leg direkt mit der GitHub
+CLI in ein eigenes Daily-Prerelease hochgeladen (Tag und Titel enthalten
+Suite/Architektur, sodass sich die Legs nicht überschreiben). Der Tag
+verweist auf den gebauten Commit. Kein Prerelease wird als „Latest“ markiert.
+Es gibt keine Actions-Artefakte und keinen Build-Cache; temporäre Dateien
+werden nach dem Upload entfernt. Ein fehlgeschlagenes Leg veröffentlicht kein
+neues Prerelease und blockiert wegen `fail-fast: false` nicht die übrigen
+Legs.
 
 Das Skript `.github/scripts/build-daily-deb.sh` ermittelt Architektur
 (`dpkg --print-architecture`) und Distributions-Codename (`VERSION_CODENAME`
-aus `/etc/os-release`) aus dem jeweiligen Build-Container selbst. Ein
-zusätzlicher Job für eine weitere Raspberry-Pi-OS-/Debian-/Ubuntu-Version oder
--Architektur ruft daher dasselbe Skript einfach mit einem anderen
-`--platform`/Basis-Image auf (z. B. `debian:bookworm-slim` für Debian 12,
-`ubuntu:24.04` für Ubuntu Noble, oder mit `--platform linux/arm/v7` bzw.
-`linux/amd64` für andere Architekturen); Versionsschema, Conflicts und die
-anschließende Veröffentlichung passen sich automatisch an.
+aus `/etc/os-release`) aus dem jeweiligen Build-Container selbst statt sie
+fest zu verdrahten. Ein zusätzlicher Matrix-Eintrag für eine weitere
+Raspberry-Pi-OS-/Debian-/Ubuntu-Version oder -Architektur ruft daher
+dasselbe Skript einfach mit einem anderen `--platform`/Basis-Image auf (z. B.
+`ubuntu:24.04` für Ubuntu Noble, oder `arch: armhf`/`arch: amd64` für andere
+Architekturen); Versionsschema, Conflicts und die anschließende
+Veröffentlichung passen sich automatisch an.
 
 ## APT-Repository auf GitHub Pages
 
-Im Anschluss an das Daily-Prerelease veröffentlicht derselbe Job das Paket
-zusätzlich in einem eigenen APT-Repository im Branch `gh-pages`, sodass es
-sich mit `apt install` beziehen und automatisch aktualisieren lässt (siehe
-„Einbindung in Raspberry Pi OS“ unten).
+Im Anschluss an das Daily-Prerelease veröffentlicht jedes Matrix-Leg sein
+Paket zusätzlich in einem gemeinsamen APT-Repository im Branch `gh-pages`,
+sodass sich alle aktuell gepflegten Versionen mit `apt install` beziehen und
+automatisch aktualisieren lassen (siehe „Einbindung auf Raspberry Pi OS und
+Debian“ unten).
 
 Aufbau des Repositorys, nach Suite (Debian-/Ubuntu-Codename) und Architektur
 getrennt — das entspricht dem üblichen Debian-Repository-Layout (wie es z. B.
@@ -79,14 +102,14 @@ pool/<suite>/main/<buchstabe>/<paketname>/<paket>.deb
 pubkey.gpg                                   # öffentlicher Signaturschlüssel
 ```
 
-`<suite>` ist der Distributions-Codename (aktuell `trixie`), `<arch>` die
-Debian-Architektur (aktuell `arm64`). Ein späterer Build für z. B. Debian 12
-Bookworm oder eine 32-Bit-Architektur legt einfach einen weiteren
-`dists/bookworm/…` bzw. `binary-armhf`-Zweig an; bestehende Suiten/
-Architekturen bleiben unverändert. Separate Pfade sind notwendig, weil ein
-`.deb` jeweils nur zu genau einer Distributionsversion und Architektur passt
-und APT-Clients Pakete nur aus dem für sie passenden `dists/<suite>/…/binary-
-<arch>`-Zweig laden.
+`<suite>` ist der Distributions-Codename (aktuell `bookworm` und `trixie`,
+siehe Matrix oben), `<arch>` die Debian-Architektur (aktuell `arm64`). Ein
+späterer Build für z. B. eine 32-Bit-Architektur oder eine neue Debian-
+Version legt einfach einen weiteren `binary-armhf`- bzw. `dists/<neue
+suite>/…`-Zweig an; bestehende Suiten/Architekturen bleiben unverändert.
+Separate Pfade sind notwendig, weil ein `.deb` jeweils nur zu genau einer
+Distributionsversion und Architektur passt und APT-Clients Pakete nur aus
+dem für sie passenden `dists/<suite>/…/binary-<arch>`-Zweig laden.
 
 Das Skript `.github/scripts/publish-apt-repo.sh` übernimmt Ablage im Pool,
 Neuaufbau von `Packages`/`Packages.gz` mit `dpkg-scanpackages`, Neuaufbau und
@@ -144,31 +167,52 @@ nach Ablauf oder Kompromittierung) erzeugt automatisch eine neue
 `pubkey.gpg`; Nutzer müssen den Schlüssel dann erneut importieren (siehe
 unten).
 
-## Einbindung in Raspberry Pi OS
+## Einbindung auf Raspberry Pi OS und Debian
 
 Sobald GitHub Pages für den Branch `gh-pages` aktiviert ist (siehe
-„Einrichtung“), lässt sich das Repository auf einem Raspberry Pi OS Trixie
-(64 Bit) mit folgenden Befehlen einbinden:
+„Einrichtung“), lässt sich das Repository einbinden. Die Befehle sind für
+alle unterstützten Systeme identisch, nur der Codename in der
+Repository-Zeile unterscheidet sich:
+
+| Betriebssystem                    | Codename    |
+|------------------------------------|-------------|
+| Raspberry Pi OS Trixie (64 Bit)    | `trixie`    |
+| Raspberry Pi OS Bookworm (64 Bit)  | `bookworm`  |
+| Debian 13 (Trixie)                 | `trixie`    |
+| Debian 12 (Bookworm)               | `bookworm`  |
+
+Aktuell werden beide Codenamen für `arm64` gepflegt (siehe Matrix im
+Abschnitt „Daily-Paket“ oben); ein 32-Bit-Raspberry-Pi-OS (`armhf`) oder ein
+Debian-System auf `amd64` sind damit noch nicht abgedeckt.
+
+Auf dem Zielsystem den passenden Codename automatisch übernehmen und das
+Repository einrichten:
 
 ```sh
 # Öffentlichen Signaturschlüssel importieren
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
-# Repository-Quelle anlegen, auf den Schlüssel beschränkt und auf die
-# passende Codename/Architektur-Kombination eingeschränkt
-echo 'deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=arm64] https://criede.github.io/svxlink-db9cr trixie main' | \
+# Repository-Quelle anlegen, auf den Schlüssel und die eigene
+# Codename/Architektur-Kombination beschränkt
+codename=$(. /etc/os-release && echo "$VERSION_CODENAME")
+arch=$(dpkg --print-architecture)
+echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} main" | \
   sudo tee /etc/apt/sources.list.d/svxlink-db9cr.list
 
 sudo apt update
 sudo apt install svxlink
 ```
 
+Ist der ermittelte Codename (noch) nicht Teil der Matrix, meldet `apt update`
+einen 404 für die betroffene Quelle; in dem Fall den Codename in
+`/etc/apt/sources.list.d/svxlink-db9cr.list` manuell auf einen der oben
+gelisteten Werte setzen oder auf die Erweiterung der Matrix warten.
+
 Danach liefert ein gewöhnliches `sudo apt upgrade` automatisch die jeweils
-neueste Tagesversion. Für eine andere Distributionsversion oder Architektur
-(sobald vorhanden) einfach `trixie` bzw. `arch=arm64` in der Zeile oben
-anpassen. Es handelt sich um tägliche Entwicklungs-Builds, keine stabilen
-Veröffentlichungen — siehe Hinweise oben zu Umfang und Testabdeckung.
+neueste Tagesversion für das installierte System. Es handelt sich um
+tägliche Entwicklungs-Builds, keine stabilen Veröffentlichungen — siehe
+Hinweise oben zu Umfang und Testabdeckung.
 
 ## Admin-Anpassungen an den TCL-Event-Skripten
 
