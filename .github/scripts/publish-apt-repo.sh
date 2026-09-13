@@ -114,6 +114,40 @@ gpg --batch --yes --local-user "$GPG_KEY_FPR" --digest-algo SHA512 \
 gpg --export --armor "$GPG_KEY_FPR" > "$REPO_DIR/pubkey.gpg"
 touch "$REPO_DIR/.nojekyll"
 
+# GitHub Pages serves static files only, with no directory listing of its
+# own; generate a plain "index.html" in every subdirectory (GitHub Pages
+# serves <dir>/index.html automatically for a directory URL) so the "dists"
+# and "pool" trees can actually be browsed link by link from the root
+# index.html, down to individual Packages/Release/.deb files. The root
+# index.html itself is untouched here -- it is the hand-written page below.
+generate_directory_indexes() {
+  local dir rel entry name size
+  find "$REPO_DIR" -mindepth 1 -type d | while IFS= read -r dir; do
+    rel="/${dir#"$REPO_DIR"/}"
+    {
+      printf '<!DOCTYPE html>\n<html lang="en">\n<head><meta charset="utf-8">\n'
+      printf '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+      printf '<title>Index of %s</title>\n' "$rel"
+      printf '<style>body{font-family:ui-monospace,monospace;max-width:60rem;margin:2rem auto;padding:0 1rem;}a{display:block;padding:0.15rem 0;text-decoration:none;}a:hover{text-decoration:underline;}.size{color:#888;font-size:0.9em;}</style>\n'
+      printf '</head>\n<body>\n<h1>Index of %s</h1>\n<a href="../">.. (up)</a>\n' "$rel"
+      for entry in "$dir"/*/; do
+        [[ -e "$entry" ]] || continue
+        name="$(basename "$entry")"
+        printf '<a href="%s/">%s/</a>\n' "$name" "$name"
+      done
+      for entry in "$dir"/*; do
+        [[ -f "$entry" ]] || continue
+        name="$(basename "$entry")"
+        [[ "$name" == "index.html" ]] && continue
+        size=$(stat -c%s "$entry" 2>/dev/null || echo '?')
+        printf '<a href="%s">%s <span class="size">(%s bytes)</span></a>\n' "$name" "$name" "$size"
+      done
+      printf '</body>\n</html>\n'
+    } > "$dir/index.html"
+  done
+}
+generate_directory_indexes
+
 repo_slug="${GITHUB_REPOSITORY:-criede/svxlink-db9cr}"
 
 # Human-readable label per known suite, for the table below. Unknown
@@ -215,6 +249,12 @@ ${suite_rows}</table>
 <h2>Signing key</h2>
 <p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; imported automatically by the
 quickstart commands above.</p>
+
+<h2>Browse repository files</h2>
+<p><a href="dists/">dists/</a> (per-suite indices, Release files, Packages
+lists) &middot; <a href="pool/">pool/</a> (the actual <code>.deb</code>
+files) &middot; <a href="https://github.com/${repo_slug}">source
+repository</a> on GitHub.</p>
 </body>
 </html>
 EOF

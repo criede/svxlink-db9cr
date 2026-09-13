@@ -7,6 +7,12 @@ on:
 
 permissions:
   contents: write
+  # Ceiling for the whole call graph, including build-and-publish.yml's own
+  # deploy-pages job: a reusable workflow call cannot escalate beyond what
+  # the calling workflow grants here, regardless of what the called job
+  # itself declares.
+  pages: write
+  id-token: write
 
 concurrency:
   group: sync-upstream-master
