@@ -25,6 +25,7 @@ jobs:
     timeout-minutes: 10
     outputs:
       source_sha: ${{ steps.source.outputs.sha }}
+      changed: ${{ steps.merge.outputs.changed }}
     steps:
       - name: Check out target branch
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -34,6 +35,7 @@ jobs:
           token: ${{ secrets.UPSTREAM_SYNC_TOKEN || github.token }}
 
       - name: Merge upstream master
+        id: merge
         shell: bash
         run: |
           set -euo pipefail
@@ -44,6 +46,7 @@ jobs:
 
           if git merge-base --is-ancestor upstream/master HEAD; then
             echo 'Already up to date.' >> "$GITHUB_STEP_SUMMARY"
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -78,6 +81,7 @@ jobs:
           # Never force-push: concurrent changes on master must be preserved.
           git push origin HEAD:refs/heads/master
           echo 'Merged sm0svx/svxlink master into master.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
 
       - name: Record synchronized source
         id: source
@@ -87,7 +91,12 @@ jobs:
   build-and-publish:
     name: Build and publish
     needs: sync
-    if: github.repository == 'criede/svxlink-db9cr'
+    # On the daily schedule, skip the build entirely if upstream had
+    # nothing new to merge -- a manual run (workflow_dispatch) always
+    # builds regardless, e.g. to test workflow changes.
+    if: |
+      github.repository == 'criede/svxlink-db9cr' &&
+      (github.event_name != 'schedule' || needs.sync.outputs.changed == 'true')
     uses: ./.github/workflows/build-and-publish.yml
     with:
       source_sha: ${{ needs.sync.outputs.source_sha }}

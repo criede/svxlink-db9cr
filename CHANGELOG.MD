@@ -35,6 +35,12 @@ project's existing release notes are located under `src/doc/`.
 - Matrix `fail-fast` turned on (was off): a failing leg cancels the
   remaining queued legs immediately instead of repeating the same
   failure across all of them, and marks the run failed.
+- The scheduled sync now skips the build entirely when upstream had
+  nothing new to merge; a manual run always builds regardless.
+- `index.html` now links a live GitHub compare view against upstream
+  master and `CHANGELOG.MD`, instead of only linking the source repo,
+  so what is actually different from upstream is transparent without
+  a snapshot here going stale.
 
 ### Added
 

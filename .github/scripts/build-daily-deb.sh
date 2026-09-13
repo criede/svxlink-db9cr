@@ -200,6 +200,7 @@ install -D -m 0755 "$qtel_bin" "$qtel_pkgroot/usr/bin/qtel"
 for lib in "${asyncqt_libs[@]}"; do
   install -D -m 0644 "$lib" "$qtel_pkgroot/${lib#/qtel-root/}"
 done
+mkdir -p "$qtel_pkgroot/usr/share"
 cp -a /qtel-root/usr/share/qtel "$qtel_pkgroot/usr/share/qtel"
 install -D -m 0644 /qtel-root/usr/share/applications/qtel.desktop \
   "$qtel_pkgroot/usr/share/applications/qtel.desktop"

@@ -21,7 +21,12 @@ the merge job finishes, its `build-and-publish` job calls
 `build-and-publish.yml` (`uses: ./.github/workflows/build-and-publish.yml`,
 `secrets: inherit`), passing the synchronized commit as `source_sha`; this
 is also where the `criede/svxlink-db9cr`-specific guard lives, so the
-called workflow itself stays portable.
+called workflow itself stays portable. On the daily **schedule**, that
+call is additionally skipped if the merge step found nothing new
+(`needs.sync.outputs.changed != 'true'`) — no point rebuilding an
+unchanged commit every day. A **manual** run
+(`workflow_dispatch`) always calls it regardless, e.g. to test workflow
+changes without waiting for an actual upstream commit.
 
 `.github/workflows/` is also fully excluded from the merge: before the
 merge commit, this folder is reset to its own state from before the merge.
@@ -60,9 +65,10 @@ adjusted accordingly — older entries removed, new ones added.
 The matrix legs deliberately run sequentially (`max-parallel: 1`), since
 the publish step commits to the shared `gh-pages` branch and a parallel
 push there would be race-prone. Each leg builds exactly the commit output
-by the sync, even if there were no new upstream commits. The server build
-does not include Qtel or sound files; these are a separate package
-respectively must be installed to match the station (see "Packages" below).
+by the sync; on the daily schedule this whole job is skipped rather than
+rebuilding an unchanged commit (see above). The server build does not
+include Qtel or sound files; these are a separate package respectively
+must be installed to match the station (see "Packages" below).
 
 Two features that need dependencies not packaged in Debian are built from
 source in the same container before the main configure, following the

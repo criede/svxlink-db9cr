@@ -214,6 +214,18 @@ and Debian. These are daily builds from the latest source, not stable
 releases &mdash; see the
 <a href="https://github.com/${repo_slug}">source repository</a> for details.</p>
 
+<h2>Upstream &amp; local changes</h2>
+<p>This is a daily-synced fork of
+<a href="https://github.com/sm0svx/svxlink">sm0svx/svxlink</a>, the
+original SvxLink project, with local packaging and feature additions
+layered on top (RTL-SDR, SipLogic, the separate <code>qtel</code> package,
+this APT repository, and more &mdash; see
+<a href="https://github.com/${repo_slug}/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>
+for the full list). To see exactly what is different from upstream at any
+point in time, without relying on a snapshot here going stale, compare
+live on GitHub:
+<a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;this fork's master</a>.</p>
+
 <h2>Quickstart</h2>
 <p>Run on the target system (detects the right codename/architecture automatically):</p>
 <pre><code># Import the public signing key
