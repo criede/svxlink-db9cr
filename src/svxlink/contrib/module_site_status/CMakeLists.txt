@@ -2,8 +2,8 @@
 set(MODNAME SiteStatus)
 
 # Install targets
-install(FILES Module${MODNAME}.tcl DESTINATION ${SVX_SHARE_INSTALL_DIR}/modules.d)
-install(FILES ${MODNAME}.tcl DESTINATION ${SVX_SHARE_INSTALL_DIR}/events.d)
+install_files_if_not_exists(${SVX_SHARE_INSTALL_DIR}/modules.d Module${MODNAME}.tcl)
+install_files_if_not_exists(${SVX_SHARE_INSTALL_DIR}/events.d ${MODNAME}.tcl)
 install_if_not_exists(Module${MODNAME}.conf
   ${SVX_SYSCONF_INSTALL_DIR}/svxlink.d
   )

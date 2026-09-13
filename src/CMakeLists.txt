@@ -285,6 +285,17 @@ function(install_if_not_exists src dest)
   ")
 endfunction(install_if_not_exists)
 
+# Same as install_if_not_exists but for several files sharing one
+# destination directory. Used for the TCL event handling scripts so that
+# local admin edits survive package upgrades (the files are registered as
+# dpkg conffiles via CONFIG_FILES, just like the .conf files).
+#   install_files_if_not_exists(destination_directory file1 [file2 ...])
+function(install_files_if_not_exists dest)
+  foreach(file ${ARGN})
+    install_if_not_exists(${file} ${dest})
+  endforeach()
+endfunction(install_files_if_not_exists)
+
 ##############################################################################
 # Main execution starts here
 ##############################################################################

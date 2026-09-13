@@ -11,10 +11,9 @@ set_property(TARGET AnnounceLogic PROPERTY NO_SONAME 1)
 
 # Install plugin, TCL event handler and config file
 install(TARGETS AnnounceLogic DESTINATION ${SVX_LOGIC_CORE_INSTALL_DIR})
-install(
-  FILES ${CMAKE_CURRENT_SOURCE_DIR}/AnnounceLogicType.tcl
-        ${CMAKE_CURRENT_SOURCE_DIR}/AnnounceLogic.tcl
-  DESTINATION ${SVX_SHARE_INSTALL_DIR}/events.d
+install_files_if_not_exists(${SVX_SHARE_INSTALL_DIR}/events.d
+  ${CMAKE_CURRENT_SOURCE_DIR}/AnnounceLogicType.tcl
+  ${CMAKE_CURRENT_SOURCE_DIR}/AnnounceLogic.tcl
 )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/AnnounceLogic.conf.in
   ${CMAKE_CURRENT_BINARY_DIR}/AnnounceLogic.conf
