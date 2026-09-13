@@ -213,9 +213,13 @@ install -D -m 0644 /qtel-root/usr/share/metainfo/org.svxlink.Qtel.metainfo.xml \
 # rather than hand-listed, since exact package names (e.g. the "t64" time_t
 # transition affecting trixie but not bookworm) differ between suites.
 # echolib/asyncaudio/asynccore (needed by qtel, shared with the svxlink
-# package built above) are not resolvable this way since they are private
-# project libraries, not a Debian package; --ignore-missing-info skips them
-# instead of failing, and "Depends: svxlink (= same version)" covers them.
+# package built above) are private project libraries, not a Debian
+# package: dpkg-shlibdeps cannot even locate them without help ("cannot
+# find library", not just "missing info", which --ignore-missing-info does
+# not cover) -- point it at their directory with -l instead, so it can
+# find them but (since there is still no shlibs/symbols file for them)
+# --ignore-missing-info then correctly skips adding a dependency for them,
+# relying on "Depends: svxlink (= same version)" to cover them instead.
 mkdir -p /tmp/qtel-shlibdeps/debian
 cat > /tmp/qtel-shlibdeps/debian/control <<EOF
 Source: qtel
@@ -231,6 +235,7 @@ EOF
 (
   cd /tmp/qtel-shlibdeps
   dpkg-shlibdeps --ignore-missing-info -O \
+    "-l/qtel-root/usr/lib/${multiarch}" \
     "$qtel_pkgroot/usr/bin/qtel" "${asyncqt_libs[@]}" \
     > shlibdeps.out
 )
