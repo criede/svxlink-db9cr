@@ -253,7 +253,7 @@ curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
 
 # Add the repository source, restricted to the key and to the local
 # codename/architecture combination
-codename=$(. /etc/os-release && echo "$VERSION_CODENAME")
+codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} main" | \
   sudo tee /etc/apt/sources.list.d/svxlink-db9cr.list

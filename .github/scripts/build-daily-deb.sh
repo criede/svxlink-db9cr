@@ -8,8 +8,11 @@ set -euo pipefail
 # different --platform/base image.
 export DEBIAN_FRONTEND=noninteractive
 arch=$(dpkg --print-architecture)
-codename=$(. /etc/os-release && echo "$VERSION_CODENAME")
-test -n "$codename"
+# Parsed as plain text rather than sourced: /etc/os-release is only meant
+# to hold KEY=VALUE pairs, but sourcing it would execute its content as
+# shell code if it ever contained anything else.
+codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
+[[ "$codename" =~ ^[a-z0-9]+$ ]]
 apt-get update
 apt-get install -y --no-install-recommends \
   ca-certificates git cmake build-essential pkg-config dpkg-dev file \
@@ -129,8 +132,13 @@ test "$(dpkg-deb -f "${packages[0]}" Architecture)" = "$arch"
 test "$(dpkg-deb -f "${packages[0]}" Version)" = "$version"
 test -n "$(dpkg-deb -f "${packages[0]}" Depends)"
 dpkg-deb --info "${packages[0]}"
-dpkg-deb -c "${packages[0]}" | grep -q '/librtlsdr\.so'
-dpkg-deb -c "${packages[0]}" | grep -q '/SipLogic\.so'
+# Captured first rather than piped straight into grep -q: grep -q exits as
+# soon as it finds a match without reading the rest of stdin, which under
+# pipefail can make dpkg-deb's SIGPIPE-killed tar subprocess register as a
+# pipeline failure even though the match was found.
+package_contents="$(dpkg-deb -c "${packages[0]}")"
+grep -q '/librtlsdr\.so' <<< "$package_contents"
+grep -q '/SipLogic\.so' <<< "$package_contents"
 printf '%s\n' "$version" > /output/VERSION
 printf '%s\n' "$codename" > /output/SUITE
 printf '%s\n' "$arch" > /output/ARCH
