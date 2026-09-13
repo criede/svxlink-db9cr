@@ -374,6 +374,18 @@ No manual GitHub Pages setup step is needed: the `deploy-pages` job's
 `actions/configure-pages` step creates (or switches) the Pages site to
 the `GitHub Actions` source itself on the first run.
 
+If a `github-pages` deployment **environment** already exists in the
+repository (e.g. left over from a previous `Deploy from a branch` setup)
+with a custom deployment branch policy, that policy is not something
+`configure-pages` touches, and the run fails at the `deploy-pages` job
+with "Branch ... is not allowed to deploy to github-pages due to
+environment protection rules." Fix once under **Settings → Environments
+→ github-pages → Deployment branches and tags**: add the branch that
+`build-and-publish.yml` actually runs on (`master`, via `sync-upstream.yml`
+or a direct dispatch) to the allowed list, or via
+`gh api -X POST repos/<owner>/<repo>/environments/github-pages/deployment-branch-policies -f name=master`.
+A repository where this environment does not exist yet is unaffected.
+
 By default, the workflow uses the automatically provided `GITHUB_TOKEN`
 with `contents: write`. Branch rules must allow this direct push, also for
 the `gh-pages` branch. Pushes with this token do not trigger further push

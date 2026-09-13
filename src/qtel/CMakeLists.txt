@@ -85,8 +85,14 @@ add_executable(${PROG} ${PRGSRC} ${QTHEADERS_MOC} ${FORMS_HEADERS}
   )
 target_link_libraries(${PROG} ${LIBS})
 set_target_properties(${PROG} PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIRECTORY}  
+  RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIRECTORY}
   )
+# FindSIGC(2).cmake append "--std=c++11" (or c++17, depending on the
+# libsigc++ version found) to the global CMAKE_CXX_FLAGS, which Qt6 (needs
+# C++17) may otherwise inherit as c++11. target_compile_options are placed
+# after directory-level flags on the compile command line, so this wins
+# over that regardless of which one was appended.
+target_compile_options(${PROG} PRIVATE -std=c++17)
 
 # Install targets
 install(TARGETS ${PROG} DESTINATION ${BIN_INSTALL_DIR})
