@@ -99,6 +99,8 @@ gpg --batch --yes --local-user "$GPG_KEY_FPR" --digest-algo SHA512 \
 gpg --export --armor "$GPG_KEY_FPR" > "$REPO_DIR/pubkey.gpg"
 touch "$REPO_DIR/.nojekyll"
 
+repo_slug="${GITHUB_REPOSITORY:-criede/svxlink-db9cr}"
+docs_url="https://github.com/${repo_slug}/blob/master/.github/UPSTREAM-SYNC.MD"
 cat > "$REPO_DIR/index.html" <<EOF
 <!DOCTYPE html>
 <html lang="en">
@@ -106,10 +108,11 @@ cat > "$REPO_DIR/index.html" <<EOF
 <body>
 <h1>SvxLink DB9CR APT repository</h1>
 <p>Daily development packages of
-<a href="https://github.com/${GITHUB_REPOSITORY:-criede/svxlink-db9cr}">svxlink-db9cr</a>.
-See
-<a href="https://github.com/${GITHUB_REPOSITORY:-criede/svxlink-db9cr}/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>
-in the source repository for setup instructions.</p>
+<a href="https://github.com/${repo_slug}">svxlink-db9cr</a>.</p>
+<p><strong>Documentation:</strong>
+<a href="${docs_url}">UPSTREAM-SYNC.MD</a>
+&mdash; setup, signing key rotation and
+<a href="${docs_url}#einbindung-in-raspberry-pi-os">Raspberry Pi OS install instructions</a>.</p>
 <p>Public signing key: <a href="pubkey.gpg">pubkey.gpg</a></p>
 <p>Available suites/architectures:</p>
 <ul>
