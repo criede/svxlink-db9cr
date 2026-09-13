@@ -1,3 +1,20 @@
+Package: qtel
+Version: 26.05.1+daily20260913.24.1.g2f4427531cc4-1~trixie
+Architecture: amd64
+Maintainer: SvxLink Community <svxlink@groups.io>
+Depends: svxlink (= 26.05.1+daily20260913.24.1.g2f4427531cc4-1~trixie), libc6 (>= 2.38), libgcc-s1 (>= 3.0), libgsm1 (>= 1.0.18), libqt6core5compat6 (>= 6.6.0), libqt6core6t64 (>= 6.8.2), libqt6gui6 (>= 6.1.2), libqt6network6 (>= 6.8.2), libqt6widgets6 (>= 6.1.2), libsigc++-2.0-0v5 (>= 2.8.0), libstdc++6 (>= 13.1)
+Filename: pool/trixie/main/q/qtel/qtel_26.05.1+daily20260913.24.1.g2f4427531cc4-1~trixie_amd64.deb
+Size: 181168
+MD5sum: 38f208075271cb7dff96cb8f402f4b0f
+SHA1: 34e8b810e01b926031849159eae75379de5e9ce5
+SHA256: 68195de7fe405d496bb6e9580d5d049bc7fbff7ae74421187a8e426740fb405e
+Section: hamradio
+Priority: optional
+Description: Graphical EchoLink client for SvxLink
+ Qtel is the graphical EchoLink client bundled with SvxLink. Built from
+ the same daily source as the svxlink package and pinned to the exact
+ same version, since it shares that package's echolib/async libraries.
+
 Package: svxlink
 Version: 26.05.1+daily20260913.10.1.ga94086671ade-1~trixie
 Architecture: amd64
