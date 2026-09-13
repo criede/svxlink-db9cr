@@ -365,6 +365,25 @@ updated normally. This does not affect the already recommended path via
 `events.d/local/*.tcl` for own additions, since new files not shipped by
 the package are never touched by dpkg.
 
+What dpkg actually does with a conffile on upgrade, depending on whether
+the admin and/or upstream touched it since the last install:
+
+- **Neither changed it**: the new version is installed silently.
+- **Only the admin changed it** (upstream shipped the same content as
+  before): the local edit is left alone; nothing to merge.
+- **Both changed it** (the real conflict): on an interactive
+  `apt install`/`apt upgrade`, dpkg asks whether to keep the local
+  version or install the maintainer's. **Either way nothing is lost**: if
+  the local version is kept (the default), the new shipped version is
+  written next to it as `<file>.dpkg-dist` for later manual review/merge
+  (`diff events.tcl events.tcl.dpkg-dist`); if the new version is
+  installed instead, the local edit is saved as `<file>.dpkg-old`. On
+  unattended upgrades (`unattended-upgrades` typically runs with
+  `--force-confdef --force-confold`), the local version is kept
+  automatically and `.dpkg-dist` is still written, without blocking the
+  upgrade. Stray `.dpkg-dist` files can be found with
+  `find /usr/share/svxlink -name '*.dpkg-dist'`.
+
 ## Setup
 
 1. Push the workflows to the GitHub repository's default branch.
