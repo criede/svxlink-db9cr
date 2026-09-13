@@ -46,6 +46,38 @@ by the sync, even if there were no new upstream commits. The server build
 does not include Qtel or sound files; these must be installed to match the
 station.
 
+Two features that need dependencies not packaged in Debian are built from
+source in the same container before the main configure, following the
+project's general rule for such cases: use the base OS's package where one
+exists and is current enough, build and bundle the rest.
+
+- **RTL-SDR**: direct-USB RTL-SDR support (`HAS_RTLSDR_SUPPORT`) is built
+  against the [RTL-SDR Blog fork](https://github.com/rtlsdrblog/rtl-sdr-blog)
+  of librtlsdr/rtl_tcp instead of Debian's `librtlsdr-dev`, since the
+  distro version is typically too old for current RTL-SDR Blog V3/V4
+  dongles. It is installed to `/usr/local` in the build container only,
+  then `librtlsdr.so*`, `rtl_tcp`, `rtl_sdr`, `rtl_eeprom` and `rtl_test`
+  are copied into the package's own staging tree via a small
+  `CPACK_INSTALL_SCRIPT` (`bundle-extra-libs.cmake`, generated inline in
+  `build-daily-deb.sh`) so they ship inside the `svxlink` package itself.
+  `libusb-1.0-0-dev` still comes from the base OS. The package
+  `Conflicts` with Debian's `librtlsdr0`/`rtl-sdr` to avoid both trying to
+  own the same files.
+- **SipLogic**: the contributed SipLogic logic core
+  (`-DWITH_CONTRIB_SIP_LOGIC=ON`) needs `libpjproject`, which is not
+  packaged in Debian either. [PJSIP/pjproject](https://github.com/pjsip/pjproject)
+  is built from source and installed to `/usr/local` for the same reason,
+  but pjproject builds static libraries by default, so `SipLogic.so` links
+  it in directly — there is nothing extra to bundle or depend on at
+  runtime for it.
+
+Both from-source builds run once per matrix leg (same container, before
+the main `cmake` configure), so they follow the same architecture/suite as
+the rest of that leg automatically. `dpkg-deb -c` on the built package is
+checked for `librtlsdr.so` and `SipLogic.so` right after the build, and the
+installation test additionally runs `ldd` on the `svxlink` binary and on
+`SipLogic.so` to catch a broken or missing link at the earliest point.
+
 The Debian version follows the scheme
 `26.05.1+daily20260912.42.1.g0123456789ab-1~trixie`: project version from
 `src/versions`, UTC date, workflow run number, attempt, commit short hash

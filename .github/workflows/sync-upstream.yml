@@ -142,6 +142,10 @@ jobs:
               test "$(dpkg-query -W -f="\${Architecture}" svxlink)" = "${{ matrix.arch }}"
               svxlink --version
               test -f /usr/lib/systemd/system/svxlink.service
+              siplogic_so="$(find /usr/lib -name SipLogic.so -print -quit)"
+              test -n "$siplogic_so"
+              ! ldd /usr/bin/svxlink | grep -q "not found"
+              ! ldd "$siplogic_so" | grep -q "not found"
             '
 
       - name: Publish daily prerelease directly

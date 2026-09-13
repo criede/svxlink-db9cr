@@ -36,6 +36,13 @@ project's existing release notes are located under `src/doc/`.
   part of publishing; old daily GitHub prereleases (and their tags) are
   deleted by a new `cleanup-old-releases` job that runs once per workflow
   run after all `daily-deb` legs finish.
+- RTL-SDR Blog fork of librtlsdr/rtl_tcp (V3/V4 dongle support) built from
+  source and bundled into the `svxlink` package itself, replacing Debian's
+  older `librtlsdr-dev`/`librtlsdr0` (package now `Conflicts` with
+  `librtlsdr0`/`rtl-sdr` to avoid file collisions).
+- Contributed SipLogic logic core enabled in the daily build
+  (`-DWITH_CONTRIB_SIP_LOGIC=ON`), linked against a from-source
+  PJSIP/pjproject build (statically linked, nothing to bundle at runtime).
 - TCL event handling scripts (`events.tcl`, `events.d/*.tcl`,
   `modules.d/*.tcl`) are now installed as dpkg conffiles, like the existing
   `.conf` files, so a package upgrade no longer silently overwrites a file
