@@ -1,19 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><title>SvxLink DB9CR APT repository</title></head>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SvxLink DB9CR APT repository</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+  pre { background: #f0f0f0; padding: 0.75rem 1rem; overflow-x: auto; border-radius: 4px; }
+  code { background: #f0f0f0; padding: 0.1rem 0.3rem; border-radius: 3px; }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; margin: 1rem 0; }
+  th, td { border: 1px solid #ccc; padding: 0.3rem 0.6rem; text-align: left; }
+  .note { color: #555; font-size: 0.95em; }
+</style>
+</head>
 <body>
 <h1>SvxLink DB9CR APT repository</h1>
 <p>Daily development packages of
-<a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a>.</p>
-<p><strong>Documentation:</strong>
-<a href="https://github.com/criede/svxlink-db9cr/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>
-&mdash; setup, signing key rotation and
-<a href="https://github.com/criede/svxlink-db9cr/blob/master/.github/UPSTREAM-SYNC.MD#einbindung-auf-raspberry-pi-os-und-debian">install instructions for Raspberry Pi OS and Debian</a>.</p>
-<p>Public signing key: <a href="pubkey.gpg">pubkey.gpg</a></p>
-<p>Available suites/architectures:</p>
-<ul>
-<li>bookworm: arm64 </li>
-<li>trixie: arm64 </li>
-</ul>
+<a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> for Raspberry Pi OS
+and Debian. These are daily builds from the latest source, not stable
+releases &mdash; see the
+<a href="https://github.com/criede/svxlink-db9cr">source repository</a> for details.</p>
+
+<h2>Quickstart</h2>
+<p>Run on the target system (detects the right codename/architecture automatically):</p>
+<pre><code># Import the public signing key
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
+  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+
+# Add the repository source
+codename=$(. /etc/os-release && echo "$VERSION_CODENAME")
+arch=$(dpkg --print-architecture)
+echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} main" | \
+  sudo tee /etc/apt/sources.list.d/svxlink-db9cr.list
+
+sudo apt update
+sudo apt install svxlink</code></pre>
+<p class="note">If <code>apt update</code> reports a 404 for this source, your
+system's codename isn't built yet (see the table below) &mdash; edit the
+codename in <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> to one of
+the supported ones instead. Afterwards, a regular <code>sudo apt upgrade</code>
+picks up new daily builds automatically.</p>
+
+<h2>Supported systems</h2>
+<table>
+<tr><th>Codename</th><th>Matches</th><th>Architectures</th></tr>
+<tr><td><code>bookworm</code></td><td>Debian 12 / Raspberry Pi OS Bookworm</td><td><code>arm64</code></td></tr>
+<tr><td><code>trixie</code></td><td>Debian 13 / Raspberry Pi OS Trixie</td><td><code>arm64</code></td></tr>
+</table>
+
+<h2>Signing key</h2>
+<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; imported automatically by the
+quickstart commands above.</p>
 </body>
 </html>
