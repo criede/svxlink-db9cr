@@ -1,49 +1,54 @@
-# Hinweise für Agenten
+# Notes for agents
 
-## Projekt
+## Project
 
-svxlink-db9cr basiert auf SvxLink, einem modularen Sprachdienstsystem für den
-Amateurfunk. Das Projekt enthält C/C++-Quellcode, Tcl-Skripte und einen
-CMake-basierten Build. Ziel und Umfang lokaler DB9CR-Anpassungen sind noch
-zu dokumentieren.
+svxlink-db9cr is based on SvxLink, a modular voice services system for
+amateur radio. The project contains C/C++ source code, Tcl scripts and a
+CMake-based build. The goal and scope of the local DB9CR customizations
+still need to be documented.
 
-## Orientierung
+## Orientation
 
-- `README.adoc`: Projektüberblick.
-- `INSTALL.adoc`: Installations- und Build-Hinweise.
-- `src/CMakeLists.txt`: Einstieg in den CMake-Build.
-- `src/svxlink/`: Server, Module, Skripte und weitere Funkkomponenten.
-- `src/async/`: Bibliotheken für asynchrone Verarbeitung und Audio.
-- `src/qtel/`: Grafischer EchoLink-Client.
-- `src/doc/`: Dokumentation und Versionshinweise.
-- `TODO.MD`: Offene Aufgaben.
-- `CHANGELOG.MD`: Protokoll lokaler Änderungen.
+- `README.adoc`: project overview.
+- `INSTALL.adoc`: installation and build notes.
+- `src/CMakeLists.txt`: entry point of the CMake build.
+- `src/svxlink/`: server, modules, scripts and other radio components.
+- `src/async/`: libraries for asynchronous processing and audio.
+- `src/qtel/`: graphical EchoLink client.
+- `src/doc/`: documentation and release notes.
+- `TODO.MD`: open tasks.
+- `CHANGELOG.MD`: log of local changes.
 
-## Arbeitsweise
+## Working method
 
-- Vor Änderungen vorhandenen Code, Dokumentation und Git-Status prüfen.
-- Vorhandene Änderungen des Nutzers erhalten.
-- Änderungen auf die jeweilige Aufgabe begrenzen und den bestehenden Stil nutzen.
-- Zugangsdaten und andere vertrauliche Konfigurationswerte nicht einchecken.
-- Funktionsänderungen mit passenden Builds oder gezielten Tests prüfen;
-  Voraussetzungen dazu in `INSTALL.adoc` nachlesen.
-- Tatsächlich ausgeführte Prüfungen und verbleibende Einschränkungen benennen.
-- Aufgabenliste und Änderungsprotokoll bei relevanten Änderungen aktualisieren.
-- In Workflows immer eine aktuell gepflegte Node.js-Version verwenden,
-  vorzugsweise eine unterstützte LTS-Version. Das gilt auch für die interne
-  Node.js-Laufzeit verwendeter Actions: passende, gepflegte Action-Versionen
-  auswählen und deren `runs.using` prüfen. `actions/setup-node` allein ändert
-  die interne Laufzeit anderer Actions nicht. Keine EOL-Versionen oder
-  Umgehungen zur Weiterverwendung abgekündigter Laufzeiten einsetzen.
+- Check existing code, documentation and git status before making changes.
+- Preserve the user's existing changes.
+- Keep changes scoped to the task at hand and follow the existing style.
+- Do not commit credentials or other sensitive configuration values.
+- Verify functional changes with matching builds or targeted tests; check
+  `INSTALL.adoc` for the prerequisites.
+- State which checks were actually run and any remaining limitations.
+- Update the task list and change log for relevant changes.
+- Always use a currently maintained Node.js version in workflows,
+  preferably a supported LTS release. This also applies to the internal
+  Node.js runtime of any actions used: pick suitably maintained action
+  versions and check their `runs.using`. `actions/setup-node` alone does
+  not change the internal runtime of other actions. Do not use EOL
+  versions or workarounds to keep using deprecated runtimes.
+- All Markdown (`.md`/`.MD`) documentation files in this repository are
+  written in English, regardless of the language used in the request that
+  produced them. This does not apply to `src/doc/` and other files
+  synchronized from upstream (`sm0svx/svxlink`), which keep their
+  upstream language and content.
 
-## Upstream-Workflows
+## Upstream workflows
 
-- Vom Upstream übernommene Actions in `criede/svxlink-db9cr` deaktiviert halten.
-- Der eigene Workflow `Sync upstream` bleibt aktiviert.
-- Beim Sync `.github/workflows/` vollständig auf dem eigenen Stand erhalten;
-  keine neuen, geänderten oder gelöschten Workflow-Dateien vom Upstream übernehmen.
+- Keep actions taken over from upstream disabled in `criede/svxlink-db9cr`.
+- Keep the project's own `Sync upstream` workflow enabled.
+- During sync, keep `.github/workflows/` fully at its own state; do not
+  take over new, changed or deleted workflow files from upstream.
 
-## Dateiname
+## File name
 
-Diese Datei heißt wie angefordert `AGENT.MD`. Werkzeuge, die Anweisungen aus
-`AGENTS.md` laden, erkennen sie unter diesem Namen möglicherweise nicht automatisch.
+This file is named `AGENT.MD` as requested. Tools that load instructions
+from `AGENTS.md` may not recognize it automatically under this name.

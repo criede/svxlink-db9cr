@@ -100,24 +100,82 @@ gpg --export --armor "$GPG_KEY_FPR" > "$REPO_DIR/pubkey.gpg"
 touch "$REPO_DIR/.nojekyll"
 
 repo_slug="${GITHUB_REPOSITORY:-criede/svxlink-db9cr}"
-docs_url="https://github.com/${repo_slug}/blob/master/.github/UPSTREAM-SYNC.MD"
+
+# Human-readable label per known suite, for the table below. Unknown
+# suites (added to the matrix but not yet listed here) just show their
+# codename without an extra description.
+declare -A suite_labels=(
+  [bookworm]="Debian 12 / Raspberry Pi OS Bookworm"
+  [trixie]="Debian 13 / Raspberry Pi OS Trixie"
+)
+
+suite_rows=""
+suite_list_items=""
+for d in "$REPO_DIR"/dists/*/; do
+  s="$(basename "$d")"
+  archs="$(cd "$d" 2>/dev/null && find . -maxdepth 2 -type d -name 'binary-*' \
+    -exec basename {} \; | sed 's/^binary-//' | sort -u | tr '\n' ' ')"
+  archs="${archs% }"
+  label="${suite_labels[$s]:-}"
+  suite_rows="${suite_rows}<tr><td><code>${s}</code></td><td>${label}</td><td><code>${archs}</code></td></tr>
+"
+  suite_list_items="${suite_list_items}<li>${s}: ${archs}</li>
+"
+done
+
 cat > "$REPO_DIR/index.html" <<EOF
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><title>SvxLink DB9CR APT repository</title></head>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SvxLink DB9CR APT repository</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+  pre { background: #f0f0f0; padding: 0.75rem 1rem; overflow-x: auto; border-radius: 4px; }
+  code { background: #f0f0f0; padding: 0.1rem 0.3rem; border-radius: 3px; }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; margin: 1rem 0; }
+  th, td { border: 1px solid #ccc; padding: 0.3rem 0.6rem; text-align: left; }
+  .note { color: #555; font-size: 0.95em; }
+</style>
+</head>
 <body>
 <h1>SvxLink DB9CR APT repository</h1>
 <p>Daily development packages of
-<a href="https://github.com/${repo_slug}">svxlink-db9cr</a>.</p>
-<p><strong>Documentation:</strong>
-<a href="${docs_url}">UPSTREAM-SYNC.MD</a>
-&mdash; setup, signing key rotation and
-<a href="${docs_url}#einbindung-auf-raspberry-pi-os-und-debian">install instructions for Raspberry Pi OS and Debian</a>.</p>
-<p>Public signing key: <a href="pubkey.gpg">pubkey.gpg</a></p>
-<p>Available suites/architectures:</p>
-<ul>
-$(cd "$REPO_DIR/dists" && for d in */; do s="${d%/}"; echo "<li>$s: $(cd "$s" 2>/dev/null && find . -maxdepth 2 -type d -name 'binary-*' -exec basename {} \; | sed 's/^binary-//' | sort -u | tr '\n' ' ')</li>"; done)
-</ul>
+<a href="https://github.com/${repo_slug}">svxlink-db9cr</a> for Raspberry Pi OS
+and Debian. These are daily builds from the latest source, not stable
+releases &mdash; see the
+<a href="https://github.com/${repo_slug}">source repository</a> for details.</p>
+
+<h2>Quickstart</h2>
+<p>Run on the target system (detects the right codename/architecture automatically):</p>
+<pre><code># Import the public signing key
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \\
+  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+
+# Add the repository source
+codename=\$(. /etc/os-release && echo "\$VERSION_CODENAME")
+arch=\$(dpkg --print-architecture)
+echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=\${arch}] https://criede.github.io/svxlink-db9cr \${codename} main" | \\
+  sudo tee /etc/apt/sources.list.d/svxlink-db9cr.list
+
+sudo apt update
+sudo apt install svxlink</code></pre>
+<p class="note">If <code>apt update</code> reports a 404 for this source, your
+system's codename isn't built yet (see the table below) &mdash; edit the
+codename in <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> to one of
+the supported ones instead. Afterwards, a regular <code>sudo apt upgrade</code>
+picks up new daily builds automatically.</p>
+
+<h2>Supported systems</h2>
+<table>
+<tr><th>Codename</th><th>Matches</th><th>Architectures</th></tr>
+${suite_rows}</table>
+
+<h2>Signing key</h2>
+<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; imported automatically by the
+quickstart commands above.</p>
 </body>
 </html>
 EOF

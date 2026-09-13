@@ -91,14 +91,24 @@ jobs:
         include:
           # Currently maintained Debian-based releases (Debian and
           # Raspberry Pi OS use the same package base per codename, so one
-          # build per codename/architecture covers both). Add further
-          # entries here for additional Debian/Ubuntu versions or
-          # architectures.
+          # build per codename/architecture covers both), for both arm64
+          # (Raspberry Pi) and amd64 (Intel/AMD PCs and servers). Each leg
+          # builds natively on a runner matching its architecture, so no
+          # QEMU emulation is needed. Add further entries here for
+          # additional Debian/Ubuntu versions or architectures.
           - suite: bookworm
             arch: arm64
+            runner: ubuntu-24.04-arm
           - suite: trixie
             arch: arm64
-    runs-on: ubuntu-24.04-arm
+            runner: ubuntu-24.04-arm
+          - suite: bookworm
+            arch: amd64
+            runner: ubuntu-24.04
+          - suite: trixie
+            arch: amd64
+            runner: ubuntu-24.04
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 45
     steps:
       - name: Check out synchronized source

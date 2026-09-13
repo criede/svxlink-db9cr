@@ -1,22 +1,22 @@
-# Aufgaben
+# Tasks
 
-Offene Aufgaben für svxlink-db9cr. Die folgenden Punkte dienen als erste Planung.
+Open tasks for svxlink-db9cr. The following items serve as an initial plan.
 
-## Projektgrundlagen
+## Project basics
 
-- [ ] Ziel und Umfang der DB9CR-spezifischen Anpassungen dokumentieren.
-- [ ] Debian-Installation und benötigte Abhängigkeiten in `Debian.md` beschreiben.
-- [ ] Build anhand von `INSTALL.adoc` in einer geeigneten Linux-Umgebung prüfen.
+- [ ] Document the goal and scope of the DB9CR-specific customizations.
+- [ ] Describe the Debian installation and required dependencies in `Debian.md`.
+- [ ] Verify the build against `INSTALL.adoc` in a suitable Linux environment.
 
-## Konfiguration und Betrieb
+## Configuration and operation
 
-- [ ] Benötigte SvxLink-Module und Stationskonfiguration festlegen.
-- [ ] Lokale Anpassungen und anonymisierte Beispielkonfigurationen dokumentieren.
-- [ ] Prüfablauf für Audio, PTT und DTMF festlegen.
+- [ ] Determine the required SvxLink modules and station configuration.
+- [ ] Document local customizations and anonymized example configurations.
+- [ ] Define a test procedure for audio, PTT and DTMF.
 
-## Dokumentation
+## Documentation
 
-- [x] Daily-Debian-Paket für Raspberry Pi OS arm64 direkt als Prerelease bereitstellen.
-- [x] Täglichen Upstream-Sync als GitHub-Actions-Workflow implementieren.
-- [ ] Erledigte Änderungen laufend in `CHANGELOG.MD` eintragen.
-- [ ] Aufgaben bei Abschluss abhaken und neue Aufgaben konkret beschreiben.
+- [x] Publish the daily Debian package for Raspberry Pi OS arm64 directly as a prerelease.
+- [x] Implement the daily upstream sync as a GitHub Actions workflow.
+- [ ] Continuously record completed changes in `CHANGELOG.MD`.
+- [ ] Check off tasks on completion and describe new tasks concretely.
