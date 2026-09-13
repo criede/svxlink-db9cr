@@ -36,10 +36,14 @@ cmake --install /tmp/rtl-sdr-blog/build --prefix /usr/local
 # Build PJSIP/pjproject from source for the contributed SipLogic logic core:
 # it is not packaged in Debian. Its libraries build static by default, so
 # SipLogic.so links pjproject in directly; nothing extra needs to be bundled
-# or added to Depends for it.
+# or added to Depends for it. -fPIC is required since those static libs end
+# up linked into SipLogic.so, a shared object; pjproject does not enable it
+# by default.
 git clone --depth 1 --branch master https://github.com/pjsip/pjproject.git /tmp/pjproject
 (
   cd /tmp/pjproject
+  export CFLAGS="-fPIC ${CFLAGS:-}"
+  export CXXFLAGS="-fPIC ${CXXFLAGS:-}"
   ./configure --prefix=/usr/local --disable-video --disable-libwebrtc
   make dep
   make -j"$(nproc)"
