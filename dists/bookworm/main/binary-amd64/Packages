@@ -1,3 +1,20 @@
+Package: qtel
+Version: 26.05.1+daily20260913.24.1.g2f4427531cc4-1~bookworm
+Architecture: amd64
+Maintainer: SvxLink Community <svxlink@groups.io>
+Depends: svxlink (= 26.05.1+daily20260913.24.1.g2f4427531cc4-1~bookworm), libc6 (>= 2.34), libgcc-s1 (>= 3.0), libgsm1 (>= 1.0.18), libqt6core5compat6 (>= 6.2.1), libqt6core6 (>= 6.4.0), libqt6gui6 (>= 6.1.2), libqt6network6 (>= 6.4.0), libqt6widgets6 (>= 6.1.2), libsigc++-2.0-0v5 (>= 2.8.0), libstdc++6 (>= 5.2)
+Filename: pool/bookworm/main/q/qtel/qtel_26.05.1+daily20260913.24.1.g2f4427531cc4-1~bookworm_amd64.deb
+Size: 183204
+MD5sum: af41dad255f535960fe162804d0a5750
+SHA1: 0bac5cd589dd1c6e1e90b1ea9b1a0769c2057581
+SHA256: 8986e36cd9f2fa0e9957857151207a671beb40347ae1a0116f9b5e52e318233e
+Section: hamradio
+Priority: optional
+Description: Graphical EchoLink client for SvxLink
+ Qtel is the graphical EchoLink client bundled with SvxLink. Built from
+ the same daily source as the svxlink package and pinned to the exact
+ same version, since it shares that package's echolib/async libraries.
+
 Package: svxlink
 Version: 26.05.1+daily20260913.10.1.ga94086671ade-1~bookworm
 Architecture: amd64
