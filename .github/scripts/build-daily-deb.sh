@@ -178,7 +178,7 @@ EOF
 # (needed by qtel/translations/CMakeLists.txt's find_package(Qt6LinguistTools)),
 # and pulls in qt6-tools-dev-tools (lupdate/lrelease binaries) itself.
 apt-get install -y --no-install-recommends \
-  qt6-base-dev qt6-base-dev-tools qt6-tools-dev libqt6core5compat6-dev
+  qt6-base-dev qt6-base-dev-tools qt6-tools-dev qt6-5compat-dev
 
 cmake -S /source/src -B /build-qtel \
   -DCMAKE_BUILD_TYPE=Release -DUSE_QT=ON -DWITH_SYSTEMD=OFF -DDO_INSTALL_CHOWN=OFF \

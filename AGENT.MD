@@ -18,6 +18,11 @@ still need to be documented.
 - `src/doc/`: documentation and release notes.
 - `TODO.MD`: open tasks.
 - `CHANGELOG.MD`: log of local changes.
+- `.github/workflows/sync-upstream.yml`: merges upstream, then calls
+  `build-and-publish.yml`.
+- `.github/workflows/build-and-publish.yml`: builds/tests/publishes the
+  daily packages and APT repository; repository-agnostic, reusable.
+- `.github/scripts/`: the shell scripts those workflows run.
 
 ## Working method
 
@@ -56,6 +61,16 @@ still need to be documented.
   `.github/scripts/publish-apt-repo.sh` (and `BUILD-INFO.MD`/
   `UPSTREAM-SYNC.MD` where relevant) in the same change, not as a
   follow-up — this listing must never fall behind what is actually built.
+- Before adding an `apt-get install` package name in a workflow/build
+  script, verify it actually exists for the target suite (and provides
+  what is needed, e.g. a specific `.cmake` file) rather than guessing from
+  naming convention or memory — Debian's Qt6 packaging in particular does
+  not follow the "obvious" name (e.g. `Qt6LinguistTools`'s CMake config is
+  in `qt6-tools-dev`, not `qt6-l10n-tools`; `Qt6Core5Compat`'s is in
+  `qt6-5compat-dev`, not `libqt6core5compat6-dev`). A wrong guess here
+  only surfaces after a multi-minute CI build, so check first via
+  `https://packages.debian.org/search?searchon=contents&keywords=<file>&mode=exactfilename&suite=<suite>`
+  for the file it needs to provide.
 
 ## Upstream workflows
 
