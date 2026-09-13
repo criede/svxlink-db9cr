@@ -233,10 +233,26 @@ jobs:
       # branch" Pages source) keeps the Node.js runtime used to build/serve
       # Pages under the same control as every other action here. The
       # classic source instead makes GitHub run its own internal
-      # "pages-build-deployment" workflow outside this repository, which
-      # has been observed pinned to a deprecated Node.js version with no
-      # way for us to update it. configure-pages creates/switches the Pages
-      # site to this workflow-based source if it is not already.
+      # "pages-build-deployment" workflow outside this repository (which
+      # has been observed pinned to a deprecated Node.js version we have no
+      # way to update), and -- since it also triggers on every push to the
+      # Pages source branch regardless of build_type -- keeps running
+      # alongside this job for as long as build_type stays "legacy".
+      # configure-pages creates the Pages site if it does not exist yet,
+      # but does not switch an *existing* branch-based ("legacy") site to
+      # the workflow source, so that is done explicitly first.
+      - name: Ensure Pages is configured for GitHub Actions deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh api "repos/${GITHUB_REPOSITORY}/pages" >/dev/null 2>&1; then
+            gh api -X PUT "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow
+          else
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow
+          fi
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0, Node.js 24
 

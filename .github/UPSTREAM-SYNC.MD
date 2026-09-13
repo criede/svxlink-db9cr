@@ -181,14 +181,20 @@ persistent, incremental data store the retention/pool logic reads and
 writes; it is not what GitHub serves directly. A separate `deploy-pages`
 job (`needs: daily-deb`, `if: always()`) runs once per workflow run after
 all legs finish, checks out that branch's current content and publishes
-it via `actions/configure-pages` + `actions/upload-pages-artifact` +
-`actions/deploy-pages` — the `GitHub Actions` Pages source, not the
-classic `Deploy from a branch` one. `configure-pages` creates or switches
-the repository's Pages site to this source automatically if it is not
-already, so no manual Pages setup step is needed. This deliberately
-avoids `Deploy from a branch`: that source makes GitHub run its own
-internal `pages-build-deployment` workflow outside this repository (not a
-file under `.github/workflows/`), which has been observed pinned to a
+it via the Pages REST API, `actions/configure-pages`,
+`actions/upload-pages-artifact` and `actions/deploy-pages` — the
+`GitHub Actions` Pages source, not the classic `Deploy from a branch`
+one. An explicit `gh api -X PUT .../pages -f build_type=workflow` step
+runs first (`-X POST` instead if the site does not exist yet): a fresh
+Pages site is fine either way, but `configure-pages` does **not** switch
+an *already existing* branch-based ("legacy") site to the workflow
+source on its own, so this is not optional. No manual Pages setup step
+is needed either way. This deliberately avoids `Deploy from a branch`:
+that source makes GitHub run its own internal `pages-build-deployment`
+workflow outside this repository (not a file under `.github/workflows/`,
+and triggered on every push to the Pages source branch regardless of
+`build_type` — it kept running alongside `deploy-pages` here until the
+explicit switch above was added), which has been observed pinned to a
 deprecated Node.js runtime with no way for us to update it — seeing that
 again is the signal something has regressed here.
 
@@ -395,9 +401,11 @@ the admin and/or upstream touched it since the last install:
    (or, to build/publish without going through the upstream merge,
    **Actions → Build and publish → Run workflow** directly).
 
-No manual GitHub Pages setup step is needed: the `deploy-pages` job's
-`actions/configure-pages` step creates (or switches) the Pages site to
-the `GitHub Actions` source itself on the first run.
+No manual GitHub Pages setup step is needed: the `deploy-pages` job
+creates the Pages site, or switches it to the `GitHub Actions` source if
+it already existed as branch-based, itself on the first run (see
+"APT repository on GitHub Pages" above for why that explicit switch is
+necessary and `configure-pages` alone does not do it).
 
 If a `github-pages` deployment **environment** already exists in the
 repository (e.g. left over from a previous `Deploy from a branch` setup)
