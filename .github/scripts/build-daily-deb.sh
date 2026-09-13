@@ -149,7 +149,9 @@ Daily development build of svxlink-db9cr, not a stable release.
 - Package version: ${version}
 - Source commit: ${source_sha}
 - Build: ${GITHUB_RUN_NUMBER}, attempt ${GITHUB_RUN_ATTEMPT}
-- Server build without Qtel; upstream sound packs are not bundled.
+- Server build without Qtel; the graphical EchoLink client is a separate
+  optional \`qtel\` package (same version, requires a desktop environment).
+  Upstream sound packs are not bundled either way.
 - RTL-SDR support uses a from-source build of the RTL-SDR Blog librtlsdr/
   rtl_tcp fork (bundled in this package), for current V3/V4 dongle support;
   it conflicts with the distro's librtlsdr0/rtl-sdr packages.
@@ -158,9 +160,100 @@ Daily development build of svxlink-db9cr, not a stable release.
 - Built natively in Debian ${codename}; package installation is smoke-tested in a clean container.
 - Radio hardware and audio operation have not been tested by CI.
 
-Install with \`sudo apt install ./svxlink_*.deb\` after downloading the package,
-or via the APT repository: https://criede.github.io/svxlink-db9cr/
+Install with \`sudo apt install ./svxlink_*.deb\` after downloading the package
+(add \`./qtel_*.deb\` too for the graphical EchoLink client), or via the APT
+repository: https://criede.github.io/svxlink-db9cr/
 Configure the station and install the appropriate sound pack before starting SvxLink.
 EOF
+# Build Qtel (graphical EchoLink client) as a second, separate package, the
+# way an Arch/AUR split package works: one build, then hand-pick each
+# package's own files from the shared install tree instead of shipping
+# everything in one package. The main svxlink package above is deliberately
+# built with -DUSE_QT=OFF so it never pulls in Qt as a runtime dependency;
+# CPack has no component-based packaging set up in this tree (it would
+# require tagging every install() call across the whole project), so Qtel
+# gets its own full build + install into a private root instead, from which
+# only its own files are copied into a hand-assembled qtel package.
+apt-get install -y --no-install-recommends \
+  qt6-base-dev qt6-base-dev-tools qt6-l10n-tools libqt6core5compat6-dev
+
+cmake -S /source/src -B /build-qtel \
+  -DCMAKE_BUILD_TYPE=Release -DUSE_QT=ON -DWITH_SYSTEMD=OFF -DDO_INSTALL_CHOWN=OFF \
+  -DWITH_CONTRIB_SIP_LOGIC=OFF \
+  -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SYSCONFDIR=/etc \
+  -DCMAKE_INSTALL_LOCALSTATEDIR=/var
+cmake --build /build-qtel --parallel "$(nproc)"
+rm -rf /qtel-root
+DESTDIR=/qtel-root cmake --install /build-qtel
+
+qtel_bin=$(find /qtel-root -type f -name qtel -path '*/bin/*' -print -quit)
+test -n "$qtel_bin"
+mapfile -t asyncqt_libs < <(find /qtel-root -name 'libasyncqt.so*')
+test "${#asyncqt_libs[@]}" -gt 0
+
+qtel_pkgroot=/output/qtel-pkgroot
+rm -rf "$qtel_pkgroot"
+install -D -m 0755 "$qtel_bin" "$qtel_pkgroot/usr/bin/qtel"
+for lib in "${asyncqt_libs[@]}"; do
+  install -D -m 0644 "$lib" "$qtel_pkgroot/${lib#/qtel-root/}"
+done
+cp -a /qtel-root/usr/share/qtel "$qtel_pkgroot/usr/share/qtel"
+install -D -m 0644 /qtel-root/usr/share/applications/qtel.desktop \
+  "$qtel_pkgroot/usr/share/applications/qtel.desktop"
+install -D -m 0644 /qtel-root/usr/share/icons/hicolor/128x128/apps/qtel.png \
+  "$qtel_pkgroot/usr/share/icons/hicolor/128x128/apps/qtel.png"
+install -D -m 0644 /qtel-root/usr/share/metainfo/org.svxlink.Qtel.metainfo.xml \
+  "$qtel_pkgroot/usr/share/metainfo/org.svxlink.Qtel.metainfo.xml"
+
+# Runtime dependencies for Qt/GSM/etc. are resolved with dpkg-shlibdeps
+# rather than hand-listed, since exact package names (e.g. the "t64" time_t
+# transition affecting trixie but not bookworm) differ between suites.
+# echolib/asyncaudio/asynccore (needed by qtel, shared with the svxlink
+# package built above) are not resolvable this way since they are private
+# project libraries, not a Debian package; --ignore-missing-info skips them
+# instead of failing, and "Depends: svxlink (= same version)" covers them.
+mkdir -p /tmp/qtel-shlibdeps/debian
+cat > /tmp/qtel-shlibdeps/debian/control <<EOF
+Source: qtel
+Section: hamradio
+Priority: optional
+Maintainer: SvxLink Community <svxlink@groups.io>
+
+Package: qtel
+Architecture: any
+Depends: \${shlibs:Depends}, \${misc:Depends}
+Description: Graphical EchoLink client for SvxLink
+EOF
+(
+  cd /tmp/qtel-shlibdeps
+  dpkg-shlibdeps --ignore-missing-info -O \
+    "$qtel_pkgroot/usr/bin/qtel" "${asyncqt_libs[@]}" \
+    > shlibdeps.out
+)
+shlibs_depends=$(sed -n 's/^shlibs:Depends=//p' /tmp/qtel-shlibdeps/shlibdeps.out)
+test -n "$shlibs_depends"
+
+mkdir -p "$qtel_pkgroot/DEBIAN"
+cat > "$qtel_pkgroot/DEBIAN/control" <<EOF
+Package: qtel
+Version: $version
+Architecture: $arch
+Maintainer: SvxLink Community <svxlink@groups.io>
+Depends: svxlink (= $version), ${shlibs_depends}
+Section: hamradio
+Priority: optional
+Description: Graphical EchoLink client for SvxLink
+ Qtel is the graphical EchoLink client bundled with SvxLink. Built from
+ the same daily source as the svxlink package and pinned to the exact
+ same version, since it shares that package's echolib/async libraries.
+EOF
+printf '#!/bin/sh\nset -e\nldconfig\n' > "$qtel_pkgroot/DEBIAN/postinst"
+chmod 0755 "$qtel_pkgroot/DEBIAN/postinst"
+find "$qtel_pkgroot" -mindepth 1 -not -path "$qtel_pkgroot/DEBIAN*" -exec chmod go-w {} +
+
+dpkg-deb --build --root-owner-group "$qtel_pkgroot" \
+  "/output/qtel_${version}_${arch}.deb"
+dpkg-deb -f "/output/qtel_${version}_${arch}.deb" Depends
+
 cd /output
 sha256sum ./*.deb > SHA256SUMS

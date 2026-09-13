@@ -1,9 +1,27 @@
 # Daily upstream synchronization
 
+This lives across two workflow files with separate responsibilities:
+
+- `.github/workflows/sync-upstream.yml` merges upstream, then calls the
+  other workflow. Specific to this fork/repository.
+- `.github/workflows/build-and-publish.yml` builds the daily packages and
+  publishes them (GitHub prerelease, APT repository on GitHub Pages).
+  Deliberately repository-agnostic: it takes the commit to build as an
+  input, carries no hardcoded repository-name guard, and can be run
+  standalone via `workflow_dispatch` — including, unchanged, from another
+  repository such as the upstream `sm0svx/svxlink` project — as well as
+  being invoked as a reusable workflow (`workflow_call`) by
+  `sync-upstream.yml`.
+
 The `Sync upstream` workflow merges all new commits from `sm0svx/svxlink`,
 branch `master`, into `criede/svxlink-db9cr`, branch `master`, daily at
 02:17 UTC. That corresponds to 03:17 in winter and 04:17 in summer, German
-time. Other branches, tags and GitHub releases are not synchronized.
+time. Other branches, tags and GitHub releases are not synchronized. Once
+the merge job finishes, its `build-and-publish` job calls
+`build-and-publish.yml` (`uses: ./.github/workflows/build-and-publish.yml`,
+`secrets: inherit`), passing the synchronized commit as `source_sha`; this
+is also where the `criede/svxlink-db9cr`-specific guard lives, so the
+called workflow itself stays portable.
 
 `.github/workflows/` is also fully excluded from the merge: before the
 merge commit, this folder is reset to its own state from before the merge.
@@ -36,15 +54,15 @@ library versions, same ABI); one build per suite/architecture therefore
 covers both at once (where Raspberry Pi OS supports that architecture),
 and a separate "Raspberry Pi OS" variant is not needed. As soon as one of
 these Debian versions changes support status (e.g. a new Debian version
-becomes stable), the matrix in `.github/workflows/sync-upstream.yml` is
+becomes stable), the matrix in `.github/workflows/build-and-publish.yml` is
 adjusted accordingly — older entries removed, new ones added.
 
 The matrix legs deliberately run sequentially (`max-parallel: 1`), since
 the publish step commits to the shared `gh-pages` branch and a parallel
 push there would be race-prone. Each leg builds exactly the commit output
 by the sync, even if there were no new upstream commits. The server build
-does not include Qtel or sound files; these must be installed to match the
-station.
+does not include Qtel or sound files; these are a separate package
+respectively must be installed to match the station (see "Packages" below).
 
 Two features that need dependencies not packaged in Debian are built from
 source in the same container before the main configure, following the
@@ -69,7 +87,41 @@ exists and is current enough, build and bundle the rest.
   is built from source and installed to `/usr/local` for the same reason,
   but pjproject builds static libraries by default, so `SipLogic.so` links
   it in directly — there is nothing extra to bundle or depend on at
-  runtime for it.
+  runtime for it. Its static libraries need `-fPIC` (set via `CFLAGS`/
+  `CXXFLAGS` before `./configure`) since they end up linked into
+  `SipLogic.so`, a shared object; pjproject does not enable that by
+  default.
+
+## Packages
+
+Each leg produces two `.deb` packages from one source tree, following the
+same idea as an Arch/AUR split package: build once, then hand-pick each
+package's own files rather than shipping everything in one package. CPack
+has no per-component packaging set up in this tree (that would need every
+`install()` call across the whole project tagged with a `COMPONENT`), so
+Qtel gets its own full second build with `-DUSE_QT=ON` into a private
+root, from which only its files are copied into a hand-assembled
+`qtel_<version>_<arch>.deb` (`dpkg-deb --build`, not CPack); the main
+`svxlink` build is untouched by this and stays `-DUSE_QT=OFF`.
+
+| Package   | Contains |
+|-----------|----------|
+| `svxlink` | Server components (svxlink, remotetrx, svxreflector, logic cores, Tcl event scripts), including RTL-SDR, SipLogic, GPIOD, Speex/Opus/LADSPA as described above, and a systemd service. No Qtel, no sound packs. |
+| `qtel`    | Graphical EchoLink client (Qt6). Needs a desktop environment. `Depends: svxlink (= <same version>)` for the echolib/async shared libraries they have in common; the private `libasyncqt.so` (only built for Qtel) is bundled inside the `qtel` package itself. |
+
+`qtel`'s other runtime dependencies (Qt6, GSM, …) are resolved with
+`dpkg-shlibdeps` against a minimal, hand-written `debian/control` rather
+than hand-listed, since exact package names shift between suites (e.g.
+the "t64" time_t-transition renames affecting trixie but not bookworm);
+`--ignore-missing-info` skips echolib/asyncaudio/asynccore, which are not
+real Debian packages, relying on the `svxlink` pin instead.
+
+Both packages share the same version string and are published together:
+same daily prerelease, same APT repository pool entry for that suite/arch.
+The `gh-pages` `index.html` lists every published package with what it
+contains (see `publish-apt-repo.sh`) — keep that listing (and this table)
+up to date whenever a package's build flags or bundled dependencies
+change, in the same change, per the rule in `AGENT.MD`.
 
 Both from-source builds run once per matrix leg (same container, before
 the main `cmake` configure), so they follow the same architecture/suite as
@@ -111,10 +163,24 @@ automatically.
 ## APT repository on GitHub Pages
 
 After the daily prerelease, each matrix leg additionally publishes its
-package into a shared APT repository on the `gh-pages` branch, so that all
-currently maintained versions can be fetched with `apt install` and
-updated automatically (see "Installing on Raspberry Pi OS and Debian"
-below).
+package into a shared APT repository, committed to the `gh-pages` branch,
+so that all currently maintained versions can be fetched with `apt
+install` and updated automatically (see "Installing on Raspberry Pi OS
+and Debian" below). The `gh-pages` branch itself is only used as the
+persistent, incremental data store the retention/pool logic reads and
+writes; it is not what GitHub serves directly. A separate `deploy-pages`
+job (`needs: daily-deb`, `if: always()`) runs once per workflow run after
+all legs finish, checks out that branch's current content and publishes
+it via `actions/configure-pages` + `actions/upload-pages-artifact` +
+`actions/deploy-pages` — the `GitHub Actions` Pages source, not the
+classic `Deploy from a branch` one. `configure-pages` creates or switches
+the repository's Pages site to this source automatically if it is not
+already, so no manual Pages setup step is needed. This deliberately
+avoids `Deploy from a branch`: that source makes GitHub run its own
+internal `pages-build-deployment` workflow outside this repository (not a
+file under `.github/workflows/`), which has been observed pinned to a
+deprecated Node.js runtime with no way for us to update it — seeing that
+again is the signal something has regressed here.
 
 Layout of the repository, separated by suite (Debian/Ubuntu codename) and
 architecture — this matches the usual Debian repository layout (as
@@ -227,8 +293,8 @@ unrelated.
 
 ## Installing on Raspberry Pi OS and Debian
 
-Once GitHub Pages is enabled for the `gh-pages` branch (see "Setup"), the
-repository can be added. The commands are identical for all supported
+Once GitHub Pages has been deployed at least once (see "Setup" — no manual
+enabling needed), the repository can be added. The commands are identical for all supported
 systems; only the codename in the repository line differs:
 
 | Operating system                   | Codename    |
@@ -260,6 +326,8 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 
 sudo apt update
 sudo apt install svxlink
+# Optional graphical EchoLink client (needs a desktop environment):
+# sudo apt install qtel
 ```
 
 If the detected codename is not (yet) part of the matrix, `apt update`
@@ -289,16 +357,18 @@ the package are never touched by dpkg.
 
 ## Setup
 
-1. Push the workflow to the GitHub repository's default branch.
+1. Push the workflows to the GitHub repository's default branch.
 2. Enable GitHub Actions in the repository, if not already done.
 3. Create the repository secret **APT_SIGNING_KEY** (see "Signing key"
    above) — without this secret, the `daily-deb` job fails while signing
    the APT repository.
-4. Under **Settings → Pages**, set the source to **Deploy from a branch**
-   and the branch to `gh-pages` (directory `/`). The branch is created
-   automatically on the first successful `daily-deb` run; this setting can
-   therefore also be made after that run.
-5. Start a first run under **Actions → Sync upstream → Run workflow**.
+4. Start a first run under **Actions → Sync upstream → Run workflow**
+   (or, to build/publish without going through the upstream merge,
+   **Actions → Build and publish → Run workflow** directly).
+
+No manual GitHub Pages setup step is needed: the `deploy-pages` job's
+`actions/configure-pages` step creates (or switches) the Pages site to
+the `GitHub Actions` source itself on the first run.
 
 By default, the workflow uses the automatically provided `GITHUB_TOKEN`
 with `contents: write`. Branch rules must allow this direct push, also for
@@ -324,7 +394,8 @@ branch.
 - [GitHub: Events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)
 - [GitHub: GITHUB_TOKEN](https://docs.github.com/en/actions/concepts/security/github_token)
 - [GitHub: Permissions for workflow changes](https://github.github.com/gh-aw/reference/safe-outputs-pull-requests/)
-- [GitHub Pages: Deploy from a branch](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
+- [GitHub Pages: Publishing with a custom GitHub Actions workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow)
+- [GitHub Actions: Reusing workflows](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows)
 - [Debian Wiki: SecureApt](https://wiki.debian.org/SecureApt)
 - [Debian Repository Format](https://wiki.debian.org/DebianRepository/Format)
 - [Debian Policy Manual: conffiles](https://www.debian.org/doc/debian-policy/ch-files.html#configuration-files)

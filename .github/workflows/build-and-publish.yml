@@ -1,0 +1,265 @@
+name: Build and publish
+
+# Builds the daily .deb packages, publishes them as a GitHub prerelease and
+# to the GPG-signed APT repository on gh-pages, then prunes old releases.
+# Deliberately self-contained and repository-agnostic (no repository-name
+# guard, no assumption about how the commit to build was chosen) so this
+# workflow can be copied into another repository — e.g. the upstream
+# sm0svx/svxlink project — and used there on its own via workflow_dispatch,
+# not only as the reusable workflow sync-upstream.yml calls after a sync.
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: >-
+          Commit to build. Defaults to the default branch's current HEAD.
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      source_sha:
+        description: Commit to build. Defaults to the triggering ref's HEAD.
+        required: false
+        type: string
+    secrets:
+      APT_SIGNING_KEY:
+        description: ASCII-armored private GPG key used to sign the APT repository.
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  # Guards the gh-pages branch regardless of how this workflow was
+  # triggered (standalone dispatch or called from sync-upstream.yml), since
+  # the caller's own concurrency group only covers runs that go through it.
+  group: build-and-publish-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  daily-deb:
+    name: ${{ matrix.suite }}/${{ matrix.arch }} daily package
+    strategy:
+      # Sequential: the "Publish package to APT repository" step below
+      # commits and pushes to the shared gh-pages branch; running matrix
+      # legs in parallel would race on that push.
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        include:
+          # Currently maintained Debian-based releases (Debian and
+          # Raspberry Pi OS use the same package base per codename, so one
+          # build per codename/architecture covers both), for both arm64
+          # (Raspberry Pi) and amd64 (Intel/AMD PCs and servers). Each leg
+          # builds natively on a runner matching its architecture, so no
+          # QEMU emulation is needed. Add further entries here for
+          # additional Debian/Ubuntu versions or architectures.
+          - suite: bookworm
+            arch: arm64
+            runner: ubuntu-24.04-arm
+          - suite: trixie
+            arch: arm64
+            runner: ubuntu-24.04-arm
+          - suite: bookworm
+            arch: amd64
+            runner: ubuntu-24.04
+          - suite: trixie
+            arch: amd64
+            runner: ubuntu-24.04
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    steps:
+      - name: Check out source to build
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
+        with:
+          ref: ${{ inputs.source_sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Build Debian package for ${{ matrix.suite }}/${{ matrix.arch }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/daily-deb"
+          docker run --rm --platform "linux/${{ matrix.arch }}" \
+            -v "$GITHUB_WORKSPACE:/source:ro" \
+            -v "$RUNNER_TEMP/daily-deb:/output" \
+            -e GITHUB_RUN_NUMBER -e GITHUB_RUN_ATTEMPT \
+            "debian:${{ matrix.suite }}-slim" bash /source/.github/scripts/build-daily-deb.sh
+
+      - name: Test installation in clean ${{ matrix.suite }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --platform "linux/${{ matrix.arch }}" \
+            -v "$RUNNER_TEMP/daily-deb:/packages:ro" \
+            "debian:${{ matrix.suite }}-slim" bash -euo pipefail -c '
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get update
+              apt-get install -y --no-install-recommends /packages/*.deb
+              test "$(dpkg-query -W -f="\${Architecture}" svxlink)" = "${{ matrix.arch }}"
+              svxlink --version
+              test -f /usr/lib/systemd/system/svxlink.service
+              siplogic_so="$(find /usr/lib -name SipLogic.so -print -quit)"
+              test -n "$siplogic_so"
+              ! ldd /usr/bin/svxlink | grep -q "not found"
+              ! ldd "$siplogic_so" | grep -q "not found"
+              test "$(dpkg-query -W -f="\${Architecture}" qtel)" = "${{ matrix.arch }}"
+              test -x /usr/bin/qtel
+              ! ldd /usr/bin/qtel | grep -q "not found"
+            '
+
+      - name: Publish daily prerelease directly
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/daily-deb"
+          version=$(cat VERSION)
+          tag="daily-${version//\~/-}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" ./*.deb SHA256SUMS --clobber
+          else
+            gh release create "$tag" ./*.deb SHA256SUMS \
+              --target "${{ inputs.source_sha || github.sha }}" \
+              --title "Daily ${version} — ${{ matrix.suite }}/${{ matrix.arch }}" \
+              --notes-file BUILD-INFO.MD --prerelease --latest=false
+          fi
+          gh release view "$tag" --json url --jq .url >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install APT repository tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gnupg dpkg-dev apt-utils
+
+      - name: Import APT repository signing key
+        id: gpgimport
+        env:
+          APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "$APT_SIGNING_KEY" | gpg --batch --import
+          fpr=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr:/{print $10; exit}')
+          test -n "$fpr"
+          echo "::add-mask::$fpr"
+          echo "fingerprint=$fpr" >> "$GITHUB_OUTPUT"
+
+      - name: Publish package to APT repository (GitHub Pages)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GPG_KEY_FPR: ${{ steps.gpgimport.outputs.fingerprint }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/daily-deb"
+          SUITE=$(cat SUITE)
+          ARCH=$(cat ARCH)
+          checkout="$RUNNER_TEMP/gh-pages"
+          repo_url="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git ls-remote --exit-code --heads "https://github.com/${GITHUB_REPOSITORY}.git" gh-pages >/dev/null 2>&1; then
+            git clone --branch gh-pages --single-branch --depth 1 "$repo_url" "$checkout"
+          else
+            git clone --depth 1 "$repo_url" "$checkout"
+            git -C "$checkout" checkout --orphan gh-pages
+            git -C "$checkout" rm -rf . >/dev/null 2>&1 || true
+          fi
+          git -C "$checkout" config user.name 'github-actions[bot]'
+          git -C "$checkout" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          # One or more .deb files per leg (currently svxlink and qtel);
+          # publish each in turn so all of them end up in the same
+          # suite/arch pool and index.
+          shopt -s nullglob
+          for deb_file in "$RUNNER_TEMP"/daily-deb/*.deb; do
+            REPO_DIR="$checkout" DEB_FILE="$deb_file" \
+              SUITE="$SUITE" ARCH="$ARCH" GPG_KEY_FPR="$GPG_KEY_FPR" \
+              bash "$GITHUB_WORKSPACE/.github/scripts/publish-apt-repo.sh"
+          done
+
+          cd "$checkout"
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'APT repository unchanged.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            pkg_names="$(cd "$RUNNER_TEMP/daily-deb" && for f in *.deb; do dpkg-deb -f "$f" Package; done | paste -sd, -)"
+            git commit -m "Add ${SUITE}/${ARCH} packages (${pkg_names}) $(cat "$RUNNER_TEMP/daily-deb/VERSION")" >/dev/null
+            git push origin HEAD:refs/heads/gh-pages
+            echo "Published ${SUITE}/${ARCH} package to the APT repository (gh-pages)." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Remove imported signing key
+        if: always()
+        shell: bash
+        run: gpgconf --kill gpg-agent 2>/dev/null; rm -rf "$HOME/.gnupg"
+
+      - name: Remove temporary package files
+        if: always()
+        shell: bash
+        run: |
+          docker run --rm -v "$RUNNER_TEMP/daily-deb:/output" \
+            "debian:${{ matrix.suite }}-slim" sh -c 'find /output -mindepth 1 -delete'
+
+  deploy-pages:
+    name: Deploy APT repository to GitHub Pages
+    needs: daily-deb
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out gh-pages content
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
+        with:
+          ref: gh-pages
+          persist-credentials: false
+
+      # Deploying via GitHub Actions (rather than the classic "Deploy from a
+      # branch" Pages source) keeps the Node.js runtime used to build/serve
+      # Pages under the same control as every other action here. The
+      # classic source instead makes GitHub run its own internal
+      # "pages-build-deployment" workflow outside this repository, which
+      # has been observed pinned to a deprecated Node.js version with no
+      # way for us to update it. configure-pages creates/switches the Pages
+      # site to this workflow-based source if it is not already.
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0, Node.js 24
+
+      - name: Upload APT repository as Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0, internally Node.js 24
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1, Node.js 24
+
+  cleanup-old-releases:
+    name: Prune old daily releases
+    needs: daily-deb
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
+        with:
+          persist-credentials: false
+
+      - name: Prune daily releases outside the retention window
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: bash .github/scripts/prune-daily-releases.sh

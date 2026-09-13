@@ -40,6 +40,22 @@ still need to be documented.
   produced them. This does not apply to `src/doc/` and other files
   synchronized from upstream (`sm0svx/svxlink`), which keep their
   upstream language and content.
+- The Node.js version rule above also applies to GitHub Pages: do not rely
+  on the classic "Deploy from a branch" Pages source, since it makes
+  GitHub run its own internal `pages-build-deployment` workflow outside
+  this repository's control (and outside `.github/workflows/`), which has
+  been observed pinned to a deprecated Node.js runtime with no way for us
+  to update it. Deploy via a `GitHub Actions` Pages source instead, using
+  our own workflow with pinned, currently-maintained actions
+  (`actions/upload-pages-artifact`, `actions/deploy-pages`), so the Node.js
+  version is under the same control as every other workflow.
+- The gh-pages APT repository's `index.html` must list every published
+  package with the features/optional dependencies built into it (e.g.
+  RTL-SDR support, SipLogic). Whenever a package's build flags or bundled
+  dependencies change, update the `index.html` generation in
+  `.github/scripts/publish-apt-repo.sh` (and `BUILD-INFO.MD`/
+  `UPSTREAM-SYNC.MD` where relevant) in the same change, not as a
+  follow-up — this listing must never fall behind what is actually built.
 
 ## Upstream workflows
 

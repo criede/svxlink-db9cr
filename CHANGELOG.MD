@@ -16,6 +16,23 @@ project's existing release notes are located under `src/doc/`.
 - CodeQL workflow switched to Checkout v6 and CodeQL Action v4 with
   Node.js 24, with permissions to upload the analysis results set explicitly.
 
+### Changed (continued)
+
+- Split the single `Sync upstream` workflow: `sync-upstream.yml` now only
+  merges upstream and then calls the new `build-and-publish.yml` as a
+  reusable workflow (`secrets: inherit`). `build-and-publish.yml` carries
+  the build/publish/cleanup jobs, has no repository-name guard, accepts
+  the commit to build as an input, and is dispatchable standalone — so it
+  can be reused as-is in another repository (e.g. upstream).
+- GitHub Pages now deploys via a `deploy-pages` job using
+  `actions/configure-pages` + `actions/upload-pages-artifact` +
+  `actions/deploy-pages` (the `GitHub Actions` Pages source), instead of
+  the classic `Deploy from a branch` source. The `gh-pages` branch is now
+  only the persistent data store the retention/pool logic reads and
+  writes; GitHub no longer serves it directly, and no longer runs its own
+  internal `pages-build-deployment` workflow for it, which had been
+  observed pinned to a deprecated Node.js version outside our control.
+
 ### Added
 
 - Native daily build for Raspberry Pi OS and Debian after the sync, built
@@ -43,6 +60,13 @@ project's existing release notes are located under `src/doc/`.
 - Contributed SipLogic logic core enabled in the daily build
   (`-DWITH_CONTRIB_SIP_LOGIC=ON`), linked against a from-source
   PJSIP/pjproject build (statically linked, nothing to bundle at runtime).
+- Separate `qtel` package (Arch/AUR-style split build: one source tree,
+  each package hand-assembled from its own install root) alongside
+  `svxlink`, published in the same daily prerelease and APT repository
+  pool entry, pinned to the same version via `Depends: svxlink (= ...)`.
+- `index.html` on the APT repository now lists every published package
+  with the features/dependencies built into it, alongside the supported
+  systems table.
 - TCL event handling scripts (`events.tcl`, `events.d/*.tcl`,
   `modules.d/*.tcl`) are now installed as dpkg conffiles, like the existing
   `.conf` files, so a package upgrade no longer silently overwrites a file

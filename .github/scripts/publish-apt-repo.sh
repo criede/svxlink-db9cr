@@ -138,6 +138,23 @@ for d in "$REPO_DIR"/dists/*/; do
 "
 done
 
+# Description per package, listing what is actually built into it. Keep in
+# sync with build-daily-deb.sh whenever a package's build flags or bundled
+# dependencies change (see the rule in AGENT.MD) -- this is the only place
+# an end user sees what a package actually contains before installing it.
+declare -A package_descriptions=(
+  [svxlink]="Server components (svxlink, remotetrx, svxreflector, logic cores, Tcl event scripts). Built with: RTL-SDR direct-USB support (bundled RTL-SDR Blog librtlsdr/rtl_tcp fork for current V3/V4 dongles; conflicts with the distro librtlsdr0/rtl-sdr), the contributed SipLogic logic core (bundled PJSIP/pjproject, statically linked), GPIO via libgpiod, and Speex/Opus/LADSPA audio codec and plugin support. Installs a systemd service. Does not include Qtel or sound packs."
+  [qtel]="Graphical EchoLink client (Qt6). Requires a desktop environment and the <code>svxlink</code> package of the exact same version (shares its echolib/async libraries)."
+)
+
+package_rows=""
+while IFS= read -r pkg; do
+  [[ -z "$pkg" ]] && continue
+  desc="${package_descriptions[$pkg]:-(undocumented -- please update publish-apt-repo.sh)}"
+  package_rows="${package_rows}<tr><td><code>${pkg}</code></td><td>${desc}</td></tr>
+"
+done < <(find "$REPO_DIR/pool" -mindepth 4 -maxdepth 4 -type d -exec basename {} \; 2>/dev/null | sort -u)
+
 cat > "$REPO_DIR/index.html" <<EOF
 <!DOCTYPE html>
 <html lang="en">
@@ -176,12 +193,19 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=\${arch}] https:
   sudo tee /etc/apt/sources.list.d/svxlink-db9cr.list
 
 sudo apt update
-sudo apt install svxlink</code></pre>
+sudo apt install svxlink
+# Optional graphical EchoLink client (needs a desktop environment):
+# sudo apt install qtel</code></pre>
 <p class="note">If <code>apt update</code> reports a 404 for this source, your
 system's codename isn't built yet (see the table below) &mdash; edit the
 codename in <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> to one of
 the supported ones instead. Afterwards, a regular <code>sudo apt upgrade</code>
 picks up new daily builds automatically.</p>
+
+<h2>Packages</h2>
+<table>
+<tr><th>Package</th><th>Contains</th></tr>
+${package_rows}</table>
 
 <h2>Supported systems</h2>
 <table>
