@@ -240,8 +240,25 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=\${arch}] https:
 
 sudo apt update
 sudo apt install svxlink
+
+# Mandatory before the first start: configure your station, radio and audio.
+# The packaged file is only a template and must be adapted to your setup.
+sudo editor /etc/svxlink/svxlink.conf
+
+# Enable SvxLink at boot and start it now.
+sudo systemctl daemon-reload
+sudo systemctl enable --now svxlink.service
+
+# Check service state and follow its log.
+systemctl status svxlink.service
+journalctl -u svxlink.service -f
+
 # Optional graphical EchoLink client (needs a desktop environment):
 # sudo apt install qtel</code></pre>
+<p class="note"><strong>Required:</strong> Do not start the service before
+editing <code>/etc/svxlink/svxlink.conf</code>. Configure at least the station
+identity, logic, receiver/transmitter and audio/PTT settings for your hardware.
+The service reads this path through <code>/etc/default/svxlink</code>.</p>
 <p class="note">If <code>apt update</code> reports a 404 for this source, your
 system's codename isn't built yet (see the table below) &mdash; edit the
 codename in <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> to one of

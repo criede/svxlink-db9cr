@@ -7,6 +7,9 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- The APT repository Quickstart now requires editing
+  `/etc/svxlink/svxlink.conf` before first start and documents how to enable,
+  start, inspect and follow the logs of `svxlink.service` with systemd.
 - Upstream sync permanently excludes changes to `.github/workflows/`;
   own workflow files are fully preserved, even on fast-forwards.
 - Upstream CodeQL disabled in the own repository: automatic triggers
