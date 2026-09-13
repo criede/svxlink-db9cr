@@ -25,17 +25,14 @@ set -euo pipefail
 # Optional:
 #   COMPONENT     Archive component. Default: "main".
 #
-# Every published version is kept in the pool indefinitely (unlike the
-# daily GitHub prereleases, which are pruned by gfs-retention.sh via
-# prune-daily-releases.sh): apt install pkg=<old-version> only works for
-# as long as that version is still listed in the Packages index, so the
-# pool is the one place old builds need to stay reachable to actually
-# roll back to them. dpkg-scanpackages/apt handle a pool with many
-# versions of the same package fine -- this is normal for a Debian
-# archive.
+# Older packages are pruned per suite/component/architecture/package using
+# the same grandfather-father-son policy in gfs-retention.sh as the daily
+# GitHub prereleases (prune-daily-releases.sh), so the pool never retains
+# more than the releases do and the branch does not grow without bound.
 
 : "${REPO_DIR:?}" "${DEB_FILE:?}" "${SUITE:?}" "${ARCH:?}" "${GPG_KEY_FPR:?}"
 COMPONENT="${COMPONENT:-main}"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 test -f "$DEB_FILE"
 pkg_name=$(dpkg-deb -f "$DEB_FILE" Package)
@@ -49,6 +46,33 @@ esac
 pool_dir="$REPO_DIR/pool/$SUITE/$COMPONENT/$letter/$pkg_name"
 mkdir -p "$pool_dir"
 cp "$DEB_FILE" "$pool_dir/"
+
+# Prune older versions of this package for this suite/arch according to
+# the grandfather-father-son retention policy. The build date is taken
+# from the "+daily<YYYYMMDD>" marker in the version string; files without
+# that marker are left untouched.
+shopt -s nullglob
+today="$(date -u +%Y%m%d)"
+dated_pairs=""
+for f in "$pool_dir"/"${pkg_name}"_*_"${ARCH}".deb; do
+  base="$(basename "$f")"
+  if [[ "$base" =~ \+daily([0-9]{8}) ]]; then
+    dated_pairs="${dated_pairs}${BASH_REMATCH[1]} ${base}"$'\n'
+  fi
+done
+
+keep_set=""
+if [[ -n "$dated_pairs" ]]; then
+  keep_set="$(printf '%s' "$dated_pairs" | bash "$script_dir/gfs-retention.sh" "$today")"
+fi
+
+for f in "$pool_dir"/"${pkg_name}"_*_"${ARCH}".deb; do
+  base="$(basename "$f")"
+  if [[ "$base" =~ \+daily([0-9]{8}) ]] && ! grep -qxF "$base" <<< "$keep_set"; then
+    echo "Pruning old package (outside retention window): $base"
+    rm -f -- "$f"
+  fi
+done
 
 dists_dir="$REPO_DIR/dists/$SUITE"
 binary_dir="$dists_dir/$COMPONENT/binary-$ARCH"
@@ -252,10 +276,11 @@ instead if a reload does not seem to pick up a change (some settings, such
 as which logic cores or sound devices are loaded, may need a full restart).</p>
 
 <h2>Installing an older version</h2>
-<p>Every version ever published stays available in the pool (see
-"Retention" in
+<p>Recent versions stay available in the pool for a while after being
+superseded (daily for a week, weekly for a month, monthly for a year --
+see "Retention" in
 <a href="https://github.com/${repo_slug}/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
-so a bad daily build can always be rolled back:</p>
+so a bad daily build can usually be rolled back:</p>
 <pre><code>apt list -a svxlink   # or qtel; lists every version still in the repository
 sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
 sudo apt-mark hold svxlink   # optional: stop "apt upgrade" pulling it forward again

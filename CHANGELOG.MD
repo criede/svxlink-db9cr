@@ -7,12 +7,6 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
-- The APT repository pool now keeps every published version indefinitely
-  instead of pruning it with the same grandfather-father-son policy as
-  the daily GitHub prereleases: `apt install pkg=<old-version>` only
-  works for as long as that version is still listed in the pool, so it
-  is the one place old builds need to stay reachable to actually roll
-  back to them. The daily prereleases keep the GFS policy unchanged.
 - Fixed a `gfs-retention.sh` bug where several builds sharing the exact
   same date (repeated manual `workflow_dispatch` runs on one day, a
   retry) were collapsed down to just one, since the "keep the newest per
@@ -20,8 +14,12 @@ project's existing release notes are located under `src/doc/`.
   silently kept whichever entry it processed first. Builds under a week
   old are no longer bucketed by day at all -- every one of them is kept,
   matching what the policy already claimed to do. This had been quietly
-  losing same-day rebuilds' releases and (before the pool retention
-  change above) pool packages during this session's testing.
+  losing same-day rebuilds' releases and pool packages during this
+  session's testing, e.g. freezing the `svxlink` pool entry at an early
+  test build for the rest of the day. The APT pool and the daily GitHub
+  prereleases still both use this same policy, applied independently but
+  off the same dates, so a version dropping out of one drops out of the
+  other at the same time.
 - The APT repository Quickstart now requires editing
   `/etc/svxlink/svxlink.conf` before first start and documents how to enable,
   start, inspect and follow the logs of `svxlink.service` with systemd,
