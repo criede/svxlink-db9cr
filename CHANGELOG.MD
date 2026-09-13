@@ -35,12 +35,13 @@ project's existing release notes are located under `src/doc/`.
   writes; GitHub no longer serves it directly, and no longer runs its own
   internal `pages-build-deployment` workflow for it, which had been
   observed pinned to a deprecated Node.js version outside our control.
-  An explicit `gh api -X PUT .../pages -f build_type=workflow` step now
-  runs before `configure-pages`, since that action does not itself switch
-  an already-existing branch-based Pages site to the workflow source --
-  without it, the legacy `pages-build-deployment` kept running on every
-  push to `gh-pages` alongside the new job, defeating the point of this
-  change.
+  `configure-pages` does not itself switch an already-existing
+  branch-based Pages site to the workflow source, and that switch cannot
+  be automated in the workflow either -- it needs repo admin rights the
+  `GITHUB_TOKEN`'s `pages` permission does not grant (confirmed via
+  "Resource not accessible by integration", HTTP 403); see "Setup" in
+  UPSTREAM-SYNC.MD for the one-time manual switch this depends on where
+  Pages was previously set up as `Deploy from a branch`.
 - Matrix `fail-fast` turned on (was off): a failing leg cancels the
   remaining queued legs immediately instead of repeating the same
   failure across all of them, and marks the run failed.

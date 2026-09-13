@@ -13,7 +13,11 @@ on:
     inputs:
       source_sha:
         description: >-
-          Commit to build. Defaults to the default branch's current HEAD.
+          Full commit SHA to build (leave empty for the default branch's
+          current HEAD). Must be the full 40-character SHA, not an
+          abbreviated one -- actions/checkout cannot reliably resolve a
+          short SHA as a ref and fails with "branch or tag ... could not
+          be found".
         required: false
         type: string
   workflow_call:
@@ -238,21 +242,16 @@ jobs:
       # way to update), and -- since it also triggers on every push to the
       # Pages source branch regardless of build_type -- keeps running
       # alongside this job for as long as build_type stays "legacy".
+      #
       # configure-pages creates the Pages site if it does not exist yet,
       # but does not switch an *existing* branch-based ("legacy") site to
-      # the workflow source, so that is done explicitly first.
-      - name: Ensure Pages is configured for GitHub Actions deployment
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          if gh api "repos/${GITHUB_REPOSITORY}/pages" >/dev/null 2>&1; then
-            gh api -X PUT "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow
-          else
-            gh api -X POST "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow
-          fi
-
+      # the workflow source. That switch cannot be automated here either:
+      # changing a Pages site's build_type needs repo admin rights, which
+      # the GITHUB_TOKEN's "pages" permission does not grant even with
+      # "pages: write" declared (confirmed via "Resource not accessible by
+      # integration", HTTP 403) -- it only covers creating deployments,
+      # not reconfiguring the site. See "Setup" in UPSTREAM-SYNC.MD for the
+      # one-time manual switch this depends on.
       - name: Configure GitHub Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0, Node.js 24
 

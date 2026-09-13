@@ -13,6 +13,17 @@ This lives across two workflow files with separate responsibilities:
   being invoked as a reusable workflow (`workflow_call`) by
   `sync-upstream.yml`.
 
+Because of that, a run triggered from `Sync upstream` does **not** show
+up under **Actions → Build and publish**'s own run history — GitHub only
+lists it there for runs it dispatched directly (`workflow_dispatch`).
+A `workflow_call` invocation instead executes as jobs nested inside the
+*caller's* run, visible under **Actions → Sync upstream** as job names
+prefixed `Build and publish / ...` (e.g. `Build and publish / trixie/arm64
+daily package`). This is normal GitHub behavior for reusable workflows,
+not a sign that the build is happening inside `sync-upstream.yml` itself
+— that file contains no `docker run`/`cmake`/build logic at all, only the
+merge and the `uses:` call.
+
 The `Sync upstream` workflow merges all new commits from `sm0svx/svxlink`,
 branch `master`, into `criede/svxlink-db9cr`, branch `master`, daily at
 02:17 UTC. That corresponds to 03:17 in winter and 04:17 in summer, German
@@ -181,17 +192,21 @@ persistent, incremental data store the retention/pool logic reads and
 writes; it is not what GitHub serves directly. A separate `deploy-pages`
 job (`needs: daily-deb`, `if: always()`) runs once per workflow run after
 all legs finish, checks out that branch's current content and publishes
-it via the Pages REST API, `actions/configure-pages`,
-`actions/upload-pages-artifact` and `actions/deploy-pages` — the
-`GitHub Actions` Pages source, not the classic `Deploy from a branch`
-one. An explicit `gh api -X PUT .../pages -f build_type=workflow` step
-runs first (`-X POST` instead if the site does not exist yet): a fresh
-Pages site is fine either way, but `configure-pages` does **not** switch
-an *already existing* branch-based ("legacy") site to the workflow
-source on its own, so this is not optional. No manual Pages setup step
-is needed either way. This deliberately avoids `Deploy from a branch`:
-that source makes GitHub run its own internal `pages-build-deployment`
-workflow outside this repository (not a file under `.github/workflows/`,
+it via `actions/configure-pages`, `actions/upload-pages-artifact` and
+`actions/deploy-pages` — the `GitHub Actions` Pages source, not the
+classic `Deploy from a branch` one. `configure-pages` creates the Pages
+site if none exists yet, but does **not** switch an *already existing*
+branch-based ("legacy") site to the workflow source, and that switch
+cannot be automated in the workflow either: changing a Pages site's
+`build_type` needs repo admin rights, which the `GITHUB_TOKEN`'s `pages`
+permission does not grant (confirmed via "Resource not accessible by
+integration", HTTP 403) even with `pages: write` declared — that scope
+only covers creating deployments, not reconfiguring the site. See
+"Setup" below for the one-time manual switch this depends on if Pages
+was ever set up as `Deploy from a branch` before. This deliberately
+avoids `Deploy from a branch` in the first place: that source makes
+GitHub run its own internal `pages-build-deployment` workflow outside
+this repository (not a file under `.github/workflows/`,
 and triggered on every push to the Pages source branch regardless of
 `build_type` — it kept running alongside `deploy-pages` here until the
 explicit switch above was added), which has been observed pinned to a
@@ -397,15 +412,21 @@ the admin and/or upstream touched it since the last install:
 3. Create the repository secret **APT_SIGNING_KEY** (see "Signing key"
    above) — without this secret, the `daily-deb` job fails while signing
    the APT repository.
-4. Start a first run under **Actions → Sync upstream → Run workflow**
+4. If GitHub Pages has never been enabled for this repository, no
+   further action is needed — `actions/configure-pages` creates it with
+   the `GitHub Actions` source on the first `deploy-pages` run. If Pages
+   was previously set up with the classic **Deploy from a branch**
+   source (as this repository's was), switch it once, with an account
+   that has admin rights on the repository (the workflow's own
+   `GITHUB_TOKEN` cannot do this — see "APT repository on GitHub Pages"
+   above): `gh api -X PUT repos/<owner>/<repo>/pages -f build_type=workflow`,
+   or under **Settings → Pages → Build and deployment → Source** in the
+   web UI.
+5. Start a first run under **Actions → Sync upstream → Run workflow**
    (or, to build/publish without going through the upstream merge,
-   **Actions → Build and publish → Run workflow** directly).
-
-No manual GitHub Pages setup step is needed: the `deploy-pages` job
-creates the Pages site, or switches it to the `GitHub Actions` source if
-it already existed as branch-based, itself on the first run (see
-"APT repository on GitHub Pages" above for why that explicit switch is
-necessary and `configure-pages` alone does not do it).
+   **Actions → Build and publish → Run workflow** directly — note that a
+   `source_sha` typed in there must be the full 40-character commit SHA,
+   not an abbreviated one).
 
 If a `github-pages` deployment **environment** already exists in the
 repository (e.g. left over from a previous `Deploy from a branch` setup)
