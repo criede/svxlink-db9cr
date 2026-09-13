@@ -9,7 +9,6 @@ set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 arch=$(dpkg --print-architecture)
 codename=$(. /etc/os-release && echo "$VERSION_CODENAME")
-multiarch=$(dpkg-architecture -qDEB_HOST_MULTIARCH)
 test -n "$codename"
 apt-get update
 apt-get install -y --no-install-recommends \
@@ -17,6 +16,9 @@ apt-get install -y --no-install-recommends \
   doxygen groff libsigc++-2.0-dev libgsm1-dev libpopt-dev tcl8.6-dev \
   libgcrypt20-dev libspeex-dev libasound2-dev libopus-dev libusb-1.0-0-dev \
   libjsoncpp-dev libcurl4-openssl-dev libgpiod-dev libogg-dev ladspa-sdk libssl-dev
+
+# dpkg-architecture needs dpkg-dev, installed just above.
+multiarch=$(dpkg-architecture -qDEB_HOST_MULTIARCH)
 
 # Build the RTL-SDR Blog fork of librtlsdr/rtl_tcp from source instead of
 # using the distro's librtlsdr-dev: Debian's librtlsdr is typically too old
