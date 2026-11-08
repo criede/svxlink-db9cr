@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT deposu</title>
 @@HREFLANG_LINKS@@
@@ -128,7 +128,7 @@ sudo apt-mark hold svxlink   # isteğe bağlı: "apt upgrade" komutunun onu yeni
 <h2>Paketler</h2>
 <table>
 <tr><th>Paket</th><th>İçerik</th></tr>
-<tr><td><code>svxlink</code></td><td>Sunucu bileşenleri (svxlink, remotetrx, svxreflector, mantık çekirdekleri, Tcl olay betikleri). Derlemeye dâhil olanlar: doğrudan USB ile RTL-SDR desteği (güncel V3/V4 dongle'lar için pakete dâhil RTL-SDR Blog librtlsdr/rtl_tcp fork'u; dağıtımın librtlsdr0/rtl-sdr paketleriyle çakışır), katkı olarak sunulan SipLogic mantık çekirdeği (pakete dâhil PJSIP/pjproject, statik olarak bağlanmış), libgpiod üzerinden GPIO ve Speex/Opus/LADSPA ses kodeği ve eklenti desteği. Bir systemd servisi kurar. Qtel'i veya ses paketlerini içermez.</td></tr>
+<tr><td><code>svxlink</code></td><td>Sunucu bileşenleri (svxlink, remotetrx, svxreflector, mantık çekirdekleri, Tcl olay betikleri). Derlemeye dâhil olanlar: doğrudan USB ile RTL-SDR desteği (güncel V3/V4 dongle'lar için pakete dâhil RTL-SDR Blog librtlsdr/rtl_tcp fork'u; dağıtımın librtlsdr0/rtl-sdr paketleriyle çakışır), katkı olarak sunulan SipLogic mantık çekirdeği (pakete dâhil PJSIP/pjproject, statik olarak bağlanmış), libgpiod üzerinden GPIO ve Speex/Opus/LADSPA ses kodeği ve eklenti desteği. Bir systemd servisi kurar. Qtel'i veya ses paketlerini içermez. SvxLink hizmetine ve masaüstünde oturum açmış kullanıcılara RTL-SDR USB donanım kilitlerine erişim veren bir udev kuralı içerir.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafik EchoLink istemcisi (Qt6). Bir masaüstü ortamı ve tam olarak aynı sürümdeki <code>svxlink</code> paketini gerektirir (onun echolib/async kitaplıklarını paylaşır).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

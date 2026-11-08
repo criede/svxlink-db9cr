@@ -2,7 +2,7 @@
 <html lang="sr">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT репозиторијум</title>
 @@HREFLANG_LINKS@@
@@ -127,7 +127,7 @@ sudo apt-mark hold svxlink   # опционо: спречава да је "apt u
 <h2>Пакети</h2>
 <table>
 <tr><th>Пакет</th><th>Садржај</th></tr>
-<tr><td><code>svxlink</code></td><td>Серверске компоненте (svxlink, remotetrx, svxreflector, логичка језгра, Tcl скрипте догађаја). Изграђен са: подршком за RTL-SDR преко директне USB везе (приложени RTL-SDR Blog форк librtlsdr/rtl_tcp за актуелне V3/V4 донгле; у сукобу са пакетима дистрибуције librtlsdr0/rtl-sdr), логичким језгром SipLogic које је допринела заједница (приложени PJSIP/pjproject, статички повезан), GPIO преко libgpiod и подршком за аудио кодеке и прикључке Speex/Opus/LADSPA. Инсталира systemd сервис. Не садржи Qtel ни звучне пакете.</td></tr>
+<tr><td><code>svxlink</code></td><td>Серверске компоненте (svxlink, remotetrx, svxreflector, логичка језгра, Tcl скрипте догађаја). Изграђен са: подршком за RTL-SDR преко директне USB везе (приложени RTL-SDR Blog форк librtlsdr/rtl_tcp за актуелне V3/V4 донгле; у сукобу са пакетима дистрибуције librtlsdr0/rtl-sdr), логичким језгром SipLogic које је допринела заједница (приложени PJSIP/pjproject, статички повезан), GPIO преко libgpiod и подршком за аудио кодеке и прикључке Speex/Opus/LADSPA. Инсталира systemd сервис. Не садржи Qtel ни звучне пакете. Садржи udev правило које сервису SvxLink и пријављеним корисницима радне површине даје приступ RTL-SDR USB донглима.</td></tr>
 <tr><td><code>qtel</code></td><td>Графички EchoLink клијент (Qt6). Захтева графичко радно окружење и пакет <code>svxlink</code> потпуно исте верзије (дели његове библиотеке echolib/async).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

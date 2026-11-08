@@ -2,7 +2,7 @@
 <html lang="sq">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Depoja APT e SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -128,7 +128,7 @@ sudo apt-mark hold svxlink   # opsionale: ndalon që "apt upgrade" ta përditës
 <h2>Paketat</h2>
 <table>
 <tr><th>Paketa</th><th>Përmban</th></tr>
-<tr><td><code>svxlink</code></td><td>Komponentët e serverit (svxlink, remotetrx, svxreflector, bërthamat logjike, skriptet e ngjarjeve Tcl). Ndërtuar me: mbështetje RTL-SDR me lidhje të drejtpërdrejtë USB (fork i përfshirë librtlsdr/rtl_tcp i RTL-SDR Blog për dongle-t aktuale V3/V4; bie ndesh me librtlsdr0/rtl-sdr të shpërndarjes), bërthamën logjike SipLogic të kontribuar (PJSIP/pjproject i përfshirë, i lidhur statikisht), GPIO përmes libgpiod, si dhe mbështetje për kodekët audio dhe shtojcat Speex/Opus/LADSPA. Instalon një shërbim systemd. Nuk përfshin Qtel as paketa zërash.</td></tr>
+<tr><td><code>svxlink</code></td><td>Komponentët e serverit (svxlink, remotetrx, svxreflector, bërthamat logjike, skriptet e ngjarjeve Tcl). Ndërtuar me: mbështetje RTL-SDR me lidhje të drejtpërdrejtë USB (fork i përfshirë librtlsdr/rtl_tcp i RTL-SDR Blog për dongle-t aktuale V3/V4; bie ndesh me librtlsdr0/rtl-sdr të shpërndarjes), bërthamën logjike SipLogic të kontribuar (PJSIP/pjproject i përfshirë, i lidhur statikisht), GPIO përmes libgpiod, si dhe mbështetje për kodekët audio dhe shtojcat Speex/Opus/LADSPA. Instalon një shërbim systemd. Nuk përfshin Qtel as paketa zërash. Përfshin një rregull udev që i jep shërbimit SvxLink dhe përdoruesve të identifikuar në desktop qasje te dongle-t USB RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Klient grafik EchoLink (Qt6). Kërkon një mjedis desktopi dhe paketën <code>svxlink</code> me saktësisht të njëjtin version (ndan me të libraritë echolib/async).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

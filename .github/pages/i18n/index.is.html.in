@@ -2,7 +2,7 @@
 <html lang="is">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-pakkasafn</title>
 @@HREFLANG_LINKS@@
@@ -128,7 +128,7 @@ sudo apt-mark hold svxlink   # valfrjálst: kemur í veg fyrir að "apt upgrade"
 <h2>Pakkar</h2>
 <table>
 <tr><th>Pakki</th><th>Inniheldur</th></tr>
-<tr><td><code>svxlink</code></td><td>Þjónshlutar (svxlink, remotetrx, svxreflector, rökfræðikjarnar, Tcl-atburðaskriftur). Smíðað með: stuðningi við RTL-SDR beint um USB (meðfylgjandi librtlsdr/rtl_tcp-kvísl frá RTL-SDR Blog fyrir núverandi V3/V4-kubba; stangast á við librtlsdr0/rtl-sdr dreifingarinnar), SipLogic-rökfræðikjarnanum frá samfélaginu (meðfylgjandi PJSIP/pjproject, statískt tengt), GPIO í gegnum libgpiod og stuðningi við Speex/Opus/LADSPA-hljóðkóðara og viðbætur. Setur upp systemd-þjónustu. Inniheldur hvorki Qtel né hljóðpakka.</td></tr>
+<tr><td><code>svxlink</code></td><td>Þjónshlutar (svxlink, remotetrx, svxreflector, rökfræðikjarnar, Tcl-atburðaskriftur). Smíðað með: stuðningi við RTL-SDR beint um USB (meðfylgjandi librtlsdr/rtl_tcp-kvísl frá RTL-SDR Blog fyrir núverandi V3/V4-kubba; stangast á við librtlsdr0/rtl-sdr dreifingarinnar), SipLogic-rökfræðikjarnanum frá samfélaginu (meðfylgjandi PJSIP/pjproject, statískt tengt), GPIO í gegnum libgpiod og stuðningi við Speex/Opus/LADSPA-hljóðkóðara og viðbætur. Setur upp systemd-þjónustu. Inniheldur hvorki Qtel né hljóðpakka. Inniheldur udev-reglu sem veitir SvxLink-þjónustunni og notendum sem eru innskráðir á skjáborðið aðgang að RTL-SDR USB-lyklum.</td></tr>
 <tr><td><code>qtel</code></td><td>Myndrænn EchoLink-biðlari (Qt6). Krefst skjáborðsumhverfis og <code>svxlink</code>-pakkans í nákvæmlega sömu útgáfu (deilir echolib/async-söfnum hans).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

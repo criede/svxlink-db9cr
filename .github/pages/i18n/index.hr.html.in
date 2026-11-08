@@ -2,7 +2,7 @@
 <html lang="hr">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT repozitorij SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -128,7 +128,7 @@ sudo apt-mark hold svxlink   # neobavezno: sprječava da ga "apt upgrade" ponovn
 <h2>Paketi</h2>
 <table>
 <tr><th>Paket</th><th>Sadržaj</th></tr>
-<tr><td><code>svxlink</code></td><td>Poslužiteljske komponente (svxlink, remotetrx, svxreflector, logičke jezgre, Tcl skripte događaja). Izgrađeno s: podrškom za RTL-SDR izravno putem USB-a (priložen fork librtlsdr/rtl_tcp od RTL-SDR Bloga za aktualne prijamnike V3/V4; u sukobu s paketima librtlsdr0/rtl-sdr iz distribucije), doprinesenom logičkom jezgrom SipLogic (priložen PJSIP/pjproject, statički povezan), GPIO-om putem libgpiod te podrškom za audio kodeke i dodatke Speex/Opus/LADSPA. Instalira uslugu systemd. Ne sadrži Qtel ni zvučne pakete.</td></tr>
+<tr><td><code>svxlink</code></td><td>Poslužiteljske komponente (svxlink, remotetrx, svxreflector, logičke jezgre, Tcl skripte događaja). Izgrađeno s: podrškom za RTL-SDR izravno putem USB-a (priložen fork librtlsdr/rtl_tcp od RTL-SDR Bloga za aktualne prijamnike V3/V4; u sukobu s paketima librtlsdr0/rtl-sdr iz distribucije), doprinesenom logičkom jezgrom SipLogic (priložen PJSIP/pjproject, statički povezan), GPIO-om putem libgpiod te podrškom za audio kodeke i dodatke Speex/Opus/LADSPA. Instalira uslugu systemd. Ne sadrži Qtel ni zvučne pakete. Sadrži udev pravilo koje usluzi SvxLink i prijavljenim korisnicima radne površine daje pristup RTL-SDR USB donglovima.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafički klijent EchoLink (Qt6). Zahtijeva grafičko okruženje i paket <code>svxlink</code> potpuno iste verzije (dijeli njegove biblioteke echolib/async).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

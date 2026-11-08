@@ -143,7 +143,19 @@ exists and is current enough, build and bundle the rest.
   `build-daily-deb.sh`) so they ship inside the `svxlink` package itself.
   `libusb-1.0-0-dev` still comes from the base OS. The package
   `Conflicts` with Debian's `librtlsdr0`/`rtl-sdr` to avoid both trying to
-  own the same files.
+  own the same files. Since that also drops Debian's udev rule for the
+  dongles, the package ships its own,
+  `/usr/lib/udev/rules.d/60-svxlink-rtlsdr.rules`, generated at build time
+  from the fork's `rtl-sdr.rules` (so its USB ID list stays current) with
+  the group changed from `plugdev` to `svxlink` and `TAG+="uaccess"` added:
+  `svxlink.service` runs SvxLink as the unprivileged user/group `svxlink`
+  (`--runasuser`), which could otherwise not open the dongle for direct USB
+  access; `uaccess` keeps access for logged-in desktop users (e.g.
+  `rtl_test`). `postinst` reloads the udev rules and re-triggers USB devices
+  (best effort, skipped without a running udev), so an already plugged-in
+  dongle works without replugging. The build fails if not every rule was
+  rewritten; the installation test checks the rule and the `svxlink` group.
+  Actual operation with a dongle is not tested by CI (no hardware).
 - **SipLogic**: the contributed SipLogic logic core
   (`-DWITH_CONTRIB_SIP_LOGIC=ON`) needs `libpjproject`, which is not
   packaged in Debian either. [PJSIP/pjproject](https://github.com/pjsip/pjproject)

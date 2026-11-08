@@ -2,7 +2,7 @@
 <html lang="lv">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT repozitorijs</title>
 @@HREFLANG_LINKS@@
@@ -129,7 +129,7 @@ sudo apt-mark hold svxlink   # neobligāti: neļauj "apt upgrade" to atkal atjau
 <h2>Pakotnes</h2>
 <table>
 <tr><th>Pakotne</th><th>Saturs</th></tr>
-<tr><td><code>svxlink</code></td><td>Servera komponenti (svxlink, remotetrx, svxreflector, loģikas kodoli, Tcl notikumu skripti). Būvēts ar: RTL-SDR tiešā USB atbalstu (iekļauts RTL-SDR Blog librtlsdr/rtl_tcp atzarojums pašreizējiem V3/V4 uztvērējiem; konfliktē ar distribūcijas librtlsdr0/rtl-sdr), kopienas izstrādāto SipLogic loģikas kodolu (iekļauts PJSIP/pjproject, statiski saistīts), GPIO ar libgpiod un Speex/Opus/LADSPA audio kodeku un spraudņu atbalstu. Instalē systemd servisu. Neietver Qtel un skaņu pakas.</td></tr>
+<tr><td><code>svxlink</code></td><td>Servera komponenti (svxlink, remotetrx, svxreflector, loģikas kodoli, Tcl notikumu skripti). Būvēts ar: RTL-SDR tiešā USB atbalstu (iekļauts RTL-SDR Blog librtlsdr/rtl_tcp atzarojums pašreizējiem V3/V4 uztvērējiem; konfliktē ar distribūcijas librtlsdr0/rtl-sdr), kopienas izstrādāto SipLogic loģikas kodolu (iekļauts PJSIP/pjproject, statiski saistīts), GPIO ar libgpiod un Speex/Opus/LADSPA audio kodeku un spraudņu atbalstu. Instalē systemd servisu. Neietver Qtel un skaņu pakas. Ietver udev noteikumu, kas SvxLink pakalpojumam un darbvirsmā pieteikušamies lietotājiem dod piekļuvi RTL-SDR USB donglim.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafisks EchoLink klients (Qt6). Nepieciešama darbvirsmas vide un tieši tādas pašas versijas <code>svxlink</code> pakotne (izmanto tās echolib/async bibliotēkas).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

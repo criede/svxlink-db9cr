@@ -127,7 +127,7 @@ sudo apt-mark hold svxlink   # optional: stop "apt upgrade" pulling it forward a
 <h2>Packages</h2>
 <table>
 <tr><th>Package</th><th>Contains</th></tr>
-<tr><td><code>svxlink</code></td><td>Server components (svxlink, remotetrx, svxreflector, logic cores, Tcl event scripts). Built with: RTL-SDR direct-USB support (bundled RTL-SDR Blog librtlsdr/rtl_tcp fork for current V3/V4 dongles; conflicts with the distro librtlsdr0/rtl-sdr), the contributed SipLogic logic core (bundled PJSIP/pjproject, statically linked), GPIO via libgpiod, and Speex/Opus/LADSPA audio codec and plugin support. Installs a systemd service. Does not include Qtel or sound packs.</td></tr>
+<tr><td><code>svxlink</code></td><td>Server components (svxlink, remotetrx, svxreflector, logic cores, Tcl event scripts). Built with: RTL-SDR direct-USB support (bundled RTL-SDR Blog librtlsdr/rtl_tcp fork for current V3/V4 dongles; conflicts with the distro librtlsdr0/rtl-sdr), the contributed SipLogic logic core (bundled PJSIP/pjproject, statically linked), GPIO via libgpiod, and Speex/Opus/LADSPA audio codec and plugin support. Installs a systemd service. Does not include Qtel or sound packs. Includes a udev rule that gives the SvxLink service and logged-in desktop users access to RTL-SDR USB dongles.</td></tr>
 <tr><td><code>qtel</code></td><td>Graphical EchoLink client (Qt6). Requires a desktop environment and the <code>svxlink</code> package of the exact same version (shares its echolib/async libraries).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

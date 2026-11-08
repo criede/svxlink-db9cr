@@ -2,7 +2,7 @@
 <html lang="ro">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Depozitul APT SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -129,7 +129,7 @@ sudo apt-mark hold svxlink   # opțional: împiedică "apt upgrade" să o actual
 <h2>Pachete</h2>
 <table>
 <tr><th>Pachet</th><th>Conține</th></tr>
-<tr><td><code>svxlink</code></td><td>Componente server (svxlink, remotetrx, svxreflector, nuclee logice, scripturi de evenimente Tcl). Compilat cu: suport RTL-SDR direct prin USB (fork-ul librtlsdr/rtl_tcp de la RTL-SDR Blog inclus, pentru dongle-urile actuale V3/V4; intră în conflict cu librtlsdr0/rtl-sdr din distribuție), nucleul logic SipLogic contribuit (PJSIP/pjproject inclus, legat static), GPIO prin libgpiod și suport pentru codecuri audio și pluginuri Speex/Opus/LADSPA. Instalează un serviciu systemd. Nu include Qtel și nici pachete de sunete.</td></tr>
+<tr><td><code>svxlink</code></td><td>Componente server (svxlink, remotetrx, svxreflector, nuclee logice, scripturi de evenimente Tcl). Compilat cu: suport RTL-SDR direct prin USB (fork-ul librtlsdr/rtl_tcp de la RTL-SDR Blog inclus, pentru dongle-urile actuale V3/V4; intră în conflict cu librtlsdr0/rtl-sdr din distribuție), nucleul logic SipLogic contribuit (PJSIP/pjproject inclus, legat static), GPIO prin libgpiod și suport pentru codecuri audio și pluginuri Speex/Opus/LADSPA. Instalează un serviciu systemd. Nu include Qtel și nici pachete de sunete. Include o regulă udev care oferă serviciului SvxLink și utilizatorilor autentificați în sesiunea desktop acces la dongle-urile USB RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Client EchoLink grafic (Qt6). Necesită un mediu desktop și pachetul <code>svxlink</code> cu exact aceeași versiune (folosește în comun bibliotecile sale echolib/async).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

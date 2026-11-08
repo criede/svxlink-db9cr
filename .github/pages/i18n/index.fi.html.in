@@ -2,7 +2,7 @@
 <html lang="fi">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR -APT-pakettivarasto</title>
 @@HREFLANG_LINKS@@
@@ -128,7 +128,7 @@ sudo apt-mark hold svxlink   # valinnainen: estää "apt upgrade" -komentoa päi
 <h2>Paketit</h2>
 <table>
 <tr><th>Paketti</th><th>Sisältö</th></tr>
-<tr><td><code>svxlink</code></td><td>Palvelinkomponentit (svxlink, remotetrx, svxreflector, logiikkaytimet, Tcl-tapahtumaskriptit). Käännetty seuraavilla: RTL-SDR-tuki suoraan USB:n kautta (mukana RTL-SDR Blogin librtlsdr/rtl_tcp-fork nykyisille V3/V4-dongleille; on ristiriidassa jakelun librtlsdr0/rtl-sdr-pakettien kanssa), yhteisön tuottama SipLogic-logiikkaydin (mukana PJSIP/pjproject, staattisesti linkitetty), GPIO libgpiodin kautta sekä Speex/Opus/LADSPA-äänikoodekki- ja liitännäistuki. Asentaa systemd-palvelun. Ei sisällä Qteliä eikä äänipaketteja.</td></tr>
+<tr><td><code>svxlink</code></td><td>Palvelinkomponentit (svxlink, remotetrx, svxreflector, logiikkaytimet, Tcl-tapahtumaskriptit). Käännetty seuraavilla: RTL-SDR-tuki suoraan USB:n kautta (mukana RTL-SDR Blogin librtlsdr/rtl_tcp-fork nykyisille V3/V4-dongleille; on ristiriidassa jakelun librtlsdr0/rtl-sdr-pakettien kanssa), yhteisön tuottama SipLogic-logiikkaydin (mukana PJSIP/pjproject, staattisesti linkitetty), GPIO libgpiodin kautta sekä Speex/Opus/LADSPA-äänikoodekki- ja liitännäistuki. Asentaa systemd-palvelun. Ei sisällä Qteliä eikä äänipaketteja. Sisältää udev-säännön, joka antaa SvxLink-palvelulle ja työpöydälle kirjautuneille käyttäjille pääsyn RTL-SDR-USB-tikkuihin.</td></tr>
 <tr><td><code>qtel</code></td><td>Graafinen EchoLink-asiakasohjelma (Qt6). Vaatii työpöytäympäristön ja täsmälleen saman version <code>svxlink</code>-paketista (käyttää sen echolib/async-kirjastoja).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

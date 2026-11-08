@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repositorio APT de SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -128,7 +128,7 @@ sudo apt-mark hold svxlink   # opcional: evita que "apt upgrade" vuelva a actual
 <h2>Paquetes</h2>
 <table>
 <tr><th>Paquete</th><th>Contenido</th></tr>
-<tr><td><code>svxlink</code></td><td>Componentes de servidor (svxlink, remotetrx, svxreflector, núcleos lógicos, scripts de eventos Tcl). Compilado con: soporte RTL-SDR por USB directo (fork de librtlsdr/rtl_tcp de RTL-SDR Blog incluido, para los dongles V3/V4 actuales; entra en conflicto con librtlsdr0/rtl-sdr de la distribución), el núcleo lógico SipLogic aportado por la comunidad (PJSIP/pjproject incluido, enlazado estáticamente), GPIO mediante libgpiod, y soporte de códecs de audio y plugins Speex/Opus/LADSPA. Instala un servicio systemd. No incluye Qtel ni paquetes de sonido.</td></tr>
+<tr><td><code>svxlink</code></td><td>Componentes de servidor (svxlink, remotetrx, svxreflector, núcleos lógicos, scripts de eventos Tcl). Compilado con: soporte RTL-SDR por USB directo (fork de librtlsdr/rtl_tcp de RTL-SDR Blog incluido, para los dongles V3/V4 actuales; entra en conflicto con librtlsdr0/rtl-sdr de la distribución), el núcleo lógico SipLogic aportado por la comunidad (PJSIP/pjproject incluido, enlazado estáticamente), GPIO mediante libgpiod, y soporte de códecs de audio y plugins Speex/Opus/LADSPA. Instala un servicio systemd. No incluye Qtel ni paquetes de sonido. Incluye una regla udev que da acceso a los dongles USB RTL-SDR al servicio SvxLink y a los usuarios con sesión de escritorio iniciada.</td></tr>
 <tr><td><code>qtel</code></td><td>Cliente gráfico de EchoLink (Qt6). Requiere un entorno de escritorio y el paquete <code>svxlink</code> exactamente de la misma versión (comparte sus bibliotecas echolib/async).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

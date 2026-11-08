@@ -2,7 +2,7 @@
 <html lang="lt">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT saugykla</title>
 @@HREFLANG_LINKS@@
@@ -129,7 +129,7 @@ sudo apt-mark hold svxlink   # neprivaloma: neleidžia "apt upgrade" vėl jos at
 <h2>Paketai</h2>
 <table>
 <tr><th>Paketas</th><th>Turinys</th></tr>
-<tr><td><code>svxlink</code></td><td>Serverio komponentai (svxlink, remotetrx, svxreflector, logikos branduoliai, Tcl įvykių scenarijai). Sukompiliuota su: RTL-SDR tiesioginio USB palaikymu (pridėta RTL-SDR Blog librtlsdr/rtl_tcp atšaka dabartiniams V3/V4 imtuvams; konfliktuoja su distribucijos librtlsdr0/rtl-sdr), bendruomenės sukurtu SipLogic logikos branduoliu (pridėtas PJSIP/pjproject, susietas statiškai), GPIO per libgpiod ir Speex/Opus/LADSPA garso kodekų bei įskiepių palaikymu. Įdiegia systemd tarnybą. Neapima Qtel ir garsų paketų.</td></tr>
+<tr><td><code>svxlink</code></td><td>Serverio komponentai (svxlink, remotetrx, svxreflector, logikos branduoliai, Tcl įvykių scenarijai). Sukompiliuota su: RTL-SDR tiesioginio USB palaikymu (pridėta RTL-SDR Blog librtlsdr/rtl_tcp atšaka dabartiniams V3/V4 imtuvams; konfliktuoja su distribucijos librtlsdr0/rtl-sdr), bendruomenės sukurtu SipLogic logikos branduoliu (pridėtas PJSIP/pjproject, susietas statiškai), GPIO per libgpiod ir Speex/Opus/LADSPA garso kodekų bei įskiepių palaikymu. Įdiegia systemd tarnybą. Neapima Qtel ir garsų paketų. Įtraukta udev taisyklė, suteikianti SvxLink tarnybai ir prie darbalaukio prisijungusiems naudotojams prieigą prie RTL-SDR USB raktų.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafinis EchoLink klientas (Qt6). Reikia darbalaukio aplinkos ir lygiai tos pačios versijos <code>svxlink</code> paketo (naudoja jo echolib/async bibliotekas).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repositório APT SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -128,7 +128,7 @@ sudo apt-mark hold svxlink   # opcional: impede que o "apt upgrade" a volte a at
 <h2>Pacotes</h2>
 <table>
 <tr><th>Pacote</th><th>Conteúdo</th></tr>
-<tr><td><code>svxlink</code></td><td>Componentes de servidor (svxlink, remotetrx, svxreflector, núcleos lógicos, scripts de eventos Tcl). Compilado com: suporte RTL-SDR por USB direto (fork RTL-SDR Blog de librtlsdr/rtl_tcp incluído, para os dongles V3/V4 atuais; entra em conflito com librtlsdr0/rtl-sdr da distribuição), o núcleo lógico SipLogic contribuído pela comunidade (PJSIP/pjproject incluído, ligado estaticamente), GPIO através de libgpiod, e suporte de codecs de áudio e plugins Speex/Opus/LADSPA. Instala um serviço systemd. Não inclui o Qtel nem pacotes de sons.</td></tr>
+<tr><td><code>svxlink</code></td><td>Componentes de servidor (svxlink, remotetrx, svxreflector, núcleos lógicos, scripts de eventos Tcl). Compilado com: suporte RTL-SDR por USB direto (fork RTL-SDR Blog de librtlsdr/rtl_tcp incluído, para os dongles V3/V4 atuais; entra em conflito com librtlsdr0/rtl-sdr da distribuição), o núcleo lógico SipLogic contribuído pela comunidade (PJSIP/pjproject incluído, ligado estaticamente), GPIO através de libgpiod, e suporte de codecs de áudio e plugins Speex/Opus/LADSPA. Instala um serviço systemd. Não inclui o Qtel nem pacotes de sons. Inclui uma regra udev que dá ao serviço SvxLink e aos utilizadores com sessão de ambiente de trabalho iniciada acesso às pens USB RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Cliente EchoLink gráfico (Qt6). Requer um ambiente de trabalho e o pacote <code>svxlink</code> exatamente da mesma versão (partilha as suas bibliotecas echolib/async).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

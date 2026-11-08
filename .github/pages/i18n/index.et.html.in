@@ -2,7 +2,7 @@
 <html lang="et">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-hoidla</title>
 @@HREFLANG_LINKS@@
@@ -128,7 +128,7 @@ sudo apt-mark hold svxlink   # valikuline: takistab, et "apt upgrade" seda uuest
 <h2>Paketid</h2>
 <table>
 <tr><th>Pakett</th><th>Sisu</th></tr>
-<tr><td><code>svxlink</code></td><td>Serverikomponendid (svxlink, remotetrx, svxreflector, loogikatuumad, Tcl-sündmusskriptid). Kompileeritud järgmisega: RTL-SDR otse-USB tugi (kaasas RTL-SDR Blogi librtlsdr/rtl_tcp fork praeguste V3/V4 donglite jaoks; on vastuolus distributsiooni pakettidega librtlsdr0/rtl-sdr), kogukonna panustatud SipLogic loogikatuum (kaasas PJSIP/pjproject, staatiliselt lingitud), GPIO libgpiodi kaudu ning Speex/Opus/LADSPA helikoodekite ja pistikprogrammide tugi. Paigaldab systemd-teenuse. Ei sisalda Qteli ega helipakette.</td></tr>
+<tr><td><code>svxlink</code></td><td>Serverikomponendid (svxlink, remotetrx, svxreflector, loogikatuumad, Tcl-sündmusskriptid). Kompileeritud järgmisega: RTL-SDR otse-USB tugi (kaasas RTL-SDR Blogi librtlsdr/rtl_tcp fork praeguste V3/V4 donglite jaoks; on vastuolus distributsiooni pakettidega librtlsdr0/rtl-sdr), kogukonna panustatud SipLogic loogikatuum (kaasas PJSIP/pjproject, staatiliselt lingitud), GPIO libgpiodi kaudu ning Speex/Opus/LADSPA helikoodekite ja pistikprogrammide tugi. Paigaldab systemd-teenuse. Ei sisalda Qteli ega helipakette. Sisaldab udev-reeglit, mis annab SvxLinki teenusele ja töölauale sisse loginud kasutajatele juurdepääsu RTL-SDR USB-donglitele.</td></tr>
 <tr><td><code>qtel</code></td><td>Graafiline EchoLinki klient (Qt6). Vajab töölauakeskkonda ja täpselt sama versiooniga <code>svxlink</code>-paketti (kasutab selle echolib/async teeke).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

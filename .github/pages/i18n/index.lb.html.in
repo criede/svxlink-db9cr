@@ -2,7 +2,7 @@
 <html lang="lb">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-Repository</title>
 @@HREFLANG_LINKS@@
@@ -126,7 +126,7 @@ sudo apt-mark hold svxlink   # fakultativ: verhënnert, datt "apt upgrade" en er
 <h2>Paketen</h2>
 <table>
 <tr><th>Paket</th><th>Inhalt</th></tr>
-<tr><td><code>svxlink</code></td><td>Server-Komponenten (svxlink, remotetrx, svxreflector, Logik-Kären, Tcl-Event-Skripter). Gebaut mat: RTL-SDR-Ënnerstëtzung iwwer direkten USB (matgeliwwerte RTL-SDR-Blog-Fork vu librtlsdr/rtl_tcp fir aktuell V3/V4-Dongles; a Konflikt mat librtlsdr0/rtl-sdr vun der Distributioun), dem bäigesteierte SipLogic-Logik-Kär (matgeliwwert PJSIP/pjproject, statesch gelinkt), GPIO iwwer libgpiod an Ënnerstëtzung fir d'Audio-Codecen a Plugins Speex/Opus/LADSPA. Installéiert e systemd-Service. Enthält weder Qtel nach Sproochpaketen.</td></tr>
+<tr><td><code>svxlink</code></td><td>Server-Komponenten (svxlink, remotetrx, svxreflector, Logik-Kären, Tcl-Event-Skripter). Gebaut mat: RTL-SDR-Ënnerstëtzung iwwer direkten USB (matgeliwwerte RTL-SDR-Blog-Fork vu librtlsdr/rtl_tcp fir aktuell V3/V4-Dongles; a Konflikt mat librtlsdr0/rtl-sdr vun der Distributioun), dem bäigesteierte SipLogic-Logik-Kär (matgeliwwert PJSIP/pjproject, statesch gelinkt), GPIO iwwer libgpiod an Ënnerstëtzung fir d'Audio-Codecen a Plugins Speex/Opus/LADSPA. Installéiert e systemd-Service. Enthält weder Qtel nach Sproochpaketen. Enthält eng udev-Regel, déi dem SvxLink-Déngscht an ugemellte Desktop-Benotzer Zougrëff op RTL-SDR-USB-Sticken gëtt.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafeschen EchoLink-Client (Qt6). Brauch eng Desktop-Ëmgebung an de Paket <code>svxlink</code> an exakt der selwechter Versioun (benotzt seng echolib/async-Bibliothéiken).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

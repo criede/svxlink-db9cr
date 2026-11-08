@@ -2,7 +2,7 @@
 <html lang="hu">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-tároló</title>
 @@HREFLANG_LINKS@@
@@ -127,7 +127,7 @@ sudo apt-mark hold svxlink   # opcionális: megakadályozza, hogy az "apt upgrad
 <h2>Csomagok</h2>
 <table>
 <tr><th>Csomag</th><th>Tartalom</th></tr>
-<tr><td><code>svxlink</code></td><td>Szerverkomponensek (svxlink, remotetrx, svxreflector, logikamagok, Tcl-eseményszkriptek). Beépített funkciók: RTL-SDR közvetlen USB-támogatás (mellékelt RTL-SDR Blog librtlsdr/rtl_tcp fork a jelenlegi V3/V4 dongle-okhoz; ütközik a disztribúció librtlsdr0/rtl-sdr csomagjaival), a külső hozzájárulásként készült SipLogic logikamag (mellékelt PJSIP/pjproject, statikusan linkelve), GPIO a libgpiod segítségével, valamint Speex/Opus/LADSPA hangkodek- és bővítménytámogatás. Telepít egy systemd szolgáltatást. Nem tartalmazza a Qtel programot és a hangcsomagokat.</td></tr>
+<tr><td><code>svxlink</code></td><td>Szerverkomponensek (svxlink, remotetrx, svxreflector, logikamagok, Tcl-eseményszkriptek). Beépített funkciók: RTL-SDR közvetlen USB-támogatás (mellékelt RTL-SDR Blog librtlsdr/rtl_tcp fork a jelenlegi V3/V4 dongle-okhoz; ütközik a disztribúció librtlsdr0/rtl-sdr csomagjaival), a külső hozzájárulásként készült SipLogic logikamag (mellékelt PJSIP/pjproject, statikusan linkelve), GPIO a libgpiod segítségével, valamint Speex/Opus/LADSPA hangkodek- és bővítménytámogatás. Telepít egy systemd szolgáltatást. Nem tartalmazza a Qtel programot és a hangcsomagokat. Tartalmaz egy udev-szabályt, amely hozzáférést ad az RTL-SDR USB-donglékhoz a SvxLink szolgáltatásnak és az asztali munkamenetbe bejelentkezett felhasználóknak.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafikus EchoLink-kliens (Qt6). Asztali környezetet és pontosan azonos verziójú <code>svxlink</code> csomagot igényel (közösen használja annak echolib/async könyvtárait).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

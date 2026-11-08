@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Αποθετήριο APT του SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -130,7 +130,7 @@ sudo apt-mark hold svxlink   # προαιρετικά: εμποδίζει το "
 <h2>Πακέτα</h2>
 <table>
 <tr><th>Πακέτο</th><th>Περιεχόμενα</th></tr>
-<tr><td><code>svxlink</code></td><td>Στοιχεία διακομιστή (svxlink, remotetrx, svxreflector, πυρήνες λογικής, σενάρια συμβάντων Tcl). Μεταγλωττισμένο με: υποστήριξη RTL-SDR μέσω απευθείας USB (ενσωματωμένο fork librtlsdr/rtl_tcp του RTL-SDR Blog για τα τρέχοντα dongle V3/V4· συγκρούεται με τα librtlsdr0/rtl-sdr της διανομής), τον συνεισφερόμενο πυρήνα λογικής SipLogic (ενσωματωμένο PJSIP/pjproject, στατικά συνδεδεμένο), GPIO μέσω libgpiod, καθώς και υποστήριξη κωδικοποιητών ήχου και πρόσθετων Speex/Opus/LADSPA. Εγκαθιστά μια υπηρεσία systemd. Δεν περιλαμβάνει το Qtel ούτε πακέτα ήχων (sound packs).</td></tr>
+<tr><td><code>svxlink</code></td><td>Στοιχεία διακομιστή (svxlink, remotetrx, svxreflector, πυρήνες λογικής, σενάρια συμβάντων Tcl). Μεταγλωττισμένο με: υποστήριξη RTL-SDR μέσω απευθείας USB (ενσωματωμένο fork librtlsdr/rtl_tcp του RTL-SDR Blog για τα τρέχοντα dongle V3/V4· συγκρούεται με τα librtlsdr0/rtl-sdr της διανομής), τον συνεισφερόμενο πυρήνα λογικής SipLogic (ενσωματωμένο PJSIP/pjproject, στατικά συνδεδεμένο), GPIO μέσω libgpiod, καθώς και υποστήριξη κωδικοποιητών ήχου και πρόσθετων Speex/Opus/LADSPA. Εγκαθιστά μια υπηρεσία systemd. Δεν περιλαμβάνει το Qtel ούτε πακέτα ήχων (sound packs). Περιλαμβάνει κανόνα udev που δίνει στην υπηρεσία SvxLink και στους συνδεδεμένους χρήστες επιφάνειας εργασίας πρόσβαση στα USB dongle RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Γραφικός πελάτης EchoLink (Qt6). Απαιτεί περιβάλλον επιφάνειας εργασίας και το πακέτο <code>svxlink</code> ακριβώς της ίδιας έκδοσης (μοιράζεται τις βιβλιοθήκες echolib/async του).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

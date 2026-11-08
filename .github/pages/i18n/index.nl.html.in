@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-repository</title>
 @@HREFLANG_LINKS@@
@@ -128,7 +128,7 @@ sudo apt-mark hold svxlink   # optioneel: voorkomt dat "apt upgrade" hem weer bi
 <h2>Pakketten</h2>
 <table>
 <tr><th>Pakket</th><th>Inhoud</th></tr>
-<tr><td><code>svxlink</code></td><td>Servercomponenten (svxlink, remotetrx, svxreflector, logic cores, Tcl-eventscripts). Gebouwd met: RTL-SDR-ondersteuning via directe USB (meegeleverde RTL-SDR Blog-fork van librtlsdr/rtl_tcp voor huidige V3/V4-dongles; conflicteert met librtlsdr0/rtl-sdr van de distributie), de bijgedragen SipLogic logic core (meegeleverd PJSIP/pjproject, statisch gelinkt), GPIO via libgpiod, en ondersteuning voor de audiocodecs en plug-ins Speex/Opus/LADSPA. Installeert een systemd-service. Bevat geen Qtel en geen geluidspakketten.</td></tr>
+<tr><td><code>svxlink</code></td><td>Servercomponenten (svxlink, remotetrx, svxreflector, logic cores, Tcl-eventscripts). Gebouwd met: RTL-SDR-ondersteuning via directe USB (meegeleverde RTL-SDR Blog-fork van librtlsdr/rtl_tcp voor huidige V3/V4-dongles; conflicteert met librtlsdr0/rtl-sdr van de distributie), de bijgedragen SipLogic logic core (meegeleverd PJSIP/pjproject, statisch gelinkt), GPIO via libgpiod, en ondersteuning voor de audiocodecs en plug-ins Speex/Opus/LADSPA. Installeert een systemd-service. Bevat geen Qtel en geen geluidspakketten. Bevat een udev-regel die de SvxLink-service en aangemelde desktopgebruikers toegang geeft tot RTL-SDR-USB-dongles.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafische EchoLink-client (Qt6). Vereist een desktopomgeving en het pakket <code>svxlink</code> van precies dezelfde versie (deelt de echolib/async-bibliotheken daarvan).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

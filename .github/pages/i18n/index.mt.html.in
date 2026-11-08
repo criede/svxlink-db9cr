@@ -2,7 +2,7 @@
 <html lang="mt">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repożitorju APT SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -128,7 +128,7 @@ sudo apt-mark hold svxlink   # fakultattiv: ma jħallix lil "apt upgrade" jaġġ
 <h2>Pakketti</h2>
 <table>
 <tr><th>Pakkett</th><th>Fih</th></tr>
-<tr><td><code>svxlink</code></td><td>Komponenti tas-server (svxlink, remotetrx, svxreflector, logic cores, skripts tal-avvenimenti Tcl). Mibni b'dan li ġej: appoġġ RTL-SDR permezz ta' USB dirett (fork inkluż ta' RTL-SDR Blog librtlsdr/rtl_tcp għad-dongles attwali V3/V4; jidħol f'kunflitt mal-librtlsdr0/rtl-sdr tad-distribuzzjoni), il-logic core SipLogic ikkontribwit (PJSIP/pjproject inkluż, marbut statikament), GPIO permezz ta' libgpiod, u appoġġ għall-codecs u l-plugins tal-awdjo Speex/Opus/LADSPA. Jinstalla servizz systemd. Ma jinkludix Qtel jew pakketti tal-ħsejjes.</td></tr>
+<tr><td><code>svxlink</code></td><td>Komponenti tas-server (svxlink, remotetrx, svxreflector, logic cores, skripts tal-avvenimenti Tcl). Mibni b'dan li ġej: appoġġ RTL-SDR permezz ta' USB dirett (fork inkluż ta' RTL-SDR Blog librtlsdr/rtl_tcp għad-dongles attwali V3/V4; jidħol f'kunflitt mal-librtlsdr0/rtl-sdr tad-distribuzzjoni), il-logic core SipLogic ikkontribwit (PJSIP/pjproject inkluż, marbut statikament), GPIO permezz ta' libgpiod, u appoġġ għall-codecs u l-plugins tal-awdjo Speex/Opus/LADSPA. Jinstalla servizz systemd. Ma jinkludix Qtel jew pakketti tal-ħsejjes. Jinkludi regola udev li tagħti aċċess għad-dongles USB RTL-SDR lis-servizz SvxLink u lill-utenti illoggjati fid-desktop.</td></tr>
 <tr><td><code>qtel</code></td><td>Klijent grafiku għal EchoLink (Qt6). Jeħtieġ ambjent desktop u l-pakkett <code>svxlink</code> tal-istess verżjoni eżatta (jaqsam il-libreriji echolib/async tiegħu).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 

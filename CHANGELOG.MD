@@ -7,6 +7,13 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- RTL-SDR direct USB access now works for the `svxlink` service: the
+  package ships `/usr/lib/udev/rules.d/60-svxlink-rtlsdr.rules` (generated
+  from the RTL-SDR Blog fork's rules, group `svxlink` plus `uaccess`),
+  since conflicting with Debian's `librtlsdr0` also removed its udev rule
+  and the service runs as the unprivileged user `svxlink`. `postinst`
+  reloads udev; the build and installation test check the rule. Package
+  description on the start page (all languages) updated.
 - `README.adoc` starts with a box explaining this repository: an
   automatically tracking fork of sm0svx/svxlink whose only purpose is
   building packages, the architectures built, and where to get them (APT

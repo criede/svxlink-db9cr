@@ -34,6 +34,10 @@ apt-get install -y --no-install-recommends /packages/*.deb
 test "$(dpkg-query -W -f='${Architecture}' svxlink)" = "$EXPECTED_ARCH"
 svxlink --version
 test -f /usr/lib/systemd/system/svxlink.service
+# RTL-SDR USB access for the service: udev rule present, pointing at the
+# svxlink group, which the package's postinst must have created.
+grep -q 'GROUP="svxlink"' /usr/lib/udev/rules.d/60-svxlink-rtlsdr.rules
+getent group svxlink >/dev/null
 siplogic_so="$(find /usr/lib -name SipLogic.so -print -quit)"
 test -n "$siplogic_so"
 assert_libs_resolved /usr/bin/svxlink

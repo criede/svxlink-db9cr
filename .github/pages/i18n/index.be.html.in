@@ -2,7 +2,7 @@
 <html lang="be">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT-рэпазіторый SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -128,7 +128,7 @@ sudo apt-mark hold svxlink   # неабавязкова: не дае "apt upgrad
 <h2>Пакеты</h2>
 <table>
 <tr><th>Пакет</th><th>Змест</th></tr>
-<tr><td><code>svxlink</code></td><td>Серверныя кампаненты (svxlink, remotetrx, svxreflector, ядры логікі, скрыпты падзей Tcl). Сабраны з: падтрымкай RTL-SDR праз прамое USB-падключэнне (убудаваны форк librtlsdr/rtl_tcp ад RTL-SDR Blog для сучасных донглаў V3/V4; канфліктуе з пакетамі дыстрыбутыва librtlsdr0/rtl-sdr), прадастаўленым супольнасцю ядром логікі SipLogic (убудаваны PJSIP/pjproject, статычна скампанаваны), GPIO праз libgpiod і падтрымкай аўдыякодэкаў і плагінаў Speex/Opus/LADSPA. Усталёўвае службу systemd. Не ўключае Qtel і гукавыя пакеты.</td></tr>
+<tr><td><code>svxlink</code></td><td>Серверныя кампаненты (svxlink, remotetrx, svxreflector, ядры логікі, скрыпты падзей Tcl). Сабраны з: падтрымкай RTL-SDR праз прамое USB-падключэнне (убудаваны форк librtlsdr/rtl_tcp ад RTL-SDR Blog для сучасных донглаў V3/V4; канфліктуе з пакетамі дыстрыбутыва librtlsdr0/rtl-sdr), прадастаўленым супольнасцю ядром логікі SipLogic (убудаваны PJSIP/pjproject, статычна скампанаваны), GPIO праз libgpiod і падтрымкай аўдыякодэкаў і плагінаў Speex/Opus/LADSPA. Усталёўвае службу systemd. Не ўключае Qtel і гукавыя пакеты. Змяшчае правіла udev, якое дае службе SvxLink і карыстальнікам, што ўвайшлі ў працоўны стол, доступ да USB-донглаў RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Графічны кліент EchoLink (Qt6). Патрабуе асяроддзя працоўнага стала і пакета <code>svxlink</code> дакладна той жа версіі (выкарыстоўвае яго бібліятэкі echolib/async).</td></tr>
 @@EXTRA_PACKAGE_ROWS@@</table>
 
