@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="source-sha256" content="c00736cfe9ab652c77c3cc1c822b13e4188abe328095c00aa64607a8220e551e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT-репозиторий SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -94,7 +94,7 @@ curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
 # Добавление источника репозитория. Выберите компонент:
 #   main     ежедневные сборки для разработки
 #   release  официальные релизы upstream (26.05 и новее)
-component=main
+component=release
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
