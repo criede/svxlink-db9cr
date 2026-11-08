@@ -213,13 +213,15 @@ jobs:
             echo "::endgroup::"
           done
 
-      # The build container runs as root and could leave symlinks pointing
-      # at host files in its output; upload only plain regular files.
+      # The build container runs as root and could leave symlinks (or other
+      # special files) pointing at host files among its output files; only
+      # plain regular files may be uploaded. Directories (CPack's
+      # _CPack_Packages work dir, qtel-pkgroot) are not uploaded anyway.
       - name: Check build output for non-regular files
         shell: bash
         run: |
           set -euo pipefail
-          odd="$(find "$RUNNER_TEMP/daily-deb" -maxdepth 1 -mindepth 1 ! -type f ! -name qtel-pkgroot)"
+          odd="$(find "$RUNNER_TEMP/daily-deb" -maxdepth 1 -mindepth 1 ! -type f ! -type d)"
           if [[ -n "$odd" ]]; then
             echo "::error::Unexpected non-regular files in build output: $odd"
             exit 1
