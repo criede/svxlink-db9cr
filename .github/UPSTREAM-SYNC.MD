@@ -525,8 +525,9 @@ differences come from the source: `release` packages contain none of
 this fork's source changes (e.g. the TCL scripts are not dpkg conffiles
 there, see below) and only change when upstream publishes a release.
 
-Use `release` for a station that should run a known, released version;
-use `main` to follow current development. Configure only one of them:
+Use `release` for a station that should run a known, released version
+(the default in the quickstart commands, here and on the repository's
+start page); use `main` to follow current development. Configure only one of them:
 with both enabled, apt always prefers `main`, since a daily build always
 carries a higher version than the release it is based on (e.g.
 `26.05.2.99.0+daily…` > `26.05.2-1~trixie`).
@@ -540,9 +541,10 @@ curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
 # Add the repository source, restricted to the key and to the local
-# codename/architecture combination. Component: "main" for the daily
-# builds, "release" for the official upstream releases (26.05 and newer).
-component=main
+# codename/architecture combination. Component: "release" (default) for
+# the official upstream releases (26.05 and newer), "main" for the daily
+# builds.
+component=release
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \

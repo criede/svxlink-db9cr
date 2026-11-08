@@ -7,6 +7,9 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- The quickstart commands (start page in all languages, UPSTREAM-SYNC.MD)
+  now default to the `release` component (upstream releases) instead of
+  `main` (daily builds).
 - The APT repository start page is now available in all European
   languages (24 official EU languages plus Norwegian, Icelandic,
   Albanian, Serbian, Bosnian, Macedonian, Ukrainian, Belarusian, Russian,
