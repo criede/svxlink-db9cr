@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-Repository</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -163,7 +163,7 @@ sudo apt-mark hold svxlink   # optional: verhindert, dass "apt upgrade" sie wied
 <h2>Pakete</h2>
 <table>
 <tr><th>Paket</th><th>Inhalt</th></tr>
-<tr><td><code>svxlink</code></td><td>Server-Komponenten (svxlink, remotetrx, svxreflector, Logik-Kerne, Tcl-Event-Skripte). Gebaut mit: RTL-SDR-Unterstützung über direktes USB (mitgelieferter RTL-SDR-Blog-Fork von librtlsdr/rtl_tcp für aktuelle V3/V4-Dongles; kollidiert mit librtlsdr0/rtl-sdr der Distribution), dem beigesteuerten SipLogic-Logik-Kern (mitgeliefertes PJSIP/pjproject, statisch gelinkt), GPIO über libgpiod sowie Unterstützung für die Audio-Codecs und Plugins Speex/Opus/LADSPA. Installiert einen systemd-Dienst. Enthält weder Qtel noch Sprachpakete.</td></tr>
+<tr><td><code>svxlink</code></td><td>Server-Komponenten (svxlink, remotetrx, svxreflector, Logik-Kerne, Tcl-Event-Skripte). Gebaut mit: RTL-SDR-Unterstützung über direktes USB (mitgelieferter RTL-SDR-Blog-Fork von librtlsdr/rtl_tcp für aktuelle V3/V4-Dongles; kollidiert mit librtlsdr0/rtl-sdr der Distribution), dem beigesteuerten SipLogic-Logik-Kern (mitgeliefertes PJSIP/pjproject, statisch gelinkt), GPIO über libgpiod sowie Unterstützung für die Audio-Codecs und Plugins Speex/Opus/LADSPA. Installiert einen systemd-Dienst. Enthält weder Qtel noch Sprachpakete. Enthält eine udev-Regel, die dem SvxLink-Dienst und angemeldeten Desktop-Benutzern Zugriff auf RTL-SDR-USB-Sticks gibt.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafischer EchoLink-Client (Qt6). Benötigt eine Desktop-Umgebung und das Paket <code>svxlink</code> in exakt derselben Version (nutzt dessen echolib/async-Bibliotheken).</td></tr>
 </table>
 

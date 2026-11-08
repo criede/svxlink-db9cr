@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dépôt APT SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -166,7 +166,7 @@ sudo apt-mark hold svxlink   # facultatif : empêche "apt upgrade" de la remettr
 <h2>Paquets</h2>
 <table>
 <tr><th>Paquet</th><th>Contenu</th></tr>
-<tr><td><code>svxlink</code></td><td>Composants serveur (svxlink, remotetrx, svxreflector, cœurs logiques, scripts d'événements Tcl). Compilé avec&nbsp;: prise en charge RTL-SDR en USB direct (fork RTL-SDR Blog de librtlsdr/rtl_tcp intégré, pour les clés V3/V4 actuelles&nbsp;; en conflit avec librtlsdr0/rtl-sdr de la distribution), le cœur logique SipLogic issu des contributions (PJSIP/pjproject intégré, lié statiquement), GPIO via libgpiod, et prise en charge des codecs audio et plugins Speex/Opus/LADSPA. Installe un service systemd. N'inclut ni Qtel ni les packs sonores.</td></tr>
+<tr><td><code>svxlink</code></td><td>Composants serveur (svxlink, remotetrx, svxreflector, cœurs logiques, scripts d'événements Tcl). Compilé avec&nbsp;: prise en charge RTL-SDR en USB direct (fork RTL-SDR Blog de librtlsdr/rtl_tcp intégré, pour les clés V3/V4 actuelles&nbsp;; en conflit avec librtlsdr0/rtl-sdr de la distribution), le cœur logique SipLogic issu des contributions (PJSIP/pjproject intégré, lié statiquement), GPIO via libgpiod, et prise en charge des codecs audio et plugins Speex/Opus/LADSPA. Installe un service systemd. N'inclut ni Qtel ni les packs sonores. Contient une règle udev qui donne au service SvxLink et aux utilisateurs connectés à une session de bureau l’accès aux clés USB RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Client EchoLink graphique (Qt6). Nécessite un environnement de bureau et le paquet <code>svxlink</code> exactement de la même version (il partage ses bibliothèques echolib/async).</td></tr>
 </table>
 

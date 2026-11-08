@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT-репозиторій SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -165,7 +165,7 @@ sudo apt-mark hold svxlink   # необов’язково: не дає "apt upg
 <h2>Пакети</h2>
 <table>
 <tr><th>Пакет</th><th>Вміст</th></tr>
-<tr><td><code>svxlink</code></td><td>Серверні компоненти (svxlink, remotetrx, svxreflector, ядра логіки, скрипти подій Tcl). Зібрано з: підтримкою RTL-SDR через пряме USB-підключення (вбудований форк librtlsdr/rtl_tcp від RTL-SDR Blog для сучасних донглів V3/V4; конфліктує з пакетами дистрибутива librtlsdr0/rtl-sdr), наданим спільнотою ядром логіки SipLogic (вбудований PJSIP/pjproject, статично скомпонований), GPIO через libgpiod і підтримкою аудіокодеків і плагінів Speex/Opus/LADSPA. Встановлює службу systemd. Не містить Qtel і звукових пакетів.</td></tr>
+<tr><td><code>svxlink</code></td><td>Серверні компоненти (svxlink, remotetrx, svxreflector, ядра логіки, скрипти подій Tcl). Зібрано з: підтримкою RTL-SDR через пряме USB-підключення (вбудований форк librtlsdr/rtl_tcp від RTL-SDR Blog для сучасних донглів V3/V4; конфліктує з пакетами дистрибутива librtlsdr0/rtl-sdr), наданим спільнотою ядром логіки SipLogic (вбудований PJSIP/pjproject, статично скомпонований), GPIO через libgpiod і підтримкою аудіокодеків і плагінів Speex/Opus/LADSPA. Встановлює службу systemd. Не містить Qtel і звукових пакетів. Містить правило udev, яке надає службі SvxLink і користувачам, що увійшли в робочий стіл, доступ до USB-донглів RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Графічний клієнт EchoLink (Qt6). Потребує стільничного середовища та пакета <code>svxlink</code> точно тієї самої версії (використовує його бібліотеки echolib/async).</td></tr>
 </table>
 

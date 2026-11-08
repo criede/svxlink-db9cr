@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-förråd</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -165,7 +165,7 @@ sudo apt-mark hold svxlink   # valfritt: hindrar "apt upgrade" från att uppgrad
 <h2>Paket</h2>
 <table>
 <tr><th>Paket</th><th>Innehåll</th></tr>
-<tr><td><code>svxlink</code></td><td>Serverkomponenter (svxlink, remotetrx, svxreflector, logikkärnor, Tcl-händelseskript). Byggt med: RTL-SDR-stöd via direkt USB (medföljande RTL-SDR Blog-fork av librtlsdr/rtl_tcp för aktuella V3/V4-donglar; står i konflikt med distributionens librtlsdr0/rtl-sdr), den bidragna SipLogic-logikkärnan (medföljande PJSIP/pjproject, statiskt länkat), GPIO via libgpiod samt stöd för ljudkodekarna och insticksprogrammen Speex/Opus/LADSPA. Installerar en systemd-tjänst. Innehåller inte Qtel eller ljudpaket.</td></tr>
+<tr><td><code>svxlink</code></td><td>Serverkomponenter (svxlink, remotetrx, svxreflector, logikkärnor, Tcl-händelseskript). Byggt med: RTL-SDR-stöd via direkt USB (medföljande RTL-SDR Blog-fork av librtlsdr/rtl_tcp för aktuella V3/V4-donglar; står i konflikt med distributionens librtlsdr0/rtl-sdr), den bidragna SipLogic-logikkärnan (medföljande PJSIP/pjproject, statiskt länkat), GPIO via libgpiod samt stöd för ljudkodekarna och insticksprogrammen Speex/Opus/LADSPA. Installerar en systemd-tjänst. Innehåller inte Qtel eller ljudpaket. Innehåller en udev-regel som ger SvxLink-tjänsten och användare som är inloggade på skrivbordet åtkomst till RTL-SDR-USB-donglar.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafisk EchoLink-klient (Qt6). Kräver en skrivbordsmiljö och paketet <code>svxlink</code> i exakt samma version (delar dess echolib/async-bibliotek).</td></tr>
 </table>
 

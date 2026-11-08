@@ -2,7 +2,7 @@
 <html lang="sl">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repozitorij APT SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -165,7 +165,7 @@ sudo apt-mark hold svxlink   # neobvezno: prepreči, da bi jo "apt upgrade" znov
 <h2>Paketi</h2>
 <table>
 <tr><th>Paket</th><th>Vsebuje</th></tr>
-<tr><td><code>svxlink</code></td><td>Strežniške komponente (svxlink, remotetrx, svxreflector, logična jedra, skripti dogodkov Tcl). Zgrajeno s: podporo za RTL-SDR neposredno prek USB (priložen fork librtlsdr/rtl_tcp RTL-SDR Blog za trenutne sprejemnike V3/V4; v sporu z distribucijskima paketoma librtlsdr0/rtl-sdr), prispevanim logičnim jedrom SipLogic (priložen PJSIP/pjproject, statično povezan), GPIO prek libgpiod ter podporo za zvočne kodeke in vtičnike Speex/Opus/LADSPA. Namesti storitev systemd. Ne vsebuje Qtel in zvočnih paketov.</td></tr>
+<tr><td><code>svxlink</code></td><td>Strežniške komponente (svxlink, remotetrx, svxreflector, logična jedra, skripti dogodkov Tcl). Zgrajeno s: podporo za RTL-SDR neposredno prek USB (priložen fork librtlsdr/rtl_tcp RTL-SDR Blog za trenutne sprejemnike V3/V4; v sporu z distribucijskima paketoma librtlsdr0/rtl-sdr), prispevanim logičnim jedrom SipLogic (priložen PJSIP/pjproject, statično povezan), GPIO prek libgpiod ter podporo za zvočne kodeke in vtičnike Speex/Opus/LADSPA. Namesti storitev systemd. Ne vsebuje Qtel in zvočnih paketov. Vsebuje pravilo udev, ki storitvi SvxLink in prijavljenim uporabnikom namizja omogoča dostop do ključkov USB RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafični odjemalec EchoLink (Qt6). Potrebuje namizno okolje in paket <code>svxlink</code> natanko iste različice (deli njegovi knjižnici echolib/async).</td></tr>
 </table>
 

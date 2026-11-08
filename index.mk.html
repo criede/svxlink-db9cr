@@ -2,7 +2,7 @@
 <html lang="mk">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT репозиториум на SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -164,7 +164,7 @@ sudo apt-mark hold svxlink   # опционално: спречува "apt upgra
 <h2>Пакети</h2>
 <table>
 <tr><th>Пакет</th><th>Содржи</th></tr>
-<tr><td><code>svxlink</code></td><td>Серверски компоненти (svxlink, remotetrx, svxreflector, логички јадра, Tcl скрипти за настани). Изграден со: поддршка за RTL-SDR преку директна USB врска (вклучен RTL-SDR Blog форк на librtlsdr/rtl_tcp за актуелните V3/V4 донгли; во конфликт со пакетите librtlsdr0/rtl-sdr од дистрибуцијата), логичкото јадро SipLogic придонесено од заедницата (вклучен PJSIP/pjproject, статички поврзан), GPIO преку libgpiod и поддршка за аудиокодеци и приклучоци Speex/Opus/LADSPA. Инсталира systemd сервис. Не ги вклучува Qtel и звучните пакети.</td></tr>
+<tr><td><code>svxlink</code></td><td>Серверски компоненти (svxlink, remotetrx, svxreflector, логички јадра, Tcl скрипти за настани). Изграден со: поддршка за RTL-SDR преку директна USB врска (вклучен RTL-SDR Blog форк на librtlsdr/rtl_tcp за актуелните V3/V4 донгли; во конфликт со пакетите librtlsdr0/rtl-sdr од дистрибуцијата), логичкото јадро SipLogic придонесено од заедницата (вклучен PJSIP/pjproject, статички поврзан), GPIO преку libgpiod и поддршка за аудиокодеци и приклучоци Speex/Opus/LADSPA. Инсталира systemd сервис. Не ги вклучува Qtel и звучните пакети. Содржи udev правило што на сервисот SvxLink и на најавените корисници на работната површина им дава пристап до RTL-SDR USB донглите.</td></tr>
 <tr><td><code>qtel</code></td><td>Графички EchoLink клиент (Qt6). Бара графичка работна околина и пакетот <code>svxlink</code> со точно истата верзија (ги споделува неговите библиотеки echolib/async).</td></tr>
 </table>
 

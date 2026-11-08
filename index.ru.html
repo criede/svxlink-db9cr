@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT-репозиторий SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -165,7 +165,7 @@ sudo apt-mark hold svxlink   # необязательно: не даёт "apt up
 <h2>Пакеты</h2>
 <table>
 <tr><th>Пакет</th><th>Содержимое</th></tr>
-<tr><td><code>svxlink</code></td><td>Серверные компоненты (svxlink, remotetrx, svxreflector, ядра логики, скрипты событий Tcl). Собран с: поддержкой RTL-SDR через прямое USB-подключение (встроенный форк librtlsdr/rtl_tcp от RTL-SDR Blog для современных донглов V3/V4; конфликтует с пакетами дистрибутива librtlsdr0/rtl-sdr), предоставленным сообществом ядром логики SipLogic (встроенный PJSIP/pjproject, статически скомпонован), GPIO через libgpiod и поддержкой аудиокодеков и плагинов Speex/Opus/LADSPA. Устанавливает службу systemd. Не содержит Qtel и звуковые пакеты.</td></tr>
+<tr><td><code>svxlink</code></td><td>Серверные компоненты (svxlink, remotetrx, svxreflector, ядра логики, скрипты событий Tcl). Собран с: поддержкой RTL-SDR через прямое USB-подключение (встроенный форк librtlsdr/rtl_tcp от RTL-SDR Blog для современных донглов V3/V4; конфликтует с пакетами дистрибутива librtlsdr0/rtl-sdr), предоставленным сообществом ядром логики SipLogic (встроенный PJSIP/pjproject, статически скомпонован), GPIO через libgpiod и поддержкой аудиокодеков и плагинов Speex/Opus/LADSPA. Устанавливает службу systemd. Не содержит Qtel и звуковые пакеты. Содержит правило udev, которое даёт службе SvxLink и пользователям, вошедшим в рабочий стол, доступ к USB-донглам RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Графический клиент EchoLink (Qt6). Требует окружения рабочего стола и пакета <code>svxlink</code> точно той же версии (использует его библиотеки echolib/async).</td></tr>
 </table>
 

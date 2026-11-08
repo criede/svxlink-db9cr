@@ -2,7 +2,7 @@
 <html lang="sk">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT repozitár SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -165,7 +165,7 @@ sudo apt-mark hold svxlink   # voliteľné: zabráni tomu, aby ju "apt upgrade" 
 <h2>Balíky</h2>
 <table>
 <tr><th>Balík</th><th>Obsah</th></tr>
-<tr><td><code>svxlink</code></td><td>Serverové komponenty (svxlink, remotetrx, svxreflector, logické jadrá, skripty udalostí Tcl). Zostavené s: podporou RTL-SDR priamo cez USB (pribalený fork librtlsdr/rtl_tcp od RTL-SDR Blog pre aktuálne prijímače V3/V4; koliduje s distribučnými balíkmi librtlsdr0/rtl-sdr), prispeným logickým jadrom SipLogic (pribalený PJSIP/pjproject, staticky linkovaný), GPIO cez libgpiod a podporou audio kodekov a pluginov Speex/Opus/LADSPA. Inštaluje službu systemd. Neobsahuje Qtel ani zvukové balíky.</td></tr>
+<tr><td><code>svxlink</code></td><td>Serverové komponenty (svxlink, remotetrx, svxreflector, logické jadrá, skripty udalostí Tcl). Zostavené s: podporou RTL-SDR priamo cez USB (pribalený fork librtlsdr/rtl_tcp od RTL-SDR Blog pre aktuálne prijímače V3/V4; koliduje s distribučnými balíkmi librtlsdr0/rtl-sdr), prispeným logickým jadrom SipLogic (pribalený PJSIP/pjproject, staticky linkovaný), GPIO cez libgpiod a podporou audio kodekov a pluginov Speex/Opus/LADSPA. Inštaluje službu systemd. Neobsahuje Qtel ani zvukové balíky. Obsahuje pravidlo udev, ktoré službe SvxLink a prihláseným používateľom desktopu umožňuje prístup k USB donglom RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafický klient EchoLink (Qt6). Vyžaduje grafické prostredie a balík <code>svxlink</code> v presne rovnakej verzii (zdieľa jeho knižnice echolib/async).</td></tr>
 </table>
 

@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repository APT SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -165,7 +165,7 @@ sudo apt-mark hold svxlink   # facoltativo: impedisce che "apt upgrade" la aggio
 <h2>Pacchetti</h2>
 <table>
 <tr><th>Pacchetto</th><th>Contenuto</th></tr>
-<tr><td><code>svxlink</code></td><td>Componenti server (svxlink, remotetrx, svxreflector, core logici, script di eventi Tcl). Compilato con: supporto RTL-SDR via USB diretto (fork RTL-SDR Blog di librtlsdr/rtl_tcp incluso, per gli attuali dongle V3/V4; in conflitto con librtlsdr0/rtl-sdr della distribuzione), il core logico SipLogic fornito dalla comunità (PJSIP/pjproject incluso, collegato staticamente), GPIO tramite libgpiod e supporto per codec audio e plugin Speex/Opus/LADSPA. Installa un servizio systemd. Non include Qtel né i pacchetti di suoni.</td></tr>
+<tr><td><code>svxlink</code></td><td>Componenti server (svxlink, remotetrx, svxreflector, core logici, script di eventi Tcl). Compilato con: supporto RTL-SDR via USB diretto (fork RTL-SDR Blog di librtlsdr/rtl_tcp incluso, per gli attuali dongle V3/V4; in conflitto con librtlsdr0/rtl-sdr della distribuzione), il core logico SipLogic fornito dalla comunità (PJSIP/pjproject incluso, collegato staticamente), GPIO tramite libgpiod e supporto per codec audio e plugin Speex/Opus/LADSPA. Installa un servizio systemd. Non include Qtel né i pacchetti di suoni. Include una regola udev che dà al servizio SvxLink e agli utenti con sessione desktop attiva l’accesso alle chiavette USB RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Client EchoLink grafico (Qt6). Richiede un ambiente desktop e il pacchetto <code>svxlink</code> esattamente della stessa versione (ne condivide le librerie echolib/async).</td></tr>
 </table>
 

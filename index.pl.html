@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
+<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repozytorium APT SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -165,7 +165,7 @@ sudo apt-mark hold svxlink   # opcjonalnie: zapobiega ponownej aktualizacji prze
 <h2>Pakiety</h2>
 <table>
 <tr><th>Pakiet</th><th>Zawartość</th></tr>
-<tr><td><code>svxlink</code></td><td>Komponenty serwerowe (svxlink, remotetrx, svxreflector, rdzenie logiki, skrypty zdarzeń Tcl). Zbudowany z: obsługą RTL-SDR przez bezpośrednie USB (dołączony fork librtlsdr/rtl_tcp od RTL-SDR Blog dla aktualnych odbiorników V3/V4; koliduje z dystrybucyjnymi librtlsdr0/rtl-sdr), dodatkowym rdzeniem logiki SipLogic (dołączony PJSIP/pjproject, linkowany statycznie), GPIO przez libgpiod oraz obsługą kodeków audio i wtyczek Speex/Opus/LADSPA. Instaluje usługę systemd. Nie zawiera Qtel ani pakietów dźwiękowych.</td></tr>
+<tr><td><code>svxlink</code></td><td>Komponenty serwerowe (svxlink, remotetrx, svxreflector, rdzenie logiki, skrypty zdarzeń Tcl). Zbudowany z: obsługą RTL-SDR przez bezpośrednie USB (dołączony fork librtlsdr/rtl_tcp od RTL-SDR Blog dla aktualnych odbiorników V3/V4; koliduje z dystrybucyjnymi librtlsdr0/rtl-sdr), dodatkowym rdzeniem logiki SipLogic (dołączony PJSIP/pjproject, linkowany statycznie), GPIO przez libgpiod oraz obsługą kodeków audio i wtyczek Speex/Opus/LADSPA. Instaluje usługę systemd. Nie zawiera Qtel ani pakietów dźwiękowych. Zawiera regułę udev, która daje usłudze SvxLink i użytkownikom zalogowanym do pulpitu dostęp do donglów USB RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Graficzny klient EchoLink (Qt6). Wymaga środowiska graficznego oraz pakietu <code>svxlink</code> w dokładnie tej samej wersji (współdzieli jego biblioteki echolib/async).</td></tr>
 </table>
 
