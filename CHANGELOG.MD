@@ -7,6 +7,10 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- All start page translations address the reader the way radio amateurs
+  address each other: informally, second person singular (du/tu/tú/je/
+  ty/ты, ...), never formal or plural forms; recorded in the translation
+  rule in `AGENT.MD`.
 - The quickstart commands (start page in all languages, UPSTREAM-SYNC.MD)
   now default to the `release` component (upstream releases) instead of
   `main` (daily builds).

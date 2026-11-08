@@ -25,7 +25,7 @@
 @@AI_NOTICE@@
 <p>Пакеты
 <a href="https://github.com/@@REPO_SLUG@@">svxlink-db9cr</a> для Raspberry Pi OS
-і Debian у двух кампанентах &mdash; выберыце адзін:</p>
+і Debian у двух кампанентах &mdash; выберы адзін:</p>
 <ul>
 <li><code>main</code>: штодзённыя зборкі для распрацоўкі з найноўшага зыходнага кода
 гэтага форка, а не стабільныя выпускі.</li>
@@ -34,27 +34,27 @@
 параметрамі зборкі і функцыямі, што і штодзённыя пакеты. Кожны выпуск захоўваецца;
 <code>apt upgrade</code> пераходзіць на кожны новы выпуск upstream.</li>
 </ul>
-<p>Падрабязнасці глядзіце ў <a href="https://github.com/@@REPO_SLUG@@">рэпазіторыі зыходнага кода</a>.</p>
+<p>Падрабязнасці глядзі ў <a href="https://github.com/@@REPO_SLUG@@">рэпазіторыі зыходнага кода</a>.</p>
 
 <h2>Upstream і лакальныя змены</h2>
 <p>Гэта штодзённа сінхранізаваны форк
 <a href="https://github.com/sm0svx/svxlink">sm0svx/svxlink</a>,
 арыгінальнага праекта SvxLink, з лакальным пакаваннем і дадатковымі функцыямі
 па-над ім (RTL-SDR, SipLogic, асобны пакет <code>qtel</code>,
-гэты APT-рэпазіторый і іншае &mdash; поўны пералік глядзіце ў
+гэты APT-рэпазіторый і іншае &mdash; поўны пералік глядзі ў
 <a href="https://github.com/@@REPO_SLUG@@/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>).
 Каб у любы момант дакладна ўбачыць, чым форк адрозніваецца ад upstream, не спадзеючыся
-на здымак тут, які можа састарэць, параўнайце актуальны стан
+на здымак тут, які можа састарэць, параўнай актуальны стан
 на GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;master гэтага форка</a>.</p>
 
 <h2>Хуткі старт</h2>
-<p>Выканайце на мэтавай сістэме (патрэбныя кодавая назва і архітэктура вызначаюцца аўтаматычна):</p>
+<p>Выканай на мэтавай сістэме (патрэбныя кодавая назва і архітэктура вызначаюцца аўтаматычна):</p>
 <pre><code># Імпарт адкрытага ключа подпісу
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
-# Даданне крыніцы рэпазіторыя. Выберыце кампанент:
+# Даданне крыніцы рэпазіторыя. Выберы кампанент:
 #   main     штодзённыя зборкі для распрацоўкі
 #   release  афіцыйныя выпускі upstream (26.05 і навейшыя)
 component=release
@@ -66,8 +66,8 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Абавязкова перад першым запускам: наладзьце станцыю, радыёстанцыю і аўдыя.
-# Файл з пакета з’яўляецца толькі шаблонам і павінен быць адаптаваны да вашай канфігурацыі.
+# Абавязкова перад першым запускам: наладзь станцыю, радыёстанцыю і аўдыя.
+# Файл з пакета з’яўляецца толькі шаблонам і павінен быць адаптаваны да тваёй канфігурацыі.
 sudo editor /etc/svxlink/svxlink.conf
 
 # Уключыць запуск SvxLink пры загрузцы сістэмы і запусціць яго зараз.
@@ -80,35 +80,35 @@ journalctl -u svxlink.service -f
 
 # Неабавязковы графічны кліент EchoLink (патрабуецца асяроддзе працоўнага стала):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Абавязкова:</strong> Не запускайце службу да
-рэдагавання <code>/etc/svxlink/svxlink.conf</code>. Наладзьце прынамсі
+<p class="note"><strong>Абавязкова:</strong> Не запускай службу да
+рэдагавання <code>/etc/svxlink/svxlink.conf</code>. Наладзь прынамсі
 ідэнтыфікацыю станцыі, логіку, прыёмнік/перадатчык і параметры аўдыя/PTT для
-вашага абсталявання. Служба атрымлівае гэты шлях праз <code>/etc/default/svxlink</code>.</p>
+твайго абсталявання. Служба атрымлівае гэты шлях праз <code>/etc/default/svxlink</code>.</p>
 <p class="note">Калі <code>apt update</code> паведамляе пра памылку 404 для гэтай крыніцы,
-для кодавай назвы вашай сістэмы яшчэ няма зборак (глядзіце табліцу ніжэй) &mdash; замест
-гэтага змяніце кодавую назву ў <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> на адну
+для кодавай назвы тваёй сістэмы яшчэ няма зборак (глядзі табліцу ніжэй) &mdash; замест
+гэтага змяні кодавую назву ў <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> на адну
 з падтрымліваемых. Пасля гэтага звычайная каманда <code>sudo apt upgrade</code>
 аўтаматычна атрымлівае новыя штодзённыя зборкі (<code>main</code>) або новыя выпускі upstream
 (<code>release</code>).</p>
-<p class="note">Не ўключайце абодва кампаненты адначасова, калі толькі вам не патрэбныя
+<p class="note">Не ўключай абодва кампаненты адначасова, калі толькі табе не патрэбныя
 штодзённыя зборкі: яны заўсёды маюць вышэйшую версію, таму apt усталяваў бы іх
 замест выпускаў. Каб перавесці існуючую ўсталёўку з <code>main</code>
-на <code>release</code>, змяніце кампанент у
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, выканайце
-<code>sudo apt update</code>, а потым яўна ўсталюйце версію выпуску
+на <code>release</code>, змяні кампанент у
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, выканай
+<code>sudo apt update</code>, а потым яўна ўсталюй версію выпуску
 (гэта паніжэнне версіі), напрыклад
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Звярніце ўвагу, што ў пакетах
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Звярні ўвагу, што ў пакетах
 <code>release</code> (нязменны зыходны код upstream) скрыпты TCL
 у <code>/usr/share/svxlink</code> не абаронены як канфігурацыйныя
-файлы; захоўвайце лакальныя змены ў <code>events.d/local/</code>.</p>
+файлы; захоўвай лакальныя змены ў <code>events.d/local/</code>.</p>
 
 <h2>Ужыванне змен канфігурацыі</h2>
 <p>Пасля рэдагавання <code>/etc/svxlink/svxlink.conf</code> (або любога
 файла модуля <code>/etc/svxlink/svxlink.d/*.conf</code>) на працуючай
-станцыі перазагрузіце канфігурацыю без разрыву актыўнага сеанса:</p>
+станцыі перазагрузі канфігурацыю без разрыву актыўнага сеанса:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Гэтая каманда адпраўляе <code>SIGHUP</code>, па якім SvxLink паўторна счытвае
-сваю канфігурацыю. Замест гэтага выкарыстоўвайце <code>sudo systemctl restart svxlink.service</code>,
+сваю канфігурацыю. Замест гэтага выкарыстоўвай <code>sudo systemctl restart svxlink.service</code>,
 калі перазагрузка, здаецца, не ўжывае змену (некаторыя параметры, напрыклад,
 якія ядры логікі ці гукавыя прылады загружаюцца, могуць патрабаваць поўнага перазапуску).</p>
 
@@ -116,7 +116,7 @@ journalctl -u svxlink.service -f
 <p>Нядаўнія версіі застаюцца даступнымі ў пуле (pool) яшчэ некаторы час пасля
 замены навейшымі (штодзённыя на працягу тыдня, штотыднёвыя на працягу месяца,
 штомесячныя на працягу года &mdash;
-глядзіце раздзел «Retention» (захоўванне) у
+глядзі раздзел «Retention» (захоўванне) у
 <a href="https://github.com/@@REPO_SLUG@@/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
 таму няўдалую штодзённую зборку звычайна можна адкаціць. Пакеты выпускаў upstream
 (кампанент <code>release</code>) ніколі не выдаляюцца:</p>

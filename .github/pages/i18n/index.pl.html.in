@@ -68,7 +68,7 @@ sudo apt update
 sudo apt install svxlink
 
 # Obowiązkowo przed pierwszym uruchomieniem: skonfiguruj stację, radio i audio.
-# Plik z pakietu jest tylko szablonem i musi zostać dostosowany do Twojej konfiguracji.
+# Plik z pakietu jest tylko szablonem i musi zostać dostosowany do twojej konfiguracji.
 sudo editor /etc/svxlink/svxlink.conf
 
 # Włącz SvxLink przy starcie systemu i uruchom go teraz.
@@ -86,7 +86,7 @@ edycją pliku <code>/etc/svxlink/svxlink.conf</code>. Skonfiguruj co najmniej
 identyfikację stacji, logikę, odbiornik/nadajnik oraz ustawienia audio/PTT
 dla swojego sprzętu. Usługa odczytuje tę ścieżkę poprzez <code>/etc/default/svxlink</code>.</p>
 <p class="note">Jeśli <code>apt update</code> zgłasza błąd 404 dla tego źródła,
-pakiety dla nazwy kodowej Twojego systemu nie są jeszcze budowane (zobacz tabelę poniżej) &mdash;
+pakiety dla nazwy kodowej twojego systemu nie są jeszcze budowane (zobacz tabelę poniżej) &mdash;
 zmień wtedy nazwę kodową w <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> na jedną
 z obsługiwanych. Następnie zwykłe <code>sudo apt upgrade</code>
 automatycznie pobiera nowe kompilacje codzienne (<code>main</code>) lub nowe wydania

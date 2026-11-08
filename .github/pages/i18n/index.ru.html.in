@@ -25,7 +25,7 @@
 @@AI_NOTICE@@
 <p>Пакеты
 <a href="https://github.com/@@REPO_SLUG@@">svxlink-db9cr</a> для Raspberry Pi OS
-и Debian в двух компонентах &mdash; выберите один:</p>
+и Debian в двух компонентах &mdash; выбери один:</p>
 <ul>
 <li><code>main</code>: ежедневные сборки для разработки из самого свежего исходного кода
 этого форка, а не стабильные релизы.</li>
@@ -44,17 +44,17 @@
 этот APT-репозиторий и другое &mdash; полный список см. в
 <a href="https://github.com/@@REPO_SLUG@@/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>).
 Чтобы в любой момент точно увидеть, чем форк отличается от upstream, не полагаясь
-на снимок, который здесь может устареть, сравните актуальное состояние
+на снимок, который здесь может устареть, сравни актуальное состояние
 на GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;master этого форка</a>.</p>
 
 <h2>Быстрый старт</h2>
-<p>Выполните на целевой системе (нужные кодовое имя и архитектура определяются автоматически):</p>
+<p>Выполни на целевой системе (нужные кодовое имя и архитектура определяются автоматически):</p>
 <pre><code># Импорт открытого ключа подписи
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
-# Добавление источника репозитория. Выберите компонент:
+# Добавление источника репозитория. Выбери компонент:
 #   main     ежедневные сборки для разработки
 #   release  официальные релизы upstream (26.05 и новее)
 component=release
@@ -66,8 +66,8 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Обязательно перед первым запуском: настройте станцию, радиостанцию и аудио.
-# Файл из пакета является лишь шаблоном и должен быть адаптирован к вашей конфигурации.
+# Обязательно перед первым запуском: настрой станцию, радиостанцию и аудио.
+# Файл из пакета является лишь шаблоном и должен быть адаптирован к твоей конфигурации.
 sudo editor /etc/svxlink/svxlink.conf
 
 # Включить автозапуск SvxLink при загрузке и запустить его сейчас.
@@ -80,35 +80,35 @@ journalctl -u svxlink.service -f
 
 # Необязательный графический клиент EchoLink (требуется окружение рабочего стола):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Обязательно:</strong> Не запускайте службу до
-редактирования <code>/etc/svxlink/svxlink.conf</code>. Настройте как минимум
+<p class="note"><strong>Обязательно:</strong> Не запускай службу до
+редактирования <code>/etc/svxlink/svxlink.conf</code>. Настрой как минимум
 идентификацию станции, логику, приёмник/передатчик и параметры аудио/PTT для
-вашего оборудования. Служба получает этот путь через <code>/etc/default/svxlink</code>.</p>
+твоего оборудования. Служба получает этот путь через <code>/etc/default/svxlink</code>.</p>
 <p class="note">Если <code>apt update</code> сообщает об ошибке 404 для этого источника,
-для кодового имени вашей системы ещё нет сборок (см. таблицу ниже) &mdash; вместо этого
-измените кодовое имя в <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> на одно
+для кодового имени твоей системы ещё нет сборок (см. таблицу ниже) &mdash; вместо этого
+измени кодовое имя в <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> на одно
 из поддерживаемых. После этого обычная команда <code>sudo apt upgrade</code>
 автоматически получает новые ежедневные сборки (<code>main</code>) или новые релизы upstream
 (<code>release</code>).</p>
-<p class="note">Не включайте оба компонента одновременно, если только вам не нужны
+<p class="note">Не включай оба компонента одновременно, если только тебе не нужны
 ежедневные сборки: у них всегда более высокая версия, поэтому apt установил бы их
 вместо релизов. Чтобы перевести существующую установку с <code>main</code>
-на <code>release</code>, измените компонент в
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, выполните
-<code>sudo apt update</code>, а затем явно установите версию релиза
+на <code>release</code>, измени компонент в
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, выполни
+<code>sudo apt update</code>, а затем явно установи версию релиза
 (это понижение версии), например
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Обратите внимание, что в пакетах
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Обрати внимание, что в пакетах
 <code>release</code> (неизменённый исходный код upstream) скрипты TCL
 в <code>/usr/share/svxlink</code> не защищены как конфигурационные
-файлы; храните локальные изменения в <code>events.d/local/</code>.</p>
+файлы; храни локальные изменения в <code>events.d/local/</code>.</p>
 
 <h2>Применение изменений конфигурации</h2>
 <p>После редактирования <code>/etc/svxlink/svxlink.conf</code> (или любого
 файла модуля <code>/etc/svxlink/svxlink.d/*.conf</code>) на работающей
-станции перезагрузите конфигурацию без разрыва активного сеанса:</p>
+станции перезагрузи конфигурацию без разрыва активного сеанса:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Эта команда отправляет <code>SIGHUP</code>, по которому SvxLink повторно считывает
-свою конфигурацию. Используйте вместо этого <code>sudo systemctl restart svxlink.service</code>,
+свою конфигурацию. Используй вместо этого <code>sudo systemctl restart svxlink.service</code>,
 если перезагрузка, по-видимому, не применяет изменение (некоторые параметры, например,
 какие ядра логики или звуковые устройства загружаются, могут требовать полного перезапуска).</p>
 
