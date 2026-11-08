@@ -7,6 +7,10 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- `README.adoc` starts with a box explaining this repository: an
+  automatically tracking fork of sm0svx/svxlink whose only purpose is
+  building packages, the architectures built, and where to get them (APT
+  repository with its quickstart, GitHub Releases).
 - `README.adoc` links the APT repository quickstart under "Resources"
   (https://criede.github.io/svxlink-db9cr/#quickstart); the quickstart
   heading on the start page (all languages) got the anchor `quickstart`.

@@ -1,6 +1,46 @@
 SvxLink
 =======
 
+[IMPORTANT]
+.About this repository: criede/svxlink-db9cr
+====
+This repository is an automatically tracking fork of the original SvxLink
+project, https://github.com/sm0svx/svxlink[sm0svx/svxlink]. A scheduled
+workflow merges upstream's `master` into this fork's `master` every day, and
+every published upstream release is picked up automatically as well.
+
+Its *only purpose is building and publishing packages* (`.deb`) of SvxLink.
+SvxLink itself is not developed here; local changes are limited to what the
+packaging needs. Please report bugs and feature requests for SvxLink itself to
+https://github.com/sm0svx/svxlink/issues[the upstream project].
+
+*Packages:* `svxlink` (server components, systemd service) and `qtel`
+(graphical EchoLink client), for Debian and Raspberry Pi OS:
+
+* `arm64` -- Raspberry Pi OS 64-bit, Debian 12 (bookworm) and 13 (trixie)
+* `armhf` -- Raspberry Pi OS 32-bit on every Raspberry Pi model (incl.
+  Pi 1/Zero/Zero W), Debian armhf; bookworm and trixie
+* `amd64` -- Intel/AMD PCs and servers, 64-bit; bookworm and trixie
+* `i386` -- Intel/AMD PCs, 32-bit; bookworm only (Debian 13 no longer
+  supports installing i386 systems)
+
+*Two ways to get them:*
+
+* *APT repository* (recommended, updates via `apt upgrade`):
+  https://criede.github.io/svxlink-db9cr/ -- see the
+  https://criede.github.io/svxlink-db9cr/#quickstart[quickstart]. Component
+  `release`: the official upstream releases (26.05 and newer), built from the
+  unmodified upstream source and kept permanently; component `main`: daily
+  builds of this fork's `master`.
+* *GitHub Releases*: https://github.com/criede/svxlink-db9cr/releases --
+  `release-<version>` holds the packages of an upstream release,
+  `daily-<version>` prereleases hold the daily builds; download the `.deb`
+  files and install them with `sudo apt install ./svxlink_*.deb`.
+
+Details on how the packages are built and published:
+link:.github/UPSTREAM-SYNC.MD[UPSTREAM-SYNC.MD].
+====
+
 image:https://github.com/sm0svx/svxlink/actions/workflows/codeql-analysis.yml/badge.svg["CodeQL", link="https://github.com/sm0svx/svxlink/actions/workflows/codeql-analysis.yml"]
 //image:https://travis-ci.org/sm0svx/svxlink.svg?branch=master["Build Status", link="https://travis-ci.org/sm0svx/svxlink"]
 image:https://badges.gitter.im/Join%20Chat.svg[link="https://gitter.im/sm0svx/svxlink?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"]
