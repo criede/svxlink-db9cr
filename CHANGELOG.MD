@@ -7,6 +7,12 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- Fixed daily builds aborting silently since 2026-10-10: after its 26.05.2
+  release upstream set `PROJECT=master` in `src/versions`, which the
+  version check rejected, so no package was published after 2026-09-13.
+  When `PROJECT` is not numeric, the build now uses the highest numeric
+  `PROJECT` value from the git history of `src/versions` (currently
+  `26.05.2.99.0`) and logs that it did so.
 - Daily packages are now also built for the 32-bit variants of the
   supported systems: `armhf` for bookworm and trixie (32-bit Raspberry Pi
   OS and Debian armhf) and `i386` for bookworm (Debian 12 on 32-bit PCs;

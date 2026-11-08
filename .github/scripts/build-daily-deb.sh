@@ -65,7 +65,22 @@ ldconfig
 git config --global --add safe.directory /source
 source_sha=$(git -C /source rev-parse HEAD)
 base_version=$(sed -n 's/^PROJECT=//p' /source/src/versions | tr -d '\r')
-[[ "$base_version" =~ ^[0-9]+(\.[0-9]+)*$ ]]
+# Between releases upstream sets PROJECT=master instead of a number (it
+# alternates: "Prepare for release X" sets it, "Set PROJECT version to
+# master" resets it). Fall back to the highest numeric PROJECT value ever
+# recorded in src/versions' history (needs the full-depth checkout the
+# workflow already does), so daily builds keep a valid, monotonically
+# increasing Debian version instead of aborting the build.
+if [[ ! "$base_version" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
+  echo "PROJECT=${base_version} in src/versions is not numeric; using the highest numeric PROJECT from its git history." >&2
+  base_version=$(git -C /source log --format= -p -- src/versions \
+    | sed -n 's/^[+-]\{0,1\}PROJECT=//p' | tr -d '\r' \
+    | grep -E '^[0-9]+(\.[0-9]+)*$' | sort -uV | tail -n 1 || true)
+fi
+if [[ ! "$base_version" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
+  echo "Could not determine a numeric project version from src/versions." >&2
+  exit 1
+fi
 version="${base_version}+daily$(date -u +%Y%m%d).${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}.g${source_sha:0:12}-1~${codename}"
 dpkg --validate-version "$version"
 
