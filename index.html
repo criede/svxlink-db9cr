@@ -85,7 +85,7 @@ point in time, without relying on a snapshot here going stale, compare
 live on GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;this fork's master</a>.</p>
 
-<h2 id="quickstart">Quickstart</h2>
+<h2>Quickstart</h2>
 <p>Run on the target system (detects the right codename/architecture automatically):</p>
 <pre><code># Import the public signing key
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
@@ -94,7 +94,7 @@ curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
 # Add the repository source. Choose the component:
 #   main     daily development builds
 #   release  official upstream releases (26.05 and newer)
-component=release
+component=main
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -164,15 +164,15 @@ sudo apt-mark hold svxlink   # optional: stop "apt upgrade" pulling it forward a
 <h2>Packages</h2>
 <table>
 <tr><th>Package</th><th>Contains</th></tr>
-<tr><td><code>svxlink</code></td><td>Server components (svxlink, remotetrx, svxreflector, logic cores, Tcl event scripts). Built with: RTL-SDR direct-USB support (bundled RTL-SDR Blog librtlsdr/rtl_tcp fork for current V3/V4 dongles; conflicts with the distro librtlsdr0/rtl-sdr), the contributed SipLogic logic core (bundled PJSIP/pjproject, statically linked), GPIO via libgpiod, and Speex/Opus/LADSPA audio codec and plugin support. Installs a systemd service. Does not include Qtel or sound packs. Includes a udev rule that gives the SvxLink service and logged-in desktop users access to RTL-SDR USB dongles.</td></tr>
+<tr><td><code>svxlink</code></td><td>Server components (svxlink, remotetrx, svxreflector, logic cores, Tcl event scripts). Built with: RTL-SDR direct-USB support (bundled RTL-SDR Blog librtlsdr/rtl_tcp fork for current V3/V4 dongles; conflicts with the distro librtlsdr0/rtl-sdr), the contributed SipLogic logic core (bundled PJSIP/pjproject, statically linked), GPIO via libgpiod, and Speex/Opus/LADSPA audio codec and plugin support. Installs a systemd service. Does not include Qtel or sound packs.</td></tr>
 <tr><td><code>qtel</code></td><td>Graphical EchoLink client (Qt6). Requires a desktop environment and the <code>svxlink</code> package of the exact same version (shares its echolib/async libraries).</td></tr>
 </table>
 
 <h2>Supported systems</h2>
 <table>
 <tr><th>Codename</th><th>Matches</th><th>Architectures: <code>main</code> (daily)</th><th>Architectures: <code>release</code></th></tr>
-<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 i386</code></td><td>&mdash;</td></tr>
-<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64</code></td><td>&mdash;</td></tr>
+<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 armhf i386</code></td><td>&mdash;</td></tr>
+<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64 armhf</code></td><td>&mdash;</td></tr>
 </table>
 <p class="note"><strong>32-bit systems:</strong> <code>armhf</code> packages
 are built against Raspbian (ARMv6+VFP), the base of 32-bit Raspberry Pi OS,

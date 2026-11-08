@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
+<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Αποθετήριο APT του SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Αυτή η σελίδα μεταφράστηκε αυτόματα με τεχνητή νοημοσύνη και ενδέχεται να περιέχει σφάλματα. Ισχύει η αγγλική έκδοση. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Πακέτα του
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> για Raspberry Pi OS
-και Debian, σε δύο συνιστώσες (components) &mdash; επίλεξε μία:</p>
+και Debian, σε δύο συνιστώσες (components) &mdash; επιλέξτε μία:</p>
 <ul>
 <li><code>main</code>: καθημερινές εκδόσεις ανάπτυξης (daily builds) από τον πιο
 πρόσφατο πηγαίο κώδικα αυτού του fork, όχι σταθερές εκδόσεις.</li>
@@ -72,30 +72,30 @@
 πακέτα. Κάθε έκδοση διατηρείται· η εντολή
 <code>apt upgrade</code> μεταβαίνει σε κάθε νέα έκδοση upstream.</li>
 </ul>
-<p>Για λεπτομέρειες, δες το <a href="https://github.com/criede/svxlink-db9cr">αποθετήριο πηγαίου κώδικα</a>.</p>
+<p>Για λεπτομέρειες, δείτε το <a href="https://github.com/criede/svxlink-db9cr">αποθετήριο πηγαίου κώδικα</a>.</p>
 
 <h2>Upstream και τοπικές αλλαγές</h2>
 <p>Πρόκειται για ένα fork, συγχρονιζόμενο καθημερινά, του
 <a href="https://github.com/sm0svx/svxlink">sm0svx/svxlink</a>, του
 αρχικού έργου SvxLink, με τοπική πακετοποίηση και πρόσθετες λειτουργίες
 από πάνω (RTL-SDR, SipLogic, το ξεχωριστό πακέτο <code>qtel</code>,
-αυτό το αποθετήριο APT και άλλα &mdash; δες το
+αυτό το αποθετήριο APT και άλλα &mdash; δείτε το
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>
-για την πλήρη λίστα). Για να δεις ακριβώς τι διαφέρει από το upstream σε
-οποιαδήποτε χρονική στιγμή, χωρίς να βασίζεσαι σε ένα στιγμιότυπο εδώ που θα
-παλιώσει, κάνε τη σύγκριση ζωντανά στο GitHub:
+για την πλήρη λίστα). Για να δείτε ακριβώς τι διαφέρει από το upstream σε
+οποιαδήποτε χρονική στιγμή, χωρίς να βασίζεστε σε ένα στιγμιότυπο εδώ που θα
+παλιώσει, κάντε τη σύγκριση ζωντανά στο GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;master αυτού του fork</a>.</p>
 
-<h2 id="quickstart">Γρήγορη εκκίνηση</h2>
-<p>Εκτέλεσε στο σύστημα-στόχο (εντοπίζει αυτόματα τη σωστή κωδική ονομασία/αρχιτεκτονική):</p>
+<h2>Γρήγορη εκκίνηση</h2>
+<p>Εκτελέστε στο σύστημα-στόχο (εντοπίζει αυτόματα τη σωστή κωδική ονομασία/αρχιτεκτονική):</p>
 <pre><code># Εισαγωγή του δημόσιου κλειδιού υπογραφής
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
-# Προσθήκη της πηγής του αποθετηρίου. Επίλεξε τη συνιστώσα (component):
+# Προσθήκη της πηγής του αποθετηρίου. Επιλέξτε τη συνιστώσα (component):
 #   main     καθημερινές εκδόσεις ανάπτυξης
 #   release  επίσημες εκδόσεις upstream (26.05 και νεότερες)
-component=release
+component=main
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -104,8 +104,8 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Υποχρεωτικό πριν από την πρώτη εκκίνηση: ρύθμισε τον σταθμό, τον πομποδέκτη και τον ήχο σου.
-# Το αρχείο του πακέτου είναι μόνο ένα πρότυπο και πρέπει να προσαρμοστεί στη δική σου διάταξη.
+# Υποχρεωτικό πριν από την πρώτη εκκίνηση: ρυθμίστε τον σταθμό, τον πομποδέκτη και τον ήχο σας.
+# Το αρχείο του πακέτου είναι μόνο ένα πρότυπο και πρέπει να προσαρμοστεί στη δική σας διάταξη.
 sudo editor /etc/svxlink/svxlink.conf
 
 # Ενεργοποίηση του SvxLink κατά την εκκίνηση του συστήματος και άμεση εκκίνησή του.
@@ -118,44 +118,44 @@ journalctl -u svxlink.service -f
 
 # Προαιρετικός γραφικός πελάτης EchoLink (απαιτεί περιβάλλον επιφάνειας εργασίας):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Απαιτείται:</strong> Μην εκκινήσεις την υπηρεσία πριν
-επεξεργαστείς το <code>/etc/svxlink/svxlink.conf</code>. Ρύθμισε τουλάχιστον την
+<p class="note"><strong>Απαιτείται:</strong> Μην εκκινήσετε την υπηρεσία πριν
+επεξεργαστείτε το <code>/etc/svxlink/svxlink.conf</code>. Ρυθμίστε τουλάχιστον την
 ταυτότητα του σταθμού, τη λογική (logic), τον δέκτη/πομπό και τις ρυθμίσεις ήχου/PTT
-για το υλικό σου. Η υπηρεσία διαβάζει αυτή τη διαδρομή μέσω του
+για το υλικό σας. Η υπηρεσία διαβάζει αυτή τη διαδρομή μέσω του
 <code>/etc/default/svxlink</code>.</p>
 <p class="note">Αν η εντολή <code>apt update</code> αναφέρει σφάλμα 404 για αυτή την πηγή,
-δεν παράγονται ακόμη πακέτα για την κωδική ονομασία του συστήματός σου (δες τον
-πίνακα παρακάτω) &mdash; αντί γι' αυτό, άλλαξε την κωδική ονομασία στο
+δεν παράγονται ακόμη πακέτα για την κωδική ονομασία του συστήματός σας (δείτε τον
+πίνακα παρακάτω) &mdash; αντί γι' αυτό, αλλάξτε την κωδική ονομασία στο
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> σε μία από τις
 υποστηριζόμενες. Στη συνέχεια, ένα συνηθισμένο <code>sudo apt upgrade</code>
 λαμβάνει αυτόματα τις νέες καθημερινές εκδόσεις (<code>main</code>) ή τις νέες
 εκδόσεις upstream (<code>release</code>).</p>
-<p class="note">Μην ενεργοποιείς και τις δύο συνιστώσες ταυτόχρονα, εκτός αν θέλεις
+<p class="note">Μην ενεργοποιείτε και τις δύο συνιστώσες ταυτόχρονα, εκτός αν θέλετε
 τις καθημερινές εκδόσεις: αυτές έχουν πάντα τον υψηλότερο αριθμό έκδοσης, οπότε το apt
-θα τις εγκαθιστούσε στη θέση των εκδόσεων release. Για να αλλάξεις μια υπάρχουσα
-εγκατάσταση από <code>main</code> σε <code>release</code>, άλλαξε τη συνιστώσα στο
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, εκτέλεσε
-<code>sudo apt update</code> και στη συνέχεια εγκατάστησε ρητά την έκδοση release
+θα τις εγκαθιστούσε στη θέση των εκδόσεων release. Για να αλλάξετε μια υπάρχουσα
+εγκατάσταση από <code>main</code> σε <code>release</code>, αλλάξτε τη συνιστώσα στο
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, εκτελέστε
+<code>sudo apt update</code> και στη συνέχεια εγκαταστήστε ρητά την έκδοση release
 (πρόκειται για υποβάθμιση έκδοσης, downgrade), π.χ.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Σημείωσε ότι στα πακέτα
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Σημειώστε ότι στα πακέτα
 <code>release</code> (αμετάβλητος πηγαίος κώδικας upstream) τα σενάρια TCL
 κάτω από το <code>/usr/share/svxlink</code> δεν προστατεύονται ως αρχεία
-ρυθμίσεων· κράτα τις τοπικές αλλαγές στο <code>events.d/local/</code>.</p>
+ρυθμίσεων· κρατήστε τις τοπικές αλλαγές στο <code>events.d/local/</code>.</p>
 
 <h2>Εφαρμογή αλλαγών στις ρυθμίσεις</h2>
 <p>Μετά την επεξεργασία του <code>/etc/svxlink/svxlink.conf</code> (ή οποιουδήποτε
 αρχείου ενότητας <code>/etc/svxlink/svxlink.d/*.conf</code>) σε σταθμό που
-λειτουργεί, φόρτωσε τις ρυθμίσεις ξανά χωρίς να διακοπεί μια ενεργή συνεδρία:</p>
+λειτουργεί, φορτώστε τις ρυθμίσεις ξανά χωρίς να διακοπεί μια ενεργή συνεδρία:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Αυτό στέλνει το σήμα <code>SIGHUP</code>, με το οποίο το SvxLink διαβάζει
-ξανά τις ρυθμίσεις του. Χρησιμοποίησε αντί γι' αυτό το <code>sudo systemctl restart svxlink.service</code>
+ξανά τις ρυθμίσεις του. Χρησιμοποιήστε αντί γι' αυτό το <code>sudo systemctl restart svxlink.service</code>
 αν η επαναφόρτωση δεν φαίνεται να εφαρμόζει μια αλλαγή (ορισμένες ρυθμίσεις, όπως
 ποιοι πυρήνες λογικής ή ποιες συσκευές ήχου φορτώνονται, ενδέχεται να απαιτούν πλήρη επανεκκίνηση).</p>
 
 <h2>Εγκατάσταση παλαιότερης έκδοσης</h2>
 <p>Οι πρόσφατες εκδόσεις παραμένουν διαθέσιμες στο pool για κάποιο διάστημα αφού
 αντικατασταθούν (καθημερινά για μία εβδομάδα, εβδομαδιαία για έναν μήνα, μηνιαία για έναν χρόνο &mdash;
-δες την ενότητα «Retention» (διατήρηση) στο
+δείτε την ενότητα «Retention» (διατήρηση) στο
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
 οπότε μια προβληματική καθημερινή έκδοση μπορεί συνήθως να αναιρεθεί (rollback). Τα πακέτα
 των εκδόσεων upstream (συνιστώσα <code>release</code>) δεν αφαιρούνται ποτέ:</p>
@@ -167,15 +167,15 @@ sudo apt-mark hold svxlink   # προαιρετικά: εμποδίζει το "
 <h2>Πακέτα</h2>
 <table>
 <tr><th>Πακέτο</th><th>Περιεχόμενα</th></tr>
-<tr><td><code>svxlink</code></td><td>Στοιχεία διακομιστή (svxlink, remotetrx, svxreflector, πυρήνες λογικής, σενάρια συμβάντων Tcl). Μεταγλωττισμένο με: υποστήριξη RTL-SDR μέσω απευθείας USB (ενσωματωμένο fork librtlsdr/rtl_tcp του RTL-SDR Blog για τα τρέχοντα dongle V3/V4· συγκρούεται με τα librtlsdr0/rtl-sdr της διανομής), τον συνεισφερόμενο πυρήνα λογικής SipLogic (ενσωματωμένο PJSIP/pjproject, στατικά συνδεδεμένο), GPIO μέσω libgpiod, καθώς και υποστήριξη κωδικοποιητών ήχου και πρόσθετων Speex/Opus/LADSPA. Εγκαθιστά μια υπηρεσία systemd. Δεν περιλαμβάνει το Qtel ούτε πακέτα ήχων (sound packs). Περιλαμβάνει κανόνα udev που δίνει στην υπηρεσία SvxLink και στους συνδεδεμένους χρήστες επιφάνειας εργασίας πρόσβαση στα USB dongle RTL-SDR.</td></tr>
+<tr><td><code>svxlink</code></td><td>Στοιχεία διακομιστή (svxlink, remotetrx, svxreflector, πυρήνες λογικής, σενάρια συμβάντων Tcl). Μεταγλωττισμένο με: υποστήριξη RTL-SDR μέσω απευθείας USB (ενσωματωμένο fork librtlsdr/rtl_tcp του RTL-SDR Blog για τα τρέχοντα dongle V3/V4· συγκρούεται με τα librtlsdr0/rtl-sdr της διανομής), τον συνεισφερόμενο πυρήνα λογικής SipLogic (ενσωματωμένο PJSIP/pjproject, στατικά συνδεδεμένο), GPIO μέσω libgpiod, καθώς και υποστήριξη κωδικοποιητών ήχου και πρόσθετων Speex/Opus/LADSPA. Εγκαθιστά μια υπηρεσία systemd. Δεν περιλαμβάνει το Qtel ούτε πακέτα ήχων (sound packs).</td></tr>
 <tr><td><code>qtel</code></td><td>Γραφικός πελάτης EchoLink (Qt6). Απαιτεί περιβάλλον επιφάνειας εργασίας και το πακέτο <code>svxlink</code> ακριβώς της ίδιας έκδοσης (μοιράζεται τις βιβλιοθήκες echolib/async του).</td></tr>
 </table>
 
 <h2>Υποστηριζόμενα συστήματα</h2>
 <table>
 <tr><th>Κωδική ονομασία</th><th>Αντιστοιχεί σε</th><th>Αρχιτεκτονικές: <code>main</code> (καθημερινές)</th><th>Αρχιτεκτονικές: <code>release</code></th></tr>
-<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 i386</code></td><td>&mdash;</td></tr>
-<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64</code></td><td>&mdash;</td></tr>
+<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 armhf i386</code></td><td>&mdash;</td></tr>
+<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64 armhf</code></td><td>&mdash;</td></tr>
 </table>
 <p class="note"><strong>Συστήματα 32 bit:</strong> τα πακέτα <code>armhf</code>
 μεταγλωττίζονται για το Raspbian (ARMv6+VFP), τη βάση του Raspberry Pi OS 32 bit,

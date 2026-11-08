@@ -2,7 +2,7 @@
 <html lang="sl">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
+<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repozitorij APT SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; To stran je samodejno prevedla umetna inteligenca in lahko vsebuje napake. Merodajna je angleška različica. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Paketi
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> za Raspberry Pi OS
-in Debian, v dveh komponentah &mdash; izberi eno:</p>
+in Debian, v dveh komponentah &mdash; izberite eno:</p>
 <ul>
 <li><code>main</code>: dnevne razvojne gradnje iz najnovejše izvorne kode
 tega forka, ne stabilne izdaje.</li>
@@ -71,7 +71,7 @@ novejše), zgrajene iz nespremenjene izvorne kode izdaje z enakimi
 nastavitvami gradnje in funkcijami kot dnevni paketi. Vsaka izdaja se ohrani;
 <code>apt upgrade</code> preide na vsako novo izdajo izvornega projekta.</li>
 </ul>
-<p>Podrobnosti najdeš v <a href="https://github.com/criede/svxlink-db9cr">repozitoriju izvorne kode</a>.
+<p>Podrobnosti najdete v <a href="https://github.com/criede/svxlink-db9cr">repozitoriju izvorne kode</a>.
 </p>
 
 <h2>Izvorni projekt in lokalne spremembe</h2>
@@ -81,21 +81,21 @@ izvirnega projekta SvxLink, z lastnim pakiranjem in dodatnimi funkcijami
 na vrhu (RTL-SDR, SipLogic, ločen paket <code>qtel</code>,
 ta repozitorij APT in drugo &mdash; celoten seznam je v
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>).
-Če želiš kadar koli natančno videti, v čem se fork razlikuje od izvornega projekta,
-ne da bi se zanašal na zastarel posnetek na tem mestu, primerjaj
+Če želite kadar koli natančno videti, v čem se fork razlikuje od izvornega projekta,
+ne da bi se zanašali na zastarel posnetek na tem mestu, primerjajte
 v živo na GitHubu:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">master izvornega projekta&nbsp;&hellip;&nbsp;master tega forka</a>.</p>
 
-<h2 id="quickstart">Hiter začetek</h2>
-<p>Zaženi na ciljnem sistemu (pravilno kodno ime in arhitektura se zaznata samodejno):</p>
+<h2>Hiter začetek</h2>
+<p>Zaženite na ciljnem sistemu (pravilno kodno ime in arhitektura se zaznata samodejno):</p>
 <pre><code># Uvoz javnega podpisnega ključa
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
-# Dodajanje vira repozitorija. Izberi komponento:
+# Dodajanje vira repozitorija. Izberite komponento:
 #   main     dnevne razvojne gradnje
 #   release  uradne izdaje izvornega projekta (26.05 in novejše)
-component=release
+component=main
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -104,56 +104,56 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Obvezno pred prvim zagonom: nastavi postajo, radio in zvok.
-# Datoteka iz paketa je le predloga in jo moraš prilagoditi svoji postavitvi.
+# Obvezno pred prvim zagonom: nastavite postajo, radio in zvok.
+# Datoteka iz paketa je le predloga in jo morate prilagoditi svoji postavitvi.
 sudo editor /etc/svxlink/svxlink.conf
 
-# Omogoči SvxLink ob zagonu sistema in ga zaženi zdaj.
+# Omogočite SvxLink ob zagonu sistema in ga zaženite zdaj.
 sudo systemctl daemon-reload
 sudo systemctl enable --now svxlink.service
 
-# Preveri stanje storitve in spremljaj njen dnevnik.
+# Preverite stanje storitve in spremljajte njen dnevnik.
 systemctl status svxlink.service
 journalctl -u svxlink.service -f
 
 # Neobvezni grafični odjemalec EchoLink (potrebuje namizno okolje):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Obvezno:</strong> Storitve ne zaženi, preden
-ne urediš datoteke <code>/etc/svxlink/svxlink.conf</code>. Nastavi vsaj
+<p class="note"><strong>Obvezno:</strong> Storitve ne zaženite, preden
+ne uredite datoteke <code>/etc/svxlink/svxlink.conf</code>. Nastavite vsaj
 identifikacijo postaje, logiko, sprejemnik/oddajnik ter nastavitve zvoka/PTT
 za svojo strojno opremo. Storitev to pot prebere prek <code>/etc/default/svxlink</code>.</p>
 <p class="note">Če <code>apt update</code> za ta vir javi napako 404,
-za kodno ime tvojega sistema paketi še niso zgrajeni (glej tabelo spodaj) &mdash;
-kodno ime v <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> zamenjaj z enim
+za kodno ime vašega sistema paketi še niso zgrajeni (glejte tabelo spodaj) &mdash;
+kodno ime v <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> zamenjajte z enim
 od podprtih. Nato običajni <code>sudo apt upgrade</code>
 samodejno prevzame nove dnevne gradnje (<code>main</code>) ali nove izdaje
 izvornega projekta (<code>release</code>).</p>
-<p class="note">Ne omogoči obeh komponent hkrati, razen če želiš
+<p class="note">Ne omogočite obeh komponent hkrati, razen če želite
 dnevne gradnje: te imajo vedno višjo različico, zato bi jih apt namestil
-namesto izdaj. Če želiš obstoječo namestitev preklopiti z <code>main</code>
-na <code>release</code>, spremeni komponento v
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, zaženi
-<code>sudo apt update</code> in nato izrecno namesti različico izdaje
+namesto izdaj. Če želite obstoječo namestitev preklopiti z <code>main</code>
+na <code>release</code>, spremenite komponento v
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, zaženite
+<code>sudo apt update</code> in nato izrecno namestite različico izdaje
 (gre za prehod na nižjo različico), npr.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Upoštevaj, da v paketih
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Upoštevajte, da v paketih
 <code>release</code> (nespremenjena izvorna koda izvornega projekta) skripti TCL
 v <code>/usr/share/svxlink</code> niso zaščiteni kot konfiguracijske
-datoteke; lokalne spremembe hrani v <code>events.d/local/</code>.</p>
+datoteke; lokalne spremembe hranite v <code>events.d/local/</code>.</p>
 
 <h2>Uveljavitev sprememb konfiguracije</h2>
 <p>Po urejanju <code>/etc/svxlink/svxlink.conf</code> (ali katere koli datoteke modula
 <code>/etc/svxlink/svxlink.d/*.conf</code>) na delujoči
-postaji konfiguracijo znova naloži, ne da bi prekinil aktivno sejo:</p>
+postaji konfiguracijo znova naložite, ne da bi prekinili aktivno sejo:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">S tem se pošlje signal <code>SIGHUP</code>, ob katerem SvxLink znova prebere
-svojo konfiguracijo. Če se zdi, da ponovno nalaganje spremembe ni upoštevalo, namesto tega uporabi
+svojo konfiguracijo. Če se zdi, da ponovno nalaganje spremembe ni upoštevalo, namesto tega uporabite
 <code>sudo systemctl restart svxlink.service</code> (nekatere nastavitve, na primer
 katera logična jedra ali zvočne naprave se naložijo, morda zahtevajo popoln ponovni zagon).</p>
 
 <h2>Namestitev starejše različice</h2>
 <p>Nedavne različice ostanejo v poolu na voljo še nekaj časa, potem ko jih
 nadomestijo novejše (dnevne en teden, tedenske en mesec, mesečne eno leto &mdash;
-glej razdelek »Retention« (hramba) v
+glejte razdelek »Retention« (hramba) v
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
 zato je slabo dnevno gradnjo običajno mogoče povrniti. Paketi izdaj izvornega projekta
 (komponenta <code>release</code>) se nikoli ne odstranijo:</p>
@@ -165,15 +165,15 @@ sudo apt-mark hold svxlink   # neobvezno: prepreči, da bi jo "apt upgrade" znov
 <h2>Paketi</h2>
 <table>
 <tr><th>Paket</th><th>Vsebuje</th></tr>
-<tr><td><code>svxlink</code></td><td>Strežniške komponente (svxlink, remotetrx, svxreflector, logična jedra, skripti dogodkov Tcl). Zgrajeno s: podporo za RTL-SDR neposredno prek USB (priložen fork librtlsdr/rtl_tcp RTL-SDR Blog za trenutne sprejemnike V3/V4; v sporu z distribucijskima paketoma librtlsdr0/rtl-sdr), prispevanim logičnim jedrom SipLogic (priložen PJSIP/pjproject, statično povezan), GPIO prek libgpiod ter podporo za zvočne kodeke in vtičnike Speex/Opus/LADSPA. Namesti storitev systemd. Ne vsebuje Qtel in zvočnih paketov. Vsebuje pravilo udev, ki storitvi SvxLink in prijavljenim uporabnikom namizja omogoča dostop do ključkov USB RTL-SDR.</td></tr>
+<tr><td><code>svxlink</code></td><td>Strežniške komponente (svxlink, remotetrx, svxreflector, logična jedra, skripti dogodkov Tcl). Zgrajeno s: podporo za RTL-SDR neposredno prek USB (priložen fork librtlsdr/rtl_tcp RTL-SDR Blog za trenutne sprejemnike V3/V4; v sporu z distribucijskima paketoma librtlsdr0/rtl-sdr), prispevanim logičnim jedrom SipLogic (priložen PJSIP/pjproject, statično povezan), GPIO prek libgpiod ter podporo za zvočne kodeke in vtičnike Speex/Opus/LADSPA. Namesti storitev systemd. Ne vsebuje Qtel in zvočnih paketov.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafični odjemalec EchoLink (Qt6). Potrebuje namizno okolje in paket <code>svxlink</code> natanko iste različice (deli njegovi knjižnici echolib/async).</td></tr>
 </table>
 
 <h2>Podprti sistemi</h2>
 <table>
 <tr><th>Kodno ime</th><th>Ustreza</th><th>Arhitekture: <code>main</code> (dnevne)</th><th>Arhitekture: <code>release</code></th></tr>
-<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 i386</code></td><td>&mdash;</td></tr>
-<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64</code></td><td>&mdash;</td></tr>
+<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 armhf i386</code></td><td>&mdash;</td></tr>
+<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64 armhf</code></td><td>&mdash;</td></tr>
 </table>
 <p class="note"><strong>32-bitni sistemi:</strong> paketi <code>armhf</code>
 so zgrajeni za Raspbian (ARMv6+VFP), osnovo 32-bitnega Raspberry Pi OS,

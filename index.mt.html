@@ -2,7 +2,7 @@
 <html lang="mt">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
+<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repożitorju APT SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -86,7 +86,7 @@ kwalunkwe ħin, mingħajr ma tiddependi fuq stampa (snapshot) li hawn tista' tis
 qabbel direttament fuq GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;il-master ta' dan il-fork</a>.</p>
 
-<h2 id="quickstart">Bidu malajr</h2>
+<h2>Bidu malajr</h2>
 <p>Ħaddem dan fuq is-sistema fil-mira (jiskopri awtomatikament l-isem tal-kodiċi/l-arkitettura t-tajba):</p>
 <pre><code># Importa ċ-ċavetta pubblika tal-iffirmar
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
@@ -95,7 +95,7 @@ curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
 # Żid is-sors tar-repożitorju. Agħżel il-komponent:
 #   main     verżjonijiet ta' żvilupp ta' kuljum
 #   release  rilaxxi uffiċjali upstream (26.05 u aktar ġodda)
-component=release
+component=main
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -165,15 +165,15 @@ sudo apt-mark hold svxlink   # fakultattiv: ma jħallix lil "apt upgrade" jaġġ
 <h2>Pakketti</h2>
 <table>
 <tr><th>Pakkett</th><th>Fih</th></tr>
-<tr><td><code>svxlink</code></td><td>Komponenti tas-server (svxlink, remotetrx, svxreflector, logic cores, skripts tal-avvenimenti Tcl). Mibni b'dan li ġej: appoġġ RTL-SDR permezz ta' USB dirett (fork inkluż ta' RTL-SDR Blog librtlsdr/rtl_tcp għad-dongles attwali V3/V4; jidħol f'kunflitt mal-librtlsdr0/rtl-sdr tad-distribuzzjoni), il-logic core SipLogic ikkontribwit (PJSIP/pjproject inkluż, marbut statikament), GPIO permezz ta' libgpiod, u appoġġ għall-codecs u l-plugins tal-awdjo Speex/Opus/LADSPA. Jinstalla servizz systemd. Ma jinkludix Qtel jew pakketti tal-ħsejjes. Jinkludi regola udev li tagħti aċċess għad-dongles USB RTL-SDR lis-servizz SvxLink u lill-utenti illoggjati fid-desktop.</td></tr>
+<tr><td><code>svxlink</code></td><td>Komponenti tas-server (svxlink, remotetrx, svxreflector, logic cores, skripts tal-avvenimenti Tcl). Mibni b'dan li ġej: appoġġ RTL-SDR permezz ta' USB dirett (fork inkluż ta' RTL-SDR Blog librtlsdr/rtl_tcp għad-dongles attwali V3/V4; jidħol f'kunflitt mal-librtlsdr0/rtl-sdr tad-distribuzzjoni), il-logic core SipLogic ikkontribwit (PJSIP/pjproject inkluż, marbut statikament), GPIO permezz ta' libgpiod, u appoġġ għall-codecs u l-plugins tal-awdjo Speex/Opus/LADSPA. Jinstalla servizz systemd. Ma jinkludix Qtel jew pakketti tal-ħsejjes.</td></tr>
 <tr><td><code>qtel</code></td><td>Klijent grafiku għal EchoLink (Qt6). Jeħtieġ ambjent desktop u l-pakkett <code>svxlink</code> tal-istess verżjoni eżatta (jaqsam il-libreriji echolib/async tiegħu).</td></tr>
 </table>
 
 <h2>Sistemi appoġġjati</h2>
 <table>
 <tr><th>Isem tal-kodiċi</th><th>Jikkorrispondi għal</th><th>Arkitetturi: <code>main</code> (ta' kuljum)</th><th>Arkitetturi: <code>release</code></th></tr>
-<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 i386</code></td><td>&mdash;</td></tr>
-<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64</code></td><td>&mdash;</td></tr>
+<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 armhf i386</code></td><td>&mdash;</td></tr>
+<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64 armhf</code></td><td>&mdash;</td></tr>
 </table>
 <p class="note"><strong>Sistemi ta' 32 bit:</strong> il-pakketti <code>armhf</code>
 huma mibnija għal Raspbian (ARMv6+VFP), il-bażi ta' Raspberry Pi OS ta' 32 bit,

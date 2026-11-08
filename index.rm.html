@@ -2,7 +2,7 @@
 <html lang="rm">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
+<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repositori APT SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Questa pagina è vegnida translatada automaticamain cun intelligenza artifiziala e po cuntegnair sbagls. Decisiva è la versiun englaisa. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Pachets da
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> per Raspberry Pi OS
-e Debian, en duas cumponentas &mdash; tscherna ina:</p>
+e Debian, en duas cumponentas &mdash; tscherni ina:</p>
 <ul>
 <li><code>main</code>: versiuns da svilup cumpiladas mintga di a partir dal code da funtauna il pli actual da
 quest fork, betg versiuns stablas.</li>
@@ -71,7 +71,7 @@ pli novas), cumpiladas a partir dal code da funtauna upstream betg modifitgà, c
 parameters da cumpilaziun e las medemas funcziuns sco ils pachets dal di. Mintga versiun vegn conservada;
 <code>apt upgrade</code> mida a mintga nova versiun upstream.</li>
 </ul>
-<p>Guarda il <a href="https://github.com/criede/svxlink-db9cr">repositori dal code da funtauna</a>
+<p>Guardai il <a href="https://github.com/criede/svxlink-db9cr">repositori dal code da funtauna</a>
 per detagls.</p>
 
 <h2>Upstream e midadas localas</h2>
@@ -79,23 +79,23 @@ per detagls.</p>
 <a href="https://github.com/sm0svx/svxlink">sm0svx/svxlink</a>, il
 project SvxLink original, cun ina pachetaziun locala e funcziuns supplementaras
 messas sur quai (RTL-SDR, SipLogic, il pachet separà <code>qtel</code>,
-quest repositori APT ed auter &mdash; guarda
+quest repositori APT ed auter &mdash; guardai
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>
 per la glista cumpletta). Per vesair exactamain tge che sa distingua dad upstream en mintga
-mument, senza sa fidar d'ina fotografia momentana qua che vegniss antiquada, cumpareglia
+mument, senza sa fidar d'ina fotografia momentana qua che vegniss antiquada, cumparegliai
 en temp real sin GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">master upstream&nbsp;&hellip;&nbsp;master da quest fork</a>.</p>
 
-<h2 id="quickstart">Entschatta svelta</h2>
-<p>Exequescha sin il sistem da destinaziun (il num da code e l'architectura correcta vegnan identifitgads automaticamain):</p>
+<h2>Entschatta svelta</h2>
+<p>Exequi sin il sistem da destinaziun (il num da code e l'architectura correcta vegnan identifitgads automaticamain):</p>
 <pre><code># Importar la clav publica da signatura
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
-# Agiuntar la funtauna dal repositori. Tscherna la cumponenta:
+# Agiuntar la funtauna dal repositori. Tscherni la cumponenta:
 #   main     versiuns da svilup dal di
 #   release  versiuns uffizialas upstream (26.05 e pli novas)
-component=release
+component=main
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -104,8 +104,8 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Obligatoric avant l'emprima aviada: configurescha tia staziun, radio ed audio.
-# La datoteca furnida è mo in model e sto vegnir adattada a tes sistem.
+# Obligatoric avant l'emprima aviada: configurai Vossa staziun, radio ed audio.
+# La datoteca furnida è mo in model e sto vegnir adattada a Voss sistem.
 sudo editor /etc/svxlink/svxlink.conf
 
 # Activar SvxLink cun aviar il sistem ed al aviar ussa.
@@ -118,41 +118,41 @@ journalctl -u svxlink.service -f
 
 # Client EchoLink grafic facultativ (basegna in ambient da desktop):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Obligatoric:</strong> Avia betg il servetsch avant che ti has
-modifitgà <code>/etc/svxlink/svxlink.conf</code>. Configurescha almain l'identitad
-da la staziun, la logica, il retschavider/emettur ed ils parameters d'audio/PTT per tes hardware.
+<p class="note"><strong>Obligatoric:</strong> Aviai betg il servetsch avant che Vus avais
+modifitgà <code>/etc/svxlink/svxlink.conf</code>. Configurai almain l'identitad
+da la staziun, la logica, il retschavider/emettur ed ils parameters d'audio/PTT per Voss hardware.
 Il servetsch legia quest percurs via <code>/etc/default/svxlink</code>.</p>
 <p class="note">Sche <code>apt update</code> annunzia in 404 per questa funtauna, na vegn il
-num da code da tes sistem anc betg cumpilà (guarda la tabella sutvart) &mdash; mida en quel cas il
+num da code da Voss sistem anc betg cumpilà (guardai la tabella sutvart) &mdash; midai en quel cas il
 num da code en <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> en in dals
 nums sustegnids. Suenter vegnan las novas versiuns dal di (<code>main</code>) u las novas versiuns upstream
 (<code>release</code>) installadas automaticamain cun in <code>sudo apt upgrade</code> regular.</p>
-<p class="note">Activescha betg omaduas cumponentas a medem temp, nun che ti vuls las
+<p class="note">Activai betg omaduas cumponentas a medem temp, nun che Vus vulais las
 versiuns dal di: ellas han adina la versiun pli auta, uschia che apt las installass
 empè da las versiuns uffizialas. Per midar ina installaziun existenta da <code>main</code>
-a <code>release</code>, mida la cumponenta en
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, exequescha
-<code>sudo apt update</code> ed installescha lura explicitamain la versiun release
+a <code>release</code>, midai la cumponenta en
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, exequi
+<code>sudo apt update</code> ed installai lura explicitamain la versiun release
 (i sa tracta d'in downgrade, quai vul dir d'ina versiun pli veglia), p.ex.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Resguarda che en ils pachets
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Resguardai che en ils pachets
 <code>release</code> (code da funtauna upstream betg modifitgà) na vegnan ils scripts TCL
 sut <code>/usr/share/svxlink</code> betg protegids sco datotecas da
-configuraziun; tegna midadas localas en <code>events.d/local/</code>.</p>
+configuraziun; tegnai midadas localas en <code>events.d/local/</code>.</p>
 
 <h2>Applitgar midadas da la configuraziun</h2>
 <p>Suenter avair modifitgà <code>/etc/svxlink/svxlink.conf</code> (u ina datoteca da modul
 <code>/etc/svxlink/svxlink.d/*.conf</code>) sin ina staziun che funcziuna,
-chargia danovamain la configuraziun senza interrumper ina sessiun activa:</p>
+chargai danovamain la configuraziun senza interrumper ina sessiun activa:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Quai trametta il signal <code>SIGHUP</code>, sin il qual SvxLink legia danovamain sia
-configuraziun. Utilisescha empè <code>sudo systemctl restart svxlink.service</code>
+configuraziun. Utilisai empè <code>sudo systemctl restart svxlink.service</code>
 sch'in chargiar danovamain na para betg da surpigliar ina midada (tscherts parameters, sco
 tge nuclis logics u apparats da tun che vegnan chargads, pon basegnar in reaviar cumplet).</p>
 
 <h2>Installar ina versiun pli veglia</h2>
 <p>Versiuns recentas restan disponiblas en il pool anc in temp suenter ch'ellas èn vegnidas
 remplazzadas (ina per di durant ina emna, ina per emna durant in mais, ina per mais durant in onn &mdash;
-guarda «Retention» (conservaziun) en
+guardai «Retention» (conservaziun) en
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
 uschia ch'ins po per ordinari turnar enavos suenter ina versiun dal di defectuosa. Pachets da versiuns upstream
 (cumponenta <code>release</code>) na vegnan mai allontanads:</p>
@@ -164,15 +164,15 @@ sudo apt-mark hold svxlink   # facultativ: impedescha che "apt upgrade" l’actu
 <h2>Pachets</h2>
 <table>
 <tr><th>Pachet</th><th>Cuntegn</th></tr>
-<tr><td><code>svxlink</code></td><td>Cumponentas da server (svxlink, remotetrx, svxreflector, nuclis logics, scripts d'eveniments Tcl). Cumpilà cun: sustegn RTL-SDR via USB direct (fork RTL-SDR Blog da librtlsdr/rtl_tcp integrà, per ils dongles V3/V4 actuals; en conflict cun librtlsdr0/rtl-sdr da la distribuziun), il nucleus logic SipLogic contribuì da la cuminanza (PJSIP/pjproject integrà, collià staticamain), GPIO via libgpiod, e sustegn da codecs d'audio e plugins Speex/Opus/LADSPA. Installescha in servetsch systemd. Na cuntegna ni Qtel ni pachets da tuns. Cuntegna ina regla udev che dat al servetsch SvxLink ed als utilisaders annunziads al desktop access als dongles USB RTL-SDR.</td></tr>
+<tr><td><code>svxlink</code></td><td>Cumponentas da server (svxlink, remotetrx, svxreflector, nuclis logics, scripts d'eveniments Tcl). Cumpilà cun: sustegn RTL-SDR via USB direct (fork RTL-SDR Blog da librtlsdr/rtl_tcp integrà, per ils dongles V3/V4 actuals; en conflict cun librtlsdr0/rtl-sdr da la distribuziun), il nucleus logic SipLogic contribuì da la cuminanza (PJSIP/pjproject integrà, collià staticamain), GPIO via libgpiod, e sustegn da codecs d'audio e plugins Speex/Opus/LADSPA. Installescha in servetsch systemd. Na cuntegna ni Qtel ni pachets da tuns.</td></tr>
 <tr><td><code>qtel</code></td><td>Client EchoLink grafic (Qt6). Basegna in ambient da desktop ed il pachet <code>svxlink</code> exactamain da la medema versiun (el parta sias bibliotecas echolib/async).</td></tr>
 </table>
 
 <h2>Sistems sustegnids</h2>
 <table>
 <tr><th>Num da code</th><th>Correspunda a</th><th>Architecturas: <code>main</code> (dal di)</th><th>Architecturas: <code>release</code></th></tr>
-<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 i386</code></td><td>&mdash;</td></tr>
-<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64</code></td><td>&mdash;</td></tr>
+<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 armhf i386</code></td><td>&mdash;</td></tr>
+<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64 armhf</code></td><td>&mdash;</td></tr>
 </table>
 <p class="note"><strong>Sistems da 32 bit:</strong> ils pachets <code>armhf</code>
 vegnan cumpilads per Raspbian (ARMv6+VFP), la basa da Raspberry Pi OS da 32 bit,

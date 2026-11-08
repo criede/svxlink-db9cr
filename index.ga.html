@@ -2,7 +2,7 @@
 <html lang="ga">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
+<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Stór APT SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -86,7 +86,7 @@ ar bith, gan a bheith ag brath ar ghrianghraf anseo a d'fhéadfadh dul as dáta,
 beo ar GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">master an bhuntionscadail&nbsp;&hellip;&nbsp;master an fhorc seo</a>.</p>
 
-<h2 id="quickstart">Tús tapa</h2>
+<h2>Tús tapa</h2>
 <p>Rith ar an spriocchóras é (aimsítear an cód-ainm/an ailtireacht cheart go huathoibríoch):</p>
 <pre><code># Iompórtáil an eochair shínithe phoiblí
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
@@ -95,7 +95,7 @@ curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
 # Cuir foinse an stóir leis. Roghnaigh an chomhpháirt:
 #   main     tógálacha forbartha laethúla
 #   release  eisiúintí oifigiúla ón mbuntionscadal (26.05 agus níos nuaí)
-component=release
+component=main
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -165,15 +165,15 @@ sudo apt-mark hold svxlink   # roghnach: cuireann sé cosc ar "apt upgrade" é a
 <h2>Pacáistí</h2>
 <table>
 <tr><th>Pacáiste</th><th>Ábhar</th></tr>
-<tr><td><code>svxlink</code></td><td>Comhpháirteanna freastalaí (svxlink, remotetrx, svxreflector, croíleacáin loighce, scripteanna imeachta Tcl). Tógtha le: tacaíocht RTL-SDR thar USB go díreach (forc librtlsdr/rtl_tcp de chuid RTL-SDR Blog san áireamh do dhonglaí reatha V3/V4; tagann sé salach ar librtlsdr0/rtl-sdr an dáileacháin), an croíleacán loighce SipLogic a chuir an pobal ar fáil (PJSIP/pjproject san áireamh, nasctha go statach), GPIO trí libgpiod, agus tacaíocht do chodecanna fuaime agus breiseáin Speex/Opus/LADSPA. Suiteálann sé seirbhís systemd. Níl Qtel ná pacáistí fuaimeanna san áireamh. Tá riail udev san áireamh a thugann rochtain ar dhonglaí USB RTL-SDR do sheirbhís SvxLink agus d’úsáideoirí atá logáilte isteach ar an deasc.</td></tr>
+<tr><td><code>svxlink</code></td><td>Comhpháirteanna freastalaí (svxlink, remotetrx, svxreflector, croíleacáin loighce, scripteanna imeachta Tcl). Tógtha le: tacaíocht RTL-SDR thar USB go díreach (forc librtlsdr/rtl_tcp de chuid RTL-SDR Blog san áireamh do dhonglaí reatha V3/V4; tagann sé salach ar librtlsdr0/rtl-sdr an dáileacháin), an croíleacán loighce SipLogic a chuir an pobal ar fáil (PJSIP/pjproject san áireamh, nasctha go statach), GPIO trí libgpiod, agus tacaíocht do chodecanna fuaime agus breiseáin Speex/Opus/LADSPA. Suiteálann sé seirbhís systemd. Níl Qtel ná pacáistí fuaimeanna san áireamh.</td></tr>
 <tr><td><code>qtel</code></td><td>Cliant grafach EchoLink (Qt6). Teastaíonn timpeallacht deisce agus an pacáiste <code>svxlink</code> den leagan céanna go díreach (roinneann sé a leabharlanna echolib/async).</td></tr>
 </table>
 
 <h2>Córais a dtacaítear leo</h2>
 <table>
 <tr><th>Cód-ainm</th><th>Comhoiriúnach le</th><th>Ailtireachtaí: <code>main</code> (laethúil)</th><th>Ailtireachtaí: <code>release</code></th></tr>
-<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 i386</code></td><td>&mdash;</td></tr>
-<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64</code></td><td>&mdash;</td></tr>
+<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 armhf i386</code></td><td>&mdash;</td></tr>
+<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64 armhf</code></td><td>&mdash;</td></tr>
 </table>
 <p class="note"><strong>Córais 32-giotán:</strong> Tógtar pacáistí <code>armhf</code>
 in aghaidh Raspbian (ARMv6+VFP), bunús Raspberry Pi OS 32-giotán,

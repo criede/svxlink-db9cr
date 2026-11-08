@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
+<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-förråd</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -86,7 +86,7 @@ utan att förlita dig på en ögonblicksbild här som blir inaktuell, kan du jä
 live på GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;denna forks master</a>.</p>
 
-<h2 id="quickstart">Snabbstart</h2>
+<h2>Snabbstart</h2>
 <p>Kör på målsystemet (identifierar automatiskt rätt kodnamn/arkitektur):</p>
 <pre><code># Importera den publika signeringsnyckeln
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
@@ -95,7 +95,7 @@ curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
 # Lägg till förrådskällan. Välj komponent:
 #   main     dagliga utvecklingsbyggen
 #   release  officiella upstream-utgåvor (26.05 och nyare)
-component=release
+component=main
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -165,15 +165,15 @@ sudo apt-mark hold svxlink   # valfritt: hindrar "apt upgrade" från att uppgrad
 <h2>Paket</h2>
 <table>
 <tr><th>Paket</th><th>Innehåll</th></tr>
-<tr><td><code>svxlink</code></td><td>Serverkomponenter (svxlink, remotetrx, svxreflector, logikkärnor, Tcl-händelseskript). Byggt med: RTL-SDR-stöd via direkt USB (medföljande RTL-SDR Blog-fork av librtlsdr/rtl_tcp för aktuella V3/V4-donglar; står i konflikt med distributionens librtlsdr0/rtl-sdr), den bidragna SipLogic-logikkärnan (medföljande PJSIP/pjproject, statiskt länkat), GPIO via libgpiod samt stöd för ljudkodekarna och insticksprogrammen Speex/Opus/LADSPA. Installerar en systemd-tjänst. Innehåller inte Qtel eller ljudpaket. Innehåller en udev-regel som ger SvxLink-tjänsten och användare som är inloggade på skrivbordet åtkomst till RTL-SDR-USB-donglar.</td></tr>
+<tr><td><code>svxlink</code></td><td>Serverkomponenter (svxlink, remotetrx, svxreflector, logikkärnor, Tcl-händelseskript). Byggt med: RTL-SDR-stöd via direkt USB (medföljande RTL-SDR Blog-fork av librtlsdr/rtl_tcp för aktuella V3/V4-donglar; står i konflikt med distributionens librtlsdr0/rtl-sdr), den bidragna SipLogic-logikkärnan (medföljande PJSIP/pjproject, statiskt länkat), GPIO via libgpiod samt stöd för ljudkodekarna och insticksprogrammen Speex/Opus/LADSPA. Installerar en systemd-tjänst. Innehåller inte Qtel eller ljudpaket.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafisk EchoLink-klient (Qt6). Kräver en skrivbordsmiljö och paketet <code>svxlink</code> i exakt samma version (delar dess echolib/async-bibliotek).</td></tr>
 </table>
 
 <h2>System som stöds</h2>
 <table>
 <tr><th>Kodnamn</th><th>Motsvarar</th><th>Arkitekturer: <code>main</code> (daglig)</th><th>Arkitekturer: <code>release</code></th></tr>
-<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 i386</code></td><td>&mdash;</td></tr>
-<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64</code></td><td>&mdash;</td></tr>
+<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 armhf i386</code></td><td>&mdash;</td></tr>
+<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64 armhf</code></td><td>&mdash;</td></tr>
 </table>
 <p class="note"><strong>32-bitarssystem:</strong> <code>armhf</code>-paket
 byggs mot Raspbian (ARMv6+VFP), grunden för 32-bitars Raspberry Pi OS,

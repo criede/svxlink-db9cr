@@ -2,7 +2,7 @@
 <html lang="ro">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
+<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Depozitul APT SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Această pagină a fost tradusă automat cu ajutorul inteligenței artificiale și poate conține erori. Versiunea în limba engleză este cea de referință. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Pachete
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> pentru Raspberry Pi OS
-și Debian, în două componente &mdash; alege una:</p>
+și Debian, în două componente &mdash; alegeți una:</p>
 <ul>
 <li><code>main</code>: build-uri zilnice de dezvoltare din cea mai recentă sursă a
 acestui fork, nu versiuni stabile.</li>
@@ -71,7 +71,7 @@ mai noi), compilate din sursa nemodificată a versiunilor upstream, cu aceleași
 setări de compilare și aceleași funcționalități ca pachetele zilnice. Fiecare versiune este păstrată;
 <code>apt upgrade</code> trece la fiecare nouă versiune upstream.</li>
 </ul>
-<p>Consultă <a href="https://github.com/criede/svxlink-db9cr">depozitul de cod sursă</a>
+<p>Consultați <a href="https://github.com/criede/svxlink-db9cr">depozitul de cod sursă</a>
 pentru detalii.</p>
 
 <h2>Upstream și modificări locale</h2>
@@ -79,23 +79,23 @@ pentru detalii.</p>
 <a href="https://github.com/sm0svx/svxlink">sm0svx/svxlink</a>,
 proiectul SvxLink original, cu împachetare locală și funcționalități suplimentare
 adăugate deasupra (RTL-SDR, SipLogic, pachetul separat <code>qtel</code>,
-acest depozit APT și altele &mdash; consultă
+acest depozit APT și altele &mdash; consultați
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>
 pentru lista completă). Pentru a vedea exact ce diferă față de upstream în orice
-moment, fără a te baza pe un instantaneu de aici care se poate învechi, compară
+moment, fără a vă baza pe un instantaneu de aici care se poate învechi, comparați
 în timp real pe GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;master-ul acestui fork</a>.</p>
 
-<h2 id="quickstart">Pornire rapidă</h2>
-<p>Rulează pe sistemul țintă (detectează automat numele de cod și arhitectura corecte):</p>
-<pre><code># Importă cheia publică de semnare
+<h2>Pornire rapidă</h2>
+<p>Rulați pe sistemul țintă (detectează automat numele de cod și arhitectura corecte):</p>
+<pre><code># Importați cheia publică de semnare
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
-# Adaugă sursa depozitului. Alege componenta:
+# Adăugați sursa depozitului. Alegeți componenta:
 #   main     build-uri zilnice de dezvoltare
 #   release  versiuni oficiale upstream (26.05 și mai noi)
-component=release
+component=main
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -104,57 +104,57 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Obligatoriu înainte de prima pornire: configurează stația, echipamentul radio și partea audio.
-# Fișierul din pachet este doar un șablon și trebuie adaptat configurației tale.
+# Obligatoriu înainte de prima pornire: configurați stația, echipamentul radio și partea audio.
+# Fișierul din pachet este doar un șablon și trebuie adaptat configurației dumneavoastră.
 sudo editor /etc/svxlink/svxlink.conf
 
-# Activează SvxLink la pornirea sistemului și pornește-l acum.
+# Activați SvxLink la pornirea sistemului și porniți-l acum.
 sudo systemctl daemon-reload
 sudo systemctl enable --now svxlink.service
 
-# Verifică starea serviciului și urmărește jurnalul acestuia.
+# Verificați starea serviciului și urmăriți jurnalul acestuia.
 systemctl status svxlink.service
 journalctl -u svxlink.service -f
 
 # Client EchoLink grafic opțional (necesită un mediu desktop):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Obligatoriu:</strong> Nu porni serviciul înainte de a
-edita <code>/etc/svxlink/svxlink.conf</code>. Configurează cel puțin identitatea
-stației, logica, receptorul/emițătorul și setările audio/PTT pentru hardware-ul tău.
+<p class="note"><strong>Obligatoriu:</strong> Nu porniți serviciul înainte de a
+edita <code>/etc/svxlink/svxlink.conf</code>. Configurați cel puțin identitatea
+stației, logica, receptorul/emițătorul și setările audio/PTT pentru hardware-ul dumneavoastră.
 Serviciul citește această cale prin <code>/etc/default/svxlink</code>.</p>
 <p class="note">Dacă <code>apt update</code> raportează o eroare 404 pentru această sursă,
-pentru numele de cod al sistemului tău nu se compilează încă pachete (consultă
-tabelul de mai jos) &mdash; în schimb, modifică numele de cod din
+pentru numele de cod al sistemului dumneavoastră nu se compilează încă pachete (consultați
+tabelul de mai jos) &mdash; în schimb, modificați numele de cod din
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> într-unul dintre cele
 suportate. Ulterior, un <code>sudo apt upgrade</code> obișnuit
 preia automat noile build-uri zilnice (<code>main</code>) sau noile versiuni upstream
 (<code>release</code>).</p>
-<p class="note">Nu activa ambele componente simultan decât dacă dorești
+<p class="note">Nu activați ambele componente simultan decât dacă doriți
 build-urile zilnice: acestea au întotdeauna versiunea mai mare, așa că apt le-ar
 instala peste versiunile release. Pentru a trece o instalare existentă de la <code>main</code>
-la <code>release</code>, schimbă componenta în
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, rulează
-<code>sudo apt update</code>, apoi instalează explicit versiunea release
+la <code>release</code>, schimbați componenta în
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, rulați
+<code>sudo apt update</code>, apoi instalați explicit versiunea release
 (este un downgrade, adică o trecere la o versiune mai veche), de ex.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Reține că în pachetele
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Rețineți că în pachetele
 <code>release</code> (sursă upstream nemodificată) scripturile TCL
 din <code>/usr/share/svxlink</code> nu sunt protejate ca fișiere de
-configurare; păstrează modificările locale în <code>events.d/local/</code>.</p>
+configurare; păstrați modificările locale în <code>events.d/local/</code>.</p>
 
 <h2>Aplicarea modificărilor de configurare</h2>
 <p>După editarea <code>/etc/svxlink/svxlink.conf</code> (sau a oricărui fișier de modul
 <code>/etc/svxlink/svxlink.d/*.conf</code>) pe o stație în funcțiune,
-reîncarcă configurația fără a întrerupe o sesiune activă:</p>
+reîncărcați configurația fără a întrerupe o sesiune activă:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Aceasta trimite <code>SIGHUP</code>, la primirea căruia SvxLink își recitește
-configurația. Folosește în schimb <code>sudo systemctl restart svxlink.service</code>
+configurația. Folosiți în schimb <code>sudo systemctl restart svxlink.service</code>
 dacă o reîncărcare nu pare să preia o modificare (unele setări, cum ar fi
 ce nuclee logice sau ce dispozitive de sunet sunt încărcate, pot necesita o repornire completă).</p>
 
 <h2>Instalarea unei versiuni mai vechi</h2>
 <p>Versiunile recente rămân disponibile în pool o vreme după ce au fost
 înlocuite (zilnic timp de o săptămână, săptămânal timp de o lună, lunar timp de un an &mdash;
-consultă „Retention” (păstrare) în
+consultați „Retention” (păstrare) în
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
 așa că un build zilnic defect poate fi de obicei anulat (rollback). Pachetele versiunilor upstream
 (componenta <code>release</code>) nu sunt eliminate niciodată:</p>
@@ -166,15 +166,15 @@ sudo apt-mark hold svxlink   # opțional: împiedică "apt upgrade" să o actual
 <h2>Pachete</h2>
 <table>
 <tr><th>Pachet</th><th>Conține</th></tr>
-<tr><td><code>svxlink</code></td><td>Componente server (svxlink, remotetrx, svxreflector, nuclee logice, scripturi de evenimente Tcl). Compilat cu: suport RTL-SDR direct prin USB (fork-ul librtlsdr/rtl_tcp de la RTL-SDR Blog inclus, pentru dongle-urile actuale V3/V4; intră în conflict cu librtlsdr0/rtl-sdr din distribuție), nucleul logic SipLogic contribuit (PJSIP/pjproject inclus, legat static), GPIO prin libgpiod și suport pentru codecuri audio și pluginuri Speex/Opus/LADSPA. Instalează un serviciu systemd. Nu include Qtel și nici pachete de sunete. Include o regulă udev care oferă serviciului SvxLink și utilizatorilor autentificați în sesiunea desktop acces la dongle-urile USB RTL-SDR.</td></tr>
+<tr><td><code>svxlink</code></td><td>Componente server (svxlink, remotetrx, svxreflector, nuclee logice, scripturi de evenimente Tcl). Compilat cu: suport RTL-SDR direct prin USB (fork-ul librtlsdr/rtl_tcp de la RTL-SDR Blog inclus, pentru dongle-urile actuale V3/V4; intră în conflict cu librtlsdr0/rtl-sdr din distribuție), nucleul logic SipLogic contribuit (PJSIP/pjproject inclus, legat static), GPIO prin libgpiod și suport pentru codecuri audio și pluginuri Speex/Opus/LADSPA. Instalează un serviciu systemd. Nu include Qtel și nici pachete de sunete.</td></tr>
 <tr><td><code>qtel</code></td><td>Client EchoLink grafic (Qt6). Necesită un mediu desktop și pachetul <code>svxlink</code> cu exact aceeași versiune (folosește în comun bibliotecile sale echolib/async).</td></tr>
 </table>
 
 <h2>Sisteme suportate</h2>
 <table>
 <tr><th>Nume de cod</th><th>Corespunde</th><th>Arhitecturi: <code>main</code> (zilnic)</th><th>Arhitecturi: <code>release</code></th></tr>
-<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 i386</code></td><td>&mdash;</td></tr>
-<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64</code></td><td>&mdash;</td></tr>
+<tr><td><code>bookworm</code></td><td>Debian 12, Raspberry Pi OS Bookworm (64/32 bit)</td><td><code>amd64 arm64 armhf i386</code></td><td>&mdash;</td></tr>
+<tr><td><code>trixie</code></td><td>Debian 13, Raspberry Pi OS Trixie (64/32 bit)</td><td><code>amd64 arm64 armhf</code></td><td>&mdash;</td></tr>
 </table>
 <p class="note"><strong>Sisteme pe 32 de biți:</strong> pachetele <code>armhf</code>
 sunt compilate pentru Raspbian (ARMv6+VFP), baza Raspberry Pi OS pe 32 de biți,
