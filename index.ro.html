@@ -2,7 +2,7 @@
 <html lang="ro">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Depozitul APT SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -140,7 +140,7 @@ la <code>release</code>, schimbă componenta în
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, rulează
 <code>sudo apt update</code>, apoi instalează explicit versiunea release
 (este un downgrade, adică o trecere la o versiune mai veche), de ex.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Reține că în pachetele
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Reține că în pachetele
 <code>release</code> (sursă upstream nemodificată) scripturile TCL
 din <code>/usr/share/svxlink</code> nu sunt protejate ca fișiere de
 configurare; păstrează modificările locale în <code>events.d/local/</code>.</p>
@@ -163,7 +163,7 @@ consultă „Retention” (păstrare) în
 așa că un build zilnic defect poate fi de obicei anulat (rollback). Pachetele versiunilor upstream
 (componenta <code>release</code>) nu sunt eliminate niciodată:</p>
 <pre><code>apt list -a svxlink   # sau qtel; afișează toate versiunile aflate încă în depozit
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # opțional: împiedică "apt upgrade" să o actualizeze din nou
 # sudo apt-mark unhold svxlink   # mai târziu, pentru a relua actualizările automate</code></pre>
 

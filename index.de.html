@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-Repository</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -137,7 +137,7 @@ auf <code>release</code> umzustellen, ändere die Komponente in
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, führe
 <code>sudo apt update</code> aus und installiere dann die Release-Version explizit
 (es handelt sich um ein Downgrade), z.&nbsp;B.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Beachte, dass in
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Beachte, dass in
 <code>release</code>-Paketen (unveränderter Upstream-Quellcode) die TCL-Skripte
 unter <code>/usr/share/svxlink</code> nicht als Konfigurationsdateien geschützt
 sind; lege lokale Änderungen in <code>events.d/local/</code> ab.</p>
@@ -160,7 +160,7 @@ siehe „Retention“ (Aufbewahrung) in
 sodass ein fehlerhafter täglicher Build in der Regel zurückgerollt werden kann. Pakete der Upstream-Releases
 (Komponente <code>release</code>) werden nie entfernt:</p>
 <pre><code>apt list -a svxlink   # oder qtel; listet alle Versionen auf, die noch im Repository liegen
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # optional: verhindert, dass "apt upgrade" sie wieder aktualisiert
 # sudo apt-mark unhold svxlink   # später, um automatische Updates fortzusetzen</code></pre>
 

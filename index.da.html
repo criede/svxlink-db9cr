@@ -2,7 +2,7 @@
 <html lang="da">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-arkiv</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -139,7 +139,7 @@ til <code>release</code> skal du ændre komponenten i
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, køre
 <code>sudo apt update</code> og derefter installere udgivelsesversionen eksplicit
 (det er en nedgradering), f.eks.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Bemærk, at i
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Bemærk, at i
 <code>release</code>-pakker (uændret upstream-kildekode) er TCL-scriptene
 under <code>/usr/share/svxlink</code> ikke beskyttet som konfigurationsfiler;
 læg lokale ændringer i <code>events.d/local/</code>.</p>
@@ -162,7 +162,7 @@ se »Retention« (opbevaring) i
 så et dårligt dagligt build normalt kan rulles tilbage. Pakker med upstream-udgivelser
 (komponenten <code>release</code>) fjernes aldrig:</p>
 <pre><code>apt list -a svxlink   # eller qtel; viser alle versioner, der stadig er i arkivet
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # valgfrit: forhindrer at "apt upgrade" opgraderer den igen
 # sudo apt-mark unhold svxlink   # senere, for at genoptage automatiske opdateringer</code></pre>
 

@@ -2,7 +2,7 @@
 <html lang="hu">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-tároló</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -138,7 +138,7 @@ telepítené a kiadások helyett. Egy meglévő telepítés <code>main</code> ko
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> fájlban, futtasd a
 <code>sudo apt update</code> parancsot, majd telepítsd kifejezetten a kiadási verziót
 (ez visszalépés egy alacsonyabb verzióra, azaz downgrade), pl.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Vedd figyelembe, hogy a
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Vedd figyelembe, hogy a
 <code>release</code> csomagokban (módosítatlan upstream forráskód) a
 <code>/usr/share/svxlink</code> alatti TCL-szkriptek nincsenek konfigurációs
 fájlként védve; a helyi módosításokat tartsd az <code>events.d/local/</code> könyvtárban.</p>
@@ -161,7 +161,7 @@ lásd a „Retention” (megőrzés) részt az
 így egy hibás napi build általában visszaállítható. Az upstream kiadási csomagok
 (<code>release</code> komponens) soha nem kerülnek eltávolításra:</p>
 <pre><code>apt list -a svxlink   # vagy qtel; kilistázza a tárolóban még elérhető összes verziót
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # opcionális: megakadályozza, hogy az "apt upgrade" újra frissítse
 # sudo apt-mark unhold svxlink   # később, az automatikus frissítések folytatásához</code></pre>
 

@@ -2,7 +2,7 @@
 <html lang="rm">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repositori APT SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -138,7 +138,7 @@ a <code>release</code>, mida la cumponenta en
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, exequescha
 <code>sudo apt update</code> ed installescha lura explicitamain la versiun release
 (i sa tracta d'in downgrade, quai vul dir d'ina versiun pli veglia), p.ex.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Resguarda che en ils pachets
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Resguarda che en ils pachets
 <code>release</code> (code da funtauna upstream betg modifitgà) na vegnan ils scripts TCL
 sut <code>/usr/share/svxlink</code> betg protegids sco datotecas da
 configuraziun; tegna midadas localas en <code>events.d/local/</code>.</p>
@@ -161,7 +161,7 @@ guarda «Retention» (conservaziun) en
 uschia ch'ins po per ordinari turnar enavos suenter ina versiun dal di defectuosa. Pachets da versiuns upstream
 (cumponenta <code>release</code>) na vegnan mai allontanads:</p>
 <pre><code>apt list -a svxlink   # u qtel; mussa tut las versiuns che èn anc en il repositori
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # facultativ: impedescha che "apt upgrade" l’actualisescha puspè
 # sudo apt-mark unhold svxlink   # pli tard, per reactivar las actualisaziuns automaticas</code></pre>
 

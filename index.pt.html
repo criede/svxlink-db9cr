@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repositório APT SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -139,7 +139,7 @@ para <code>release</code>, altera o componente em
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, executa
 <code>sudo apt update</code> e depois instala explicitamente a versão release
 (trata-se de um downgrade, ou seja, de uma versão inferior), por exemplo
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Nota que, nos pacotes
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Nota que, nos pacotes
 <code>release</code> (código-fonte upstream sem alterações), os scripts TCL
 em <code>/usr/share/svxlink</code> não estão protegidos como ficheiros de
 configuração; mantém as alterações locais em <code>events.d/local/</code>.</p>
@@ -162,7 +162,7 @@ ver «Retention» (retenção) em
 pelo que normalmente é possível reverter uma compilação diária defeituosa. Os pacotes das versões upstream
 (componente <code>release</code>) nunca são removidos:</p>
 <pre><code>apt list -a svxlink   # ou qtel; lista todas as versões ainda presentes no repositório
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # opcional: impede que o "apt upgrade" a volte a atualizar
 # sudo apt-mark unhold svxlink   # mais tarde, para retomar as atualizações automáticas</code></pre>
 

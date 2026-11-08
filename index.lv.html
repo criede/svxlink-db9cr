@@ -2,7 +2,7 @@
 <html lang="lv">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT repozitorijs</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -139,7 +139,7 @@ uz <code>release</code>, nomaini komponentu failā
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, izpildi
 <code>sudo apt update</code> un pēc tam skaidri norādot instalē laidiena versiju
 (tā ir versijas pazemināšana), piem.,
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Ņem vērā, ka
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Ņem vērā, ka
 <code>release</code> pakotnēs (nemainīts sākotnējā projekta pirmkods) TCL skripti
 direktorijā <code>/usr/share/svxlink</code> nav aizsargāti kā konfigurācijas
 faili; vietējās izmaiņas glabā direktorijā <code>events.d/local/</code>.</p>
@@ -163,7 +163,7 @@ skati sadaļu "Retention" (saglabāšana) failā
 tāpēc sliktu ikdienas būvējumu parasti var atritināt atpakaļ. Sākotnējā projekta laidienu pakotnes
 (<code>release</code> komponents) nekad netiek dzēstas:</p>
 <pre><code>apt list -a svxlink   # vai qtel; uzskaita visas versijas, kas vēl ir repozitorijā
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # neobligāti: neļauj "apt upgrade" to atkal atjaunināt
 # sudo apt-mark unhold svxlink   # vēlāk, lai atsāktu automātiskos atjauninājumus</code></pre>
 

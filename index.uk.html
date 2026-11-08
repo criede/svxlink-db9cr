@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT-репозиторій SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -138,7 +138,7 @@ journalctl -u svxlink.service -f
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, виконай
 <code>sudo apt update</code>, а потім явно встанови версію випуску
 (це пониження версії), наприклад
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Зверни увагу, що в пакетах
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Зверни увагу, що в пакетах
 <code>release</code> (незмінений вихідний код upstream) скрипти TCL
 у <code>/usr/share/svxlink</code> не захищені як конфігураційні
 файли; зберігай локальні зміни в <code>events.d/local/</code>.</p>
@@ -162,7 +162,7 @@ journalctl -u svxlink.service -f
 тож невдалу щоденну збірку зазвичай можна відкотити. Пакети випусків upstream
 (компонент <code>release</code>) ніколи не видаляються:</p>
 <pre><code>apt list -a svxlink   # або qtel; показує всі версії, які ще є в репозиторії
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # необов’язково: не дає "apt upgrade" знову її оновити
 # sudo apt-mark unhold svxlink   # пізніше, щоб відновити автоматичні оновлення</code></pre>
 

@@ -2,7 +2,7 @@
 <html lang="lb">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-Repository</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -137,7 +137,7 @@ op <code>release</code> ëmzestellen, änner de Komponent an
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, féier
 <code>sudo apt update</code> aus an installéier dann d'Release-Versioun explizit
 (et ass en Downgrade), z.&nbsp;B.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Notéier, datt an
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Notéier, datt an
 <code>release</code>-Paketen (onverännerten Upstream-Quellcode) d'TCL-Skripter
 ënner <code>/usr/share/svxlink</code> net als Konfiguratiounsfichiere geschützt
 sinn; lee lokal Ännerungen an <code>events.d/local/</code> of.</p>
@@ -160,7 +160,7 @@ kuck „Retention“ (Bewaardauer) an
 sou datt e schlechten deegleche Build normalerweis zréckgesat ka ginn. Pakete vun Upstream-Releases
 (Komponent <code>release</code>) ginn ni geläscht:</p>
 <pre><code>apt list -a svxlink   # oder qtel; weist all Versiounen, déi nach am Repository sinn
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # fakultativ: verhënnert, datt "apt upgrade" en erëm aktualiséiert
 # sudo apt-mark unhold svxlink   # méi spéit, fir automatesch Updates erëm opzehuelen</code></pre>
 

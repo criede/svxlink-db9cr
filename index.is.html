@@ -2,7 +2,7 @@
 <html lang="is">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-pakkasafn</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -139,7 +139,7 @@ yfir í <code>release</code> skaltu breyta hlutanum í
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, keyra
 <code>sudo apt update</code> og setja síðan útgáfuna upp sérstaklega
 (þetta er niðurfærsla í eldri útgáfu), t.d.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Athugaðu að í
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Athugaðu að í
 <code>release</code>-pökkum (óbreyttur frumkóði upprunaverkefnisins) eru TCL-skriftur
 undir <code>/usr/share/svxlink</code> ekki varðar sem stillingaskrár;
 geymdu staðbundnar breytingar í <code>events.d/local/</code>.</p>
@@ -162,7 +162,7 @@ sjá "Retention" (varðveisla) í
 svo yfirleitt er hægt að snúa til baka frá gallaðri daglegri smíð. Útgáfupakkar upprunaverkefnisins
 (hlutinn <code>release</code>) eru aldrei fjarlægðir:</p>
 <pre><code>apt list -a svxlink   # eða qtel; sýnir allar útgáfur sem enn eru í safninu
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # valfrjálst: kemur í veg fyrir að "apt upgrade" uppfæri hana aftur
 # sudo apt-mark unhold svxlink   # síðar, til að hefja sjálfvirkar uppfærslur á ný</code></pre>
 

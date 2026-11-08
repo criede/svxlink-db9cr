@@ -2,7 +2,7 @@
 <html lang="et">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-hoidla</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -139,7 +139,7 @@ komponendile <code>release</code> muuda komponenti failis
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, käivita
 <code>sudo apt update</code> ja seejärel paigalda väljalaskeversioon selgesõnaliselt
 (tegemist on versiooni alandamisega), nt
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Pane tähele, et
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Pane tähele, et
 <code>release</code>-pakettides (muutmata upstream-lähtekood) ei ole kataloogis
 <code>/usr/share/svxlink</code> olevad TCL-skriptid konfiguratsioonifailidena
 kaitstud; hoia kohalikke muudatusi kataloogis <code>events.d/local/</code>.</p>
@@ -162,7 +162,7 @@ vt jaotist "Retention" (säilitamine) failis
 nii et halva igapäevase versiooni saab tavaliselt tagasi pöörata. Upstream-väljalaskepakette
 (<code>release</code>-komponent) ei eemaldata kunagi:</p>
 <pre><code>apt list -a svxlink   # või qtel; loetleb kõik hoidlas veel olevad versioonid
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # valikuline: takistab, et "apt upgrade" seda uuesti uuendaks
 # sudo apt-mark unhold svxlink   # hiljem, automaatsete uuenduste jätkamiseks</code></pre>
 
