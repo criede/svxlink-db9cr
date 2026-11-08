@@ -1,13 +1,13 @@
 Package: qtel
-Version: 26.05.1+daily20260913.27.1.g6b8b8b5d7160-1~trixie
+Version: 26.05.2.99.0+daily20261108.4.1.g7fae42583aa0-1~trixie
 Architecture: amd64
 Maintainer: SvxLink Community <svxlink@groups.io>
-Depends: svxlink (= 26.05.1+daily20260913.27.1.g6b8b8b5d7160-1~trixie), libc6 (>= 2.38), libgcc-s1 (>= 3.0), libgsm1 (>= 1.0.18), libqt6core5compat6 (>= 6.6.0), libqt6core6t64 (>= 6.8.2), libqt6gui6 (>= 6.1.2), libqt6network6 (>= 6.8.2), libqt6widgets6 (>= 6.1.2), libsigc++-2.0-0v5 (>= 2.8.0), libstdc++6 (>= 13.1)
-Filename: pool/trixie/main/q/qtel/qtel_26.05.1+daily20260913.27.1.g6b8b8b5d7160-1~trixie_amd64.deb
-Size: 181196
-MD5sum: bced11874b3a5e69060514afce919e18
-SHA1: 9b0ed0566c333bda741d46f92aed9d9a861c6fc1
-SHA256: 8409f4d601c631cc054de09b0cb04de5235ebcb02b0821ea574586dce13fdf1b
+Depends: svxlink (= 26.05.2.99.0+daily20261108.4.1.g7fae42583aa0-1~trixie), libc6 (>= 2.38), libgcc-s1 (>= 3.0), libgsm1 (>= 1.0.18), libqt6core5compat6 (>= 6.6.0), libqt6core6t64 (>= 6.8.2), libqt6gui6 (>= 6.1.2), libqt6network6 (>= 6.8.2), libqt6widgets6 (>= 6.1.2), libsigc++-2.0-0v5 (>= 2.8.0), libstdc++6 (>= 13.1)
+Filename: pool/trixie/main/q/qtel/qtel_26.05.2.99.0+daily20261108.4.1.g7fae42583aa0-1~trixie_amd64.deb
+Size: 181604
+MD5sum: a6c7825675daa3f1f6de58afc56c6ae7
+SHA1: 33ccf653bb28bc6b0a0261028f860749768ca2b1
+SHA256: ce4fb04d82cd74e364f6e40944e71aa5698214d0535ea5d197481d465b2a3737
 Section: hamradio
 Priority: optional
 Description: Graphical EchoLink client for SvxLink
@@ -16,17 +16,17 @@ Description: Graphical EchoLink client for SvxLink
  same version, since it shares that package's echolib/async libraries.
 
 Package: svxlink
-Version: 26.05.1+daily20260913.27.1.g6b8b8b5d7160-1~trixie
+Version: 26.05.2.99.0+daily20261108.4.1.g7fae42583aa0-1~trixie
 Architecture: amd64
 Maintainer: SvxLink Community <svxlink@groups.io>
-Installed-Size: 17737
+Installed-Size: 17973
 Depends: adduser, libc-bin, alsa-utils, vorbis-tools, tcl8.6, libasound2t64 (>= 1.0.16), libc6 (>= 2.38), libcurl4t64 (>= 7.16.2), libgcc-s1 (>= 4.0), libgcrypt20 (>= 1.11.0), libgpiod3 (>= 2.1), libgsm1 (>= 1.0.18), libjsoncpp26 (>= 1.9.6), libogg0 (>= 1.1.4~dfsg), libopus0 (>= 1.1), libpopt0 (>= 1.14), libsigc++-2.0-0v5 (>= 2.8.0), libspeex1 (>= 1.2~), libssl3t64 (>= 3.0.0), libstdc++6 (>= 14), libtcl8.6 (>= 8.6.0), libusb-1.0-0 (>= 2:1.0.21)
 Conflicts: svxlink-server, svxreflector, remotetrx, librtlsdr0, rtl-sdr
-Filename: pool/trixie/main/s/svxlink/svxlink_26.05.1+daily20260913.27.1.g6b8b8b5d7160-1~trixie_amd64.deb
-Size: 5139130
-MD5sum: b90830fa68caa9de4bcd57a6ca4dd80a
-SHA1: b8270835efc48e7fd42450bc097093312ebd6518
-SHA256: 68b0e52bfedf80658f76e463518761c753c4250a8c5f0b159168c72dfe2910a2
+Filename: pool/trixie/main/s/svxlink/svxlink_26.05.2.99.0+daily20261108.4.1.g7fae42583aa0-1~trixie_amd64.deb
+Size: 5224038
+MD5sum: 1588d2910dcb56d3746a784c3c5d85f9
+SHA1: a375a7305508359c7e8bbb6c87ee125b5b745684
+SHA256: 5ff5fa9f28aba0d50d4999aad62ee2ee68a566d224c5cbd9eaee777c2f3356d8
 Section: devel
 Priority: optional
 Description: Advanced voice services system for ham radio use
