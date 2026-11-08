@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Ова страница је аутоматски преведена помоћу вештачке интелигенције и може садржати грешке. Меродавна је енглеска верзија. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Пакети
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> за Raspberry Pi OS
-и Debian, у две компоненте &mdash; изаберите једну:</p>
+и Debian, у две компоненте &mdash; изабери једну:</p>
 <ul>
 <li><code>main</code>: дневне развојне верзије из најновијег изворног кода
 овог форка, а не стабилна издања.</li>
@@ -71,7 +71,7 @@
 подешавањима изградње и функцијама као и дневни пакети. Свако издање се чува;
 <code>apt upgrade</code> прелази на свако ново upstream издање.</li>
 </ul>
-<p>Детаље потражите у <a href="https://github.com/criede/svxlink-db9cr">репозиторијуму изворног кода</a>.</p>
+<p>Детаље потражи у <a href="https://github.com/criede/svxlink-db9cr">репозиторијуму изворног кода</a>.</p>
 
 <h2>Upstream и локалне измене</h2>
 <p>Ово је свакодневно синхронизован форк пројекта
@@ -80,18 +80,18 @@
 поврх њега (RTL-SDR, SipLogic, засебан пакет <code>qtel</code>,
 овај APT репозиторијум и још много тога &mdash; потпуну листу погледајте у
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>).
-Да бисте у било ком тренутку тачно видели шта се разликује у односу на upstream,
-без ослањања на снимак стања овде који може да застари, упоредите тренутно стање
+Да би у било ком тренутку тачно видео шта се разликује у односу на upstream,
+без ослањања на снимак стања овде који може да застари, упореди тренутно стање
 на GitHub-у:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;master овог форка</a>.</p>
 
 <h2>Брзи почетак</h2>
-<p>Покрените на циљном систему (одговарајуће кодно име и архитектура се откривају аутоматски):</p>
+<p>Покрени на циљном систему (одговарајуће кодно име и архитектура се откривају аутоматски):</p>
 <pre><code># Увоз јавног кључа за потписивање
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
-# Додавање извора репозиторијума. Изаберите компоненту:
+# Додавање извора репозиторијума. Изабери компоненту:
 #   main     дневне развојне верзије
 #   release  званична upstream издања (26.05 и новија)
 component=release
@@ -103,8 +103,8 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Обавезно пре првог покретања: подесите станицу, радио-уређај и звук.
-# Датотека из пакета је само шаблон и мора се прилагодити вашој конфигурацији.
+# Обавезно пре првог покретања: подеси станицу, радио-уређај и звук.
+# Датотека из пакета је само шаблон и мора се прилагодити твојој конфигурацији.
 sudo editor /etc/svxlink/svxlink.conf
 
 # Омогућавање покретања SvxLink-а при подизању система и покретање одмах.
@@ -117,42 +117,42 @@ journalctl -u svxlink.service -f
 
 # Опциони графички EchoLink клијент (захтева графичко радно окружење):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Обавезно:</strong> Не покрећите сервис пре
-уређивања датотеке <code>/etc/svxlink/svxlink.conf</code>. Подесите барем
-идентитет станице, логику, пријемник/предајник и подешавања звука/PTT-а за ваш хардвер.
+<p class="note"><strong>Обавезно:</strong> Не покрећи сервис пре
+уређивања датотеке <code>/etc/svxlink/svxlink.conf</code>. Подеси барем
+идентитет станице, логику, пријемник/предајник и подешавања звука/PTT-а за твој хардвер.
 Сервис чита ову путању преко <code>/etc/default/svxlink</code>.</p>
 <p class="note">Ако <code>apt update</code> пријави грешку 404 за овај извор,
-за кодно име вашег система још нема изграђених пакета (погледајте табелу испод) &mdash;
-уместо тога, у датотеци <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> промените
+за кодно име твог система још нема изграђених пакета (погледај табелу испод) &mdash;
+уместо тога, у датотеци <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> промени
 кодно име у неко од подржаних. Након тога, уобичајено <code>sudo apt upgrade</code>
 аутоматски преузима нове дневне верзије (<code>main</code>) или нова upstream издања
 (<code>release</code>).</p>
-<p class="note">Не омогућавајте обе компоненте истовремено, осим ако желите
+<p class="note">Не омогућавај обе компоненте истовремено, осим ако желиш
 дневне верзије: оне увек имају вишу верзију, па би их apt инсталирао
-уместо издања. Да бисте постојећу инсталацију пребацили са <code>main</code>
-на <code>release</code>, промените компоненту у
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, покрените
-<code>sudo apt update</code>, а затим изричито инсталирајте верзију издања
+уместо издања. Да би постојећу инсталацију пребацио са <code>main</code>
+на <code>release</code>, промени компоненту у
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, покрени
+<code>sudo apt update</code>, а затим изричито инсталирај верзију издања
 (то је враћање на старију верзију), нпр.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Имајте у виду да у
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Имај у виду да у
 пакетима <code>release</code> (неизмењен upstream изворни код) TCL скрипте
 у <code>/usr/share/svxlink</code> нису заштићене као конфигурационе
-датотеке; локалне измене чувајте у <code>events.d/local/</code>.</p>
+датотеке; локалне измене чувај у <code>events.d/local/</code>.</p>
 
 <h2>Примена измена конфигурације</h2>
 <p>Након уређивања <code>/etc/svxlink/svxlink.conf</code> (или било које
 модулске датотеке <code>/etc/svxlink/svxlink.d/*.conf</code>) на станици
-која ради, поново учитајте конфигурацију без прекидања активне сесије:</p>
+која ради, поново учитај конфигурацију без прекидања активне сесије:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Ово шаље <code>SIGHUP</code>, на који SvxLink поново учитава своју
-конфигурацију. Уместо тога користите <code>sudo systemctl restart svxlink.service</code>
+конфигурацију. Уместо тога користи <code>sudo systemctl restart svxlink.service</code>
 ако се чини да поновно учитавање не примењује неку измену (нека подешавања, на пример
 која се логичка језгра или звучни уређаји учитавају, могу захтевати потпуно поновно покретање).</p>
 
 <h2>Инсталирање старије верзије</h2>
 <p>Недавне верзије остају доступне у pool-у још неко време након што их
 замене новије (дневне недељу дана, недељне месец дана, месечне годину дана &mdash;
-погледајте одељак „Retention“ (задржавање) у
+погледај одељак „Retention“ (задржавање) у
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
 тако да се лоша дневна верзија обично може вратити. Пакети upstream издања
 (компонента <code>release</code>) се никада не уклањају:</p>

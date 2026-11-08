@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Táto stránka bola preložená automaticky pomocou umelej inteligencie a môže obsahovať chyby. Záväzná je anglická verzia. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Balíky
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> pre Raspberry Pi OS
-a Debian v dvoch komponentoch &mdash; vyberte si jeden:</p>
+a Debian v dvoch komponentoch &mdash; vyber si jeden:</p>
 <ul>
 <li><code>main</code>: denné vývojové zostavenia z najnovšieho zdrojového kódu
 tohto forku, nie stabilné vydania.</li>
@@ -71,7 +71,7 @@ a novšie), zostavené z nezmeneného zdrojového kódu vydania s rovnakými
 nastaveniami zostavenia a funkciami ako denné balíky. Každé vydanie sa zachováva;
 <code>apt upgrade</code> prechádza na každé nové vydanie materského projektu.</li>
 </ul>
-<p>Podrobnosti nájdete v <a href="https://github.com/criede/svxlink-db9cr">zdrojovom repozitári</a>.
+<p>Podrobnosti nájdeš v <a href="https://github.com/criede/svxlink-db9cr">zdrojovom repozitári</a>.
 </p>
 
 <h2>Materský projekt a lokálne zmeny</h2>
@@ -81,18 +81,18 @@ pôvodného projektu SvxLink, s vlastným balíčkovaním a rozšíreniami funkc
 navrchu (RTL-SDR, SipLogic, samostatný balík <code>qtel</code>,
 tento APT repozitár a ďalšie &mdash; úplný zoznam pozri v
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>).
-Ak chcete kedykoľvek zistiť, čím presne sa fork líši od materského projektu,
-bez spoliehania sa na zastaraný snímok na tejto stránke, porovnajte
+Ak chceš kedykoľvek zistiť, čím presne sa fork líši od materského projektu,
+bez spoliehania sa na zastaraný snímok na tejto stránke, porovnaj
 to naživo na GitHube:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">master materského projektu&nbsp;&hellip;&nbsp;master tohto forku</a>.</p>
 
 <h2>Rýchly štart</h2>
-<p>Spustite na cieľovom systéme (správne kódové meno a architektúra sa zistia automaticky):</p>
+<p>Spusti na cieľovom systéme (správne kódové meno a architektúra sa zistia automaticky):</p>
 <pre><code># Import verejného podpisového kľúča
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
-# Pridanie zdroja repozitára. Zvoľte komponent:
+# Pridanie zdroja repozitára. Zvoľ komponent:
 #   main     denné vývojové zostavenia
 #   release  oficiálne vydania materského projektu (26.05 a novšie)
 component=release
@@ -104,8 +104,8 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Povinné pred prvým spustením: nakonfigurujte stanicu, rádio a audio.
-# Súbor z balíka je len šablóna a musí sa prispôsobiť vašej zostave.
+# Povinné pred prvým spustením: nakonfiguruj stanicu, rádio a audio.
+# Súbor z balíka je len šablóna a musí sa prispôsobiť tvojej zostave.
 sudo editor /etc/svxlink/svxlink.conf
 
 # Povolenie SvxLink pri štarte systému a jeho okamžité spustenie.
@@ -118,35 +118,35 @@ journalctl -u svxlink.service -f
 
 # Voliteľný grafický klient EchoLink (vyžaduje grafické prostredie):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Povinné:</strong> Nespúšťajte službu pred
-úpravou súboru <code>/etc/svxlink/svxlink.conf</code>. Nastavte aspoň
+<p class="note"><strong>Povinné:</strong> Nespúšťaj službu pred
+úpravou súboru <code>/etc/svxlink/svxlink.conf</code>. Nastav aspoň
 identifikáciu stanice, logiku, prijímač/vysielač a nastavenia audia/PTT
 pre svoj hardvér. Služba číta túto cestu cez <code>/etc/default/svxlink</code>.</p>
 <p class="note">Ak <code>apt update</code> hlási pre tento zdroj chybu 404,
-pre kódové meno vášho systému sa zatiaľ nezostavuje (pozri tabuľku nižšie) &mdash;
-zmeňte kódové meno v <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> na niektoré
+pre kódové meno tvojho systému sa zatiaľ nezostavuje (pozri tabuľku nižšie) &mdash;
+zmeň kódové meno v <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> na niektoré
 z podporovaných. Potom bežný príkaz <code>sudo apt upgrade</code>
 automaticky stiahne nové denné zostavenia (<code>main</code>) alebo nové vydania
 materského projektu (<code>release</code>).</p>
-<p class="note">Nepovoľujte oba komponenty súčasne, pokiaľ nechcete
+<p class="note">Nepovoľuj oba komponenty súčasne, pokiaľ nechceš
 denné zostavenia: tie majú vždy vyššiu verziu, takže by ich apt nainštaloval
-namiesto vydaní. Ak chcete prepnúť existujúcu inštaláciu z <code>main</code>
-na <code>release</code>, zmeňte komponent v
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, spustite
-<code>sudo apt update</code> a potom explicitne nainštalujte verziu vydania
+namiesto vydaní. Ak chceš prepnúť existujúcu inštaláciu z <code>main</code>
+na <code>release</code>, zmeň komponent v
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, spusti
+<code>sudo apt update</code> a potom explicitne nainštaluj verziu vydania
 (ide o downgrade, t.&nbsp;j. prechod na nižšiu verziu), napr.
 <code>sudo apt install svxlink=26.05.2-1~trixie</code>. Upozorňujeme, že v balíkoch
 <code>release</code> (nezmenený zdrojový kód materského projektu) nie sú skripty TCL
 v <code>/usr/share/svxlink</code> chránené ako konfiguračné
-súbory; lokálne zmeny ukladajte do <code>events.d/local/</code>.</p>
+súbory; lokálne zmeny ukladaj do <code>events.d/local/</code>.</p>
 
 <h2>Uplatnenie zmien konfigurácie</h2>
 <p>Po úprave <code>/etc/svxlink/svxlink.conf</code> (alebo ľubovoľného súboru modulu
 <code>/etc/svxlink/svxlink.d/*.conf</code>) na bežiacej
-stanici konfiguráciu znovu načítajte bez prerušenia aktívnej relácie:</p>
+stanici konfiguráciu znovu načítaj bez prerušenia aktívnej relácie:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Tým sa odošle signál <code>SIGHUP</code>, na ktorý SvxLink znovu načíta
-svoju konfiguráciu. Ak sa zdá, že opätovné načítanie zmenu neprevzalo, použite namiesto toho
+svoju konfiguráciu. Ak sa zdá, že opätovné načítanie zmenu neprevzalo, použi namiesto toho
 <code>sudo systemctl restart svxlink.service</code> (niektoré nastavenia, napríklad
 ktoré logické jadrá alebo zvukové zariadenia sa načítavajú, môžu vyžadovať úplný reštart).</p>
 

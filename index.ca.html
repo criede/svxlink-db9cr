@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Aquesta pàgina s’ha traduït automàticament amb intel·ligència artificial i pot contenir errors. La versió anglesa és la de referència. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Paquets de
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> per a Raspberry Pi OS
-i Debian, en dos components &mdash; trieu-ne un:</p>
+i Debian, en dos components &mdash; tria'n un:</p>
 <ul>
 <li><code>main</code>: compilacions de desenvolupament diàries a partir del codi font més recent
 d'aquest fork, no versions estables.</li>
@@ -71,7 +71,7 @@ posteriors), compilades a partir del codi font original sense modificar, amb la 
 configuració de compilació i les mateixes funcionalitats que els paquets diaris. Es conserven totes les versions;
 <code>apt upgrade</code> passa a cada nova versió del projecte original.</li>
 </ul>
-<p>Consulteu el <a href="https://github.com/criede/svxlink-db9cr">repositori de codi font</a>
+<p>Consulta el <a href="https://github.com/criede/svxlink-db9cr">repositori de codi font</a>
 per a més detalls.</p>
 
 <h2>Projecte original i canvis locals</h2>
@@ -79,20 +79,20 @@ per a més detalls.</p>
 <a href="https://github.com/sm0svx/svxlink">sm0svx/svxlink</a>, el
 projecte SvxLink original, amb empaquetament local i funcionalitats addicionals
 afegides al damunt (RTL-SDR, SipLogic, el paquet separat <code>qtel</code>,
-aquest repositori APT i més &mdash; vegeu
+aquest repositori APT i més &mdash; vegis
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>
 per a la llista completa). Per veure exactament què és diferent del projecte original en qualsevol
-moment, sense dependre d'una instantània d'aquí que quedi desactualitzada, compareu-ho
+moment, sense dependre d'una instantània d'aquí que quedi desactualitzada, compara-ho
 en directe a GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">master original&nbsp;&hellip;&nbsp;master d'aquest fork</a>.</p>
 
 <h2>Inici ràpid</h2>
-<p>Executeu-ho al sistema de destinació (detecta automàticament el nom en clau i l'arquitectura correctes):</p>
+<p>Executa-ho al sistema de destinació (detecta automàticament el nom en clau i l'arquitectura correctes):</p>
 <pre><code># Importar la clau pública de signatura
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
-# Afegir la font del repositori. Trieu el component:
+# Afegir la font del repositori. Tria el component:
 #   main     compilacions de desenvolupament diàries
 #   release  versions oficials del projecte original (26.05 i posteriors)
 component=release
@@ -104,8 +104,8 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Obligatori abans del primer inici: configureu l'estació, la ràdio i l'àudio.
-# El fitxer inclòs és només una plantilla i s'ha d'adaptar a la vostra instal·lació.
+# Obligatori abans del primer inici: configura l'estació, la ràdio i l'àudio.
+# El fitxer inclòs és només una plantilla i s'ha d'adaptar a la teva instal·lació.
 sudo editor /etc/svxlink/svxlink.conf
 
 # Habilitar SvxLink en l'arrencada i iniciar-lo ara.
@@ -118,42 +118,42 @@ journalctl -u svxlink.service -f
 
 # Client gràfic d'EchoLink opcional (necessita un entorn d'escriptori):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Obligatori:</strong> no inicieu el servei abans
-d'editar <code>/etc/svxlink/svxlink.conf</code>. Configureu com a mínim la identitat
-de l'estació, la lògica, el receptor/transmissor i els paràmetres d'àudio/PTT per al vostre maquinari.
+<p class="note"><strong>Obligatori:</strong> no iniciïs el servei abans
+d'editar <code>/etc/svxlink/svxlink.conf</code>. Configura com a mínim la identitat
+de l'estació, la lògica, el receptor/transmissor i els paràmetres d'àudio/PTT per al teu maquinari.
 El servei llegeix aquest camí a través de <code>/etc/default/svxlink</code>.</p>
 <p class="note">Si <code>apt update</code> informa d'un error 404 per a aquesta font, el
-nom en clau del vostre sistema encara no es compila (vegeu la taula següent) &mdash; en aquest cas, canvieu el
+nom en clau del teu sistema encara no es compila (vegis la taula següent) &mdash; en aquest cas, canvia el
 nom en clau a <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> per un dels
 que són compatibles. Després, un <code>sudo apt upgrade</code> habitual
 obté automàticament les noves compilacions diàries (<code>main</code>) o les noves versions del projecte original
 (<code>release</code>).</p>
-<p class="note">No habiliteu tots dos components alhora, tret que vulgueu les
+<p class="note">No habilitis tots dos components alhora, tret que vulguis les
 compilacions diàries: sempre tenen la versió més alta, de manera que apt les instal·laria
 en lloc de les versions oficials. Per canviar una instal·lació existent de <code>main</code>
-a <code>release</code>, canvieu el component a
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, executeu
-<code>sudo apt update</code> i després instal·leu explícitament la versió release
+a <code>release</code>, canvia el component a
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, executa
+<code>sudo apt update</code> i després instal·la explícitament la versió release
 (és un downgrade, és a dir, una versió inferior), per exemple
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Tingueu en compte que, als paquets
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Tingues en compte que, als paquets
 <code>release</code> (codi font original sense modificar), els scripts TCL
 de <code>/usr/share/svxlink</code> no estan protegits com a fitxers de
-configuració; deseu els canvis locals a <code>events.d/local/</code>.</p>
+configuració; desa els canvis locals a <code>events.d/local/</code>.</p>
 
 <h2>Aplicar canvis de configuració</h2>
 <p>Després d'editar <code>/etc/svxlink/svxlink.conf</code> (o qualsevol fitxer de mòdul
 <code>/etc/svxlink/svxlink.d/*.conf</code>) en una estació en funcionament,
-torneu-la a carregar sense interrompre una sessió activa:</p>
+torna-la a carregar sense interrompre una sessió activa:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Això envia el senyal <code>SIGHUP</code>, en rebre el qual SvxLink torna a llegir la seva
-configuració. Feu servir <code>sudo systemctl restart svxlink.service</code>
+configuració. Fes servir <code>sudo systemctl restart svxlink.service</code>
 en lloc d'això si una recàrrega no sembla aplicar un canvi (alguns paràmetres, com ara
 quins nuclis lògics o dispositius de so es carreguen, poden requerir un reinici complet).</p>
 
 <h2>Instal·lar una versió anterior</h2>
 <p>Les versions recents continuen disponibles al pool durant un temps després de ser
 substituïdes (una per dia durant una setmana, una per setmana durant un mes, una per mes durant un any &mdash;
-vegeu «Retention» (retenció) a
+vegis «Retention» (retenció) a
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
 de manera que normalment es pot tornar enrere després d'una compilació diària defectuosa. Els paquets de les versions del projecte original
 (component <code>release</code>) no s'eliminen mai:</p>

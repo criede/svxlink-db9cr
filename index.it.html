@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Questa pagina è stata tradotta automaticamente con l’intelligenza artificiale e può contenere errori. Fa fede la versione inglese. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Pacchetti di
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> per Raspberry Pi OS
-e Debian, in due componenti &mdash; sceglietene uno:</p>
+e Debian, in due componenti &mdash; scegline uno:</p>
 <ul>
 <li><code>main</code>: build di sviluppo giornaliere dai sorgenti più recenti di
 questo fork, non versioni stabili.</li>
@@ -71,7 +71,7 @@ successive), compilate dai sorgenti upstream non modificati con le stesse
 impostazioni di compilazione e funzionalità dei pacchetti giornalieri. Ogni versione viene conservata;
 <code>apt upgrade</code> passa a ogni nuova versione upstream.</li>
 </ul>
-<p>Consultate il <a href="https://github.com/criede/svxlink-db9cr">repository dei sorgenti</a>
+<p>Consulta il <a href="https://github.com/criede/svxlink-db9cr">repository dei sorgenti</a>
 per i dettagli.</p>
 
 <h2>Upstream e modifiche locali</h2>
@@ -82,17 +82,17 @@ aggiunte sopra (RTL-SDR, SipLogic, il pacchetto separato <code>qtel</code>,
 questo repository APT e altro ancora &mdash; vedere
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>
 per l'elenco completo). Per vedere esattamente cosa differisce da upstream in qualsiasi
-momento, senza affidarsi a un'istantanea che qui diventerebbe obsoleta, confrontate
+momento, senza affidarsi a un'istantanea che qui diventerebbe obsoleta, confronta
 in tempo reale su GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">master upstream&nbsp;&hellip;&nbsp;master di questo fork</a>.</p>
 
 <h2>Avvio rapido</h2>
-<p>Eseguite sul sistema di destinazione (rileva automaticamente il nome in codice e l'architettura corretti):</p>
+<p>Esegui sul sistema di destinazione (rileva automaticamente il nome in codice e l'architettura corretti):</p>
 <pre><code># Importare la chiave pubblica di firma
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
-# Aggiungere la sorgente del repository. Scegliete il componente:
+# Aggiungere la sorgente del repository. Scegli il componente:
 #   main     build di sviluppo giornaliere
 #   release  versioni ufficiali upstream (26.05 e successive)
 component=release
@@ -104,8 +104,8 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Obbligatorio prima del primo avvio: configurate stazione, radio e audio.
-# Il file fornito è solo un modello e deve essere adattato alla vostra configurazione.
+# Obbligatorio prima del primo avvio: configura stazione, radio e audio.
+# Il file fornito è solo un modello e deve essere adattato alla tua configurazione.
 sudo editor /etc/svxlink/svxlink.conf
 
 # Abilitare SvxLink all'avvio del sistema e avviarlo subito.
@@ -118,35 +118,35 @@ journalctl -u svxlink.service -f
 
 # Client EchoLink grafico opzionale (richiede un ambiente desktop):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Obbligatorio:</strong> non avviate il servizio prima di
-aver modificato <code>/etc/svxlink/svxlink.conf</code>. Configurate almeno l'identità
-della stazione, la logica, ricevitore/trasmettitore e le impostazioni audio/PTT per il vostro hardware.
+<p class="note"><strong>Obbligatorio:</strong> non avviare il servizio prima di
+aver modificato <code>/etc/svxlink/svxlink.conf</code>. Configura almeno l'identità
+della stazione, la logica, ricevitore/trasmettitore e le impostazioni audio/PTT per il tuo hardware.
 Il servizio legge questo percorso tramite <code>/etc/default/svxlink</code>.</p>
 <p class="note">Se <code>apt update</code> segnala un errore 404 per questa sorgente, il
-nome in codice del vostro sistema non viene ancora compilato (vedere la tabella sotto) &mdash; in tal caso modificate il
+nome in codice del tuo sistema non viene ancora compilato (vedere la tabella sotto) &mdash; in tal caso modifica il
 nome in codice in <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> in uno di
 quelli supportati. Successivamente, un normale <code>sudo apt upgrade</code>
 installa automaticamente le nuove build giornaliere (<code>main</code>) o le nuove versioni upstream
 (<code>release</code>).</p>
-<p class="note">Non abilitate entrambi i componenti contemporaneamente, a meno che non vogliate le
+<p class="note">Non abilitare entrambi i componenti contemporaneamente, a meno che tu non voglia le
 build giornaliere: hanno sempre la versione più alta, quindi apt le installerebbe
 al posto delle versioni ufficiali. Per passare un'installazione esistente da <code>main</code>
-a <code>release</code>, cambiate il componente in
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, eseguite
-<code>sudo apt update</code>, quindi installate esplicitamente la versione release
+a <code>release</code>, cambia il componente in
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, esegui
+<code>sudo apt update</code>, quindi installa esplicitamente la versione release
 (si tratta di un downgrade), ad es.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Tenete presente che nei pacchetti
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Tieni presente che nei pacchetti
 <code>release</code> (sorgenti upstream non modificati) gli script TCL
 in <code>/usr/share/svxlink</code> non sono protetti come file di
-configurazione; mantenete le modifiche locali in <code>events.d/local/</code>.</p>
+configurazione; mantieni le modifiche locali in <code>events.d/local/</code>.</p>
 
 <h2>Applicare modifiche alla configurazione</h2>
 <p>Dopo aver modificato <code>/etc/svxlink/svxlink.conf</code> (o un qualsiasi file di modulo
 <code>/etc/svxlink/svxlink.d/*.conf</code>) su una stazione in funzione,
-ricaricate la configurazione senza interrompere una sessione attiva:</p>
+ricarica la configurazione senza interrompere una sessione attiva:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Questo invia il segnale <code>SIGHUP</code>, alla ricezione del quale SvxLink rilegge la propria
-configurazione. Usate invece <code>sudo systemctl restart svxlink.service</code>
+configurazione. Usa invece <code>sudo systemctl restart svxlink.service</code>
 se un ricaricamento non sembra recepire una modifica (alcune impostazioni, come
 quali core logici o dispositivi audio vengono caricati, possono richiedere un riavvio completo).</p>
 

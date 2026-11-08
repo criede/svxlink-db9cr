@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Šis puslapis išverstas automatiškai naudojant dirbtinį intelektą ir gali turėti klaidų. Galiojanti yra angliška versija. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Projekto
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> paketai, skirti Raspberry Pi OS
-ir Debian, dviejuose komponentuose &mdash; pasirinkite vieną:</p>
+ir Debian, dviejuose komponentuose &mdash; pasirink vieną:</p>
 <ul>
 <li><code>main</code>: kasdieniai kūrimo versijų rinkiniai iš naujausio šios atšakos
 išeitinio kodo, o ne stabilios laidos.</li>
@@ -71,7 +71,7 @@ naujesnės), sukompiliuotos iš nepakeisto pirminės laidos išeitinio kodo su t
 kompiliavimo nustatymais ir funkcijomis kaip kasdieniai paketai. Saugomos visos laidos;
 <code>apt upgrade</code> pereina prie kiekvienos naujos pirminės laidos.</li>
 </ul>
-<p>Daugiau informacijos rasite <a href="https://github.com/criede/svxlink-db9cr">išeitinio kodo saugykloje</a>.
+<p>Daugiau informacijos rasi <a href="https://github.com/criede/svxlink-db9cr">išeitinio kodo saugykloje</a>.
 </p>
 
 <h2>Pirminis projektas ir vietiniai pakeitimai</h2>
@@ -79,20 +79,20 @@ kompiliavimo nustatymais ir funkcijomis kaip kasdieniai paketai. Saugomos visos 
 <a href="https://github.com/sm0svx/svxlink">sm0svx/svxlink</a>, kuris yra
 originalus SvxLink projektas, su papildomai pridėtu vietiniu pakavimu ir
 funkcijomis (RTL-SDR, SipLogic, atskiras <code>qtel</code> paketas,
-ši APT saugykla ir kita &mdash; visą sąrašą rasite faile
+ši APT saugykla ir kita &mdash; visą sąrašą rasi faile
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>).
-Norėdami bet kuriuo metu tiksliai pamatyti, kuo ji skiriasi nuo pirminio projekto,
-nepasikliaudami čia pateikta ir pasenti galinčia momentine kopija, palyginkite
+Norint bet kuriuo metu tiksliai pamatyti, kuo ji skiriasi nuo pirminio projekto,
+nepasikliaujant čia pateikta ir pasenti galinčia momentine kopija, palygink
 tiesiogiai GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">pirminio projekto master&nbsp;&hellip;&nbsp;šios atšakos master</a>.</p>
 
 <h2>Greita pradžia</h2>
-<p>Vykdykite tikslinėje sistemoje (tinkamas kodinis pavadinimas / architektūra nustatomi automatiškai):</p>
-<pre><code># Importuokite viešąjį pasirašymo raktą
+<p>Vykdyk tikslinėje sistemoje (tinkamas kodinis pavadinimas / architektūra nustatomi automatiškai):</p>
+<pre><code># Importuok viešąjį pasirašymo raktą
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
-# Pridėkite saugyklos šaltinį. Pasirinkite komponentą:
+# Pridėk saugyklos šaltinį. Pasirink komponentą:
 #   main     kasdieniai kūrimo versijų rinkiniai
 #   release  oficialios pirminio projekto laidos (26.05 ir naujesnės)
 component=release
@@ -104,49 +104,49 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Privaloma prieš pirmąjį paleidimą: sukonfigūruokite savo stotį, radijo stotį ir garsą.
+# Privaloma prieš pirmąjį paleidimą: sukonfigūruok savo stotį, radijo stotį ir garsą.
 # Pakete pateiktas failas yra tik šablonas, jį būtina pritaikyti savo įrangai.
 sudo editor /etc/svxlink/svxlink.conf
 
-# Įjunkite SvxLink paleidimą įkrovos metu ir paleiskite jį dabar.
+# Įjunk SvxLink paleidimą įkrovos metu ir paleisk jį dabar.
 sudo systemctl daemon-reload
 sudo systemctl enable --now svxlink.service
 
-# Patikrinkite tarnybos būseną ir stebėkite jos žurnalą.
+# Patikrink tarnybos būseną ir stebėk jos žurnalą.
 systemctl status svxlink.service
 journalctl -u svxlink.service -f
 
 # Pasirenkamas grafinis EchoLink klientas (reikia darbalaukio aplinkos):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Būtina:</strong> Nepaleiskite tarnybos, kol
-nepakeitėte failo <code>/etc/svxlink/svxlink.conf</code>. Sukonfigūruokite bent stoties
+<p class="note"><strong>Būtina:</strong> Nepaleisk tarnybos, kol
+nepakeitei failo <code>/etc/svxlink/svxlink.conf</code>. Sukonfigūruok bent stoties
 identifikaciją, logiką, imtuvą/siųstuvą ir garso/PTT nustatymus pagal savo aparatinę įrangą.
 Tarnyba šį kelią nuskaito per <code>/etc/default/svxlink</code>.</p>
-<p class="note">Jei <code>apt update</code> šiam šaltiniui praneša klaidą 404, jūsų
+<p class="note">Jei <code>apt update</code> šiam šaltiniui praneša klaidą 404, tavo
 sistemos kodiniam pavadinimui paketai dar nekompiliuojami (žr. lentelę žemiau) &mdash; vietoj to
-faile <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> pakeiskite kodinį pavadinimą į vieną iš
+faile <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> pakeisk kodinį pavadinimą į vieną iš
 palaikomų. Vėliau įprastas <code>sudo apt upgrade</code>
 automatiškai įdiegs naujus kasdienius rinkinius (<code>main</code>) arba naujas pirminio projekto laidas
 (<code>release</code>).</p>
-<p class="note">Neįjunkite abiejų komponentų vienu metu, nebent norite
+<p class="note">Neįjunk abiejų komponentų vienu metu, nebent nori
 kasdienių rinkinių: jų versija visada aukštesnė, todėl apt juos įdiegtų
-vietoj laidų. Norėdami esamą įdiegtį perjungti iš <code>main</code>
-į <code>release</code>, pakeiskite komponentą faile
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, paleiskite
-<code>sudo apt update</code>, tada aiškiai nurodę įdiekite laidos versiją
+vietoj laidų. Norint esamą įdiegtį perjungti iš <code>main</code>
+į <code>release</code>, pakeisk komponentą faile
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, paleisk
+<code>sudo apt update</code>, tada aiškiai nurodant įdiek laidos versiją
 (tai yra versijos pažeminimas), pvz.,
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Atkreipkite dėmesį, kad
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Atkreipk dėmesį, kad
 <code>release</code> paketuose (nepakeistas pirminio projekto išeitinis kodas) TCL scenarijai
 kataloge <code>/usr/share/svxlink</code> nėra apsaugoti kaip konfigūracijos
-failai; vietinius pakeitimus laikykite kataloge <code>events.d/local/</code>.</p>
+failai; vietinius pakeitimus laikyk kataloge <code>events.d/local/</code>.</p>
 
 <h2>Konfigūracijos pakeitimų pritaikymas</h2>
-<p>Pakeitę failą <code>/etc/svxlink/svxlink.conf</code> (arba bet kurį
+<p>Pakeitus failą <code>/etc/svxlink/svxlink.conf</code> (arba bet kurį
 <code>/etc/svxlink/svxlink.d/*.conf</code> modulio failą) veikiančioje
-stotyje, iš naujo įkelkite jį nenutraukdami aktyvaus seanso:</p>
+stotyje, iš naujo įkelk jį nenutraukiant aktyvaus seanso:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Tai išsiunčia signalą <code>SIGHUP</code>, kurį gavęs SvxLink iš naujo nuskaito savo
-konfigūraciją. Jei atrodo, kad pakartotinis įkėlimas pakeitimo nepritaikė, vietoj to naudokite
+konfigūraciją. Jei atrodo, kad pakartotinis įkėlimas pakeitimo nepritaikė, vietoj to naudok
 <code>sudo systemctl restart svxlink.service</code>
 (kai kuriems nustatymams, pvz., kurie logikos branduoliai ar garso įrenginiai įkeliami,
 gali reikėti visiško paleidimo iš naujo).</p>

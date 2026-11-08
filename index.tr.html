@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Bu sayfa yapay zekâ ile otomatik olarak çevrilmiştir ve hatalar içerebilir. Esas alınan sürüm İngilizce sürümdür. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Raspberry Pi OS ve Debian için
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> paketleri,
-iki bileşen hâlinde &mdash; birini seçin:</p>
+iki bileşen hâlinde &mdash; birini seç:</p>
 <ul>
 <li><code>main</code>: bu fork'un en güncel kaynak kodundan oluşturulan günlük
 geliştirme derlemeleri; kararlı sürümler değildir.</li>
@@ -72,7 +72,7 @@ aynı derleme ayarları ve özelliklerle derlenir. Her sürüm saklanır;
 <code>apt upgrade</code> her yeni upstream sürümüne geçer.</li>
 </ul>
 <p>Ayrıntılar için <a href="https://github.com/criede/svxlink-db9cr">kaynak kod deposuna</a>
-bakın.</p>
+bak.</p>
 
 <h2>Upstream ve yerel değişiklikler</h2>
 <p>Bu, özgün SvxLink projesi olan
@@ -81,18 +81,18 @@ günlük olarak senkronize edilen bir fork'udur; üzerine yerel paketleme ve ek
 özellikler eklenmiştir (RTL-SDR, SipLogic, ayrı <code>qtel</code> paketi,
 bu APT deposu ve daha fazlası &mdash; tam liste için
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>
-dosyasına bakın). Herhangi bir anda upstream'den tam olarak neyin farklı olduğunu,
+dosyasına bak). Herhangi bir anda upstream'den tam olarak neyin farklı olduğunu,
 burada eskiyebilecek bir anlık görüntüye güvenmeden görmek için GitHub'da canlı
-olarak karşılaştırın:
+olarak karşılaştır:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;bu fork'un master'ı</a>.</p>
 
 <h2>Hızlı başlangıç</h2>
-<p>Hedef sistemde çalıştırın (doğru kod adını/mimariyi otomatik olarak algılar):</p>
-<pre><code># Genel imzalama anahtarını içe aktarın
+<p>Hedef sistemde çalıştır (doğru kod adını/mimariyi otomatik olarak algılar):</p>
+<pre><code># Genel imzalama anahtarını içe aktar
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
-# Depo kaynağını ekleyin. Bileşeni seçin:
+# Depo kaynağını ekle. Bileşeni seç:
 #   main     günlük geliştirme derlemeleri
 #   release  resmî upstream sürümleri (26.05 ve daha yenisi)
 component=release
@@ -104,50 +104,50 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# İlk başlatmadan önce zorunlu: istasyonunuzu, telsizinizi ve ses ayarlarınızı yapılandırın.
-# Paketle gelen dosya yalnızca bir şablondur ve kendi kurulumunuza uyarlanmalıdır.
+# İlk başlatmadan önce zorunlu: istasyonunu, telsizini ve ses ayarlarını yapılandır.
+# Paketle gelen dosya yalnızca bir şablondur ve kendi kurulumuna uyarlanmalıdır.
 sudo editor /etc/svxlink/svxlink.conf
 
-# SvxLink'i açılışta etkinleştirin ve şimdi başlatın.
+# SvxLink'i açılışta etkinleştir ve şimdi başlat.
 sudo systemctl daemon-reload
 sudo systemctl enable --now svxlink.service
 
-# Servis durumunu kontrol edin ve günlüğünü izleyin.
+# Servis durumunu kontrol et ve günlüğünü izle.
 systemctl status svxlink.service
 journalctl -u svxlink.service -f
 
 # İsteğe bağlı grafik EchoLink istemcisi (masaüstü ortamı gerektirir):
 # sudo apt install qtel</code></pre>
 <p class="note"><strong>Zorunlu:</strong> <code>/etc/svxlink/svxlink.conf</code>
-dosyasını düzenlemeden önce servisi başlatmayın. Donanımınız için en azından
-istasyon kimliğini, mantığı (logic), alıcı/verici ve ses/PTT ayarlarını yapılandırın.
+dosyasını düzenlemeden önce servisi başlatma. Donanımın için en azından
+istasyon kimliğini, mantığı (logic), alıcı/verici ve ses/PTT ayarlarını yapılandır.
 Servis bu yolu <code>/etc/default/svxlink</code> üzerinden okur.</p>
-<p class="note"><code>apt update</code> bu kaynak için 404 bildirirse, sisteminizin
-kod adı için henüz paket derlenmiyordur (aşağıdaki tabloya bakın) &mdash; bunun yerine
+<p class="note"><code>apt update</code> bu kaynak için 404 bildirirse, sisteminin
+kod adı için henüz paket derlenmiyordur (aşağıdaki tabloya bak) &mdash; bunun yerine
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> dosyasındaki kod adını
-desteklenenlerden biriyle değiştirin. Ardından, olağan bir <code>sudo apt upgrade</code>
+desteklenenlerden biriyle değiştir. Ardından, olağan bir <code>sudo apt upgrade</code>
 yeni günlük derlemeleri (<code>main</code>) veya yeni upstream sürümlerini
 (<code>release</code>) otomatik olarak alır.</p>
-<p class="note">Günlük derlemeleri istemiyorsanız iki bileşeni aynı anda
-etkinleştirmeyin: bunlar her zaman daha yüksek sürüm numarasına sahiptir, bu yüzden
+<p class="note">Günlük derlemeleri istemiyorsan iki bileşeni aynı anda
+etkinleştirme: bunlar her zaman daha yüksek sürüm numarasına sahiptir, bu yüzden
 apt bunları sürümlerin yerine kurar. Mevcut bir kurulumu <code>main</code>
 bileşeninden <code>release</code> bileşenine geçirmek için
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> dosyasındaki bileşeni değiştirin,
-<code>sudo apt update</code> komutunu çalıştırın, ardından release sürümünü açıkça kurun
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> dosyasındaki bileşeni değiştir,
+<code>sudo apt update</code> komutunu çalıştır, ardından release sürümünü açıkça kur
 (bu bir sürüm düşürmedir, yani downgrade), örn.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Şunu unutmayın:
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Şunu unutma:
 <code>release</code> paketlerinde (değiştirilmemiş upstream kaynak kodu)
 <code>/usr/share/svxlink</code> altındaki TCL betikleri yapılandırma dosyası
-olarak korunmaz; yerel değişikliklerinizi <code>events.d/local/</code> içinde tutun.</p>
+olarak korunmaz; yerel değişikliklerini <code>events.d/local/</code> içinde tut.</p>
 
 <h2>Yapılandırma değişikliklerini uygulama</h2>
 <p>Çalışan bir istasyonda <code>/etc/svxlink/svxlink.conf</code> dosyasını (veya herhangi bir
 <code>/etc/svxlink/svxlink.d/*.conf</code> modül dosyasını) düzenledikten sonra,
-etkin bir oturumu kesmeden yapılandırmayı yeniden yükleyin:</p>
+etkin bir oturumu kesmeden yapılandırmayı yeniden yükle:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Bu komut, SvxLink'in yapılandırmasını yeniden okumasını sağlayan <code>SIGHUP</code>
 sinyalini gönderir. Yeniden yükleme bir değişikliği almıyor gibi görünüyorsa bunun yerine
-<code>sudo systemctl restart svxlink.service</code> kullanın (hangi mantık
+<code>sudo systemctl restart svxlink.service</code> kullan (hangi mantık
 çekirdeklerinin veya ses aygıtlarının yükleneceği gibi bazı ayarlar tam bir yeniden başlatma gerektirebilir).</p>
 
 <h2>Eski bir sürümü kurma</h2>
@@ -187,7 +187,7 @@ paketlerle aynı özellikleri içerir.</p>
 <p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; yukarıdaki hızlı başlangıç
 komutlarıyla otomatik olarak içe aktarılır.</p>
 
-<h2>Depo dosyalarına göz atın</h2>
+<h2>Depo dosyalarına göz at</h2>
 <p><a href="dists/">dists/</a> (suite başına dizinler, Release dosyaları, Packages
 listeleri) &middot; <a href="pool/">pool/</a> (asıl <code>.deb</code>
 dosyaları) &middot; GitHub'daki <a href="https://github.com/criede/svxlink-db9cr">kaynak

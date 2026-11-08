@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Dës Säit gouf automatesch mat kënschtlecher Intelligenz iwwersat a ka Feeler enthalen. Déi englesch Versioun ass déi mossgeeblech. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Pakete vun
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> fir Raspberry Pi OS
-an Debian, an zwou Komponenten &mdash; wielt der eng aus:</p>
+an Debian, an zwou Komponenten &mdash; wiel der eng aus:</p>
 <ul>
 <li><code>main</code>: deeglech Entwécklungs-Builds aus dem neiste Quellcode vun
 dësem Fork, keng stabil Releases.</li>
@@ -71,7 +71,7 @@ méi nei), gebaut aus dem onverännerte Upstream-Release-Quellcode mat deene sel
 Build-Astellungen a Funktiounen wéi déi deeglech Paketen. All Release gëtt behalen;
 <code>apt upgrade</code> wiesselt all Kéier op dat neit Upstream-Release.</li>
 </ul>
-<p>Detailer fannt Dir am <a href="https://github.com/criede/svxlink-db9cr">Quellcode-Repository</a>.</p>
+<p>Detailer fënns du am <a href="https://github.com/criede/svxlink-db9cr">Quellcode-Repository</a>.</p>
 
 <h2>Upstream an lokal Ännerungen</h2>
 <p>Dëst ass en deeglech synchroniséierte Fork vun
@@ -80,7 +80,7 @@ ursprénglechen SvxLink-Projet, mat eegener Paketéierung an zousätzleche Funkt
 doriwwer (RTL-SDR, SipLogic, de separate Paket <code>qtel</code>,
 dëse APT-Repository a méi &mdash; déi komplett Lëscht steet an
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>). Fir zu all Moment genee ze gesinn, wat sech vum Upstream ënnerscheet,
-ouni sech op eng Momentopnam hei ze verloossen, déi veralt, vergläicht
+ouni dech op eng Momentopnam hei ze verloossen, déi veralt, vergläich
 live op GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">Upstream-master&nbsp;&hellip;&nbsp;master vun dësem Fork</a>.</p>
 
@@ -103,7 +103,7 @@ sudo apt update
 sudo apt install svxlink
 
 # Obligatoresch virum éischte Start: Statioun, Funkgerät an Audio konfiguréieren.
-# De matgeliwwerte Fichier ass nëmmen eng Schabloun a muss un Är Installatioun ugepasst ginn.
+# De matgeliwwerte Fichier ass nëmmen eng Schabloun a muss un deng Installatioun ugepasst ginn.
 sudo editor /etc/svxlink/svxlink.conf
 
 # SvxLink beim Booten aktivéieren an elo starten.
@@ -116,42 +116,42 @@ journalctl -u svxlink.service -f
 
 # Optionalen grafeschen EchoLink-Client (brauch eng Desktop-Ëmgebung):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Obligatoresch:</strong> Startt de Service net, ier Dir
-<code>/etc/svxlink/svxlink.conf</code> beaarbecht hutt. Konfiguréiert op d'mannst d'Identitéit
-vun der Statioun, d'Logik, Empfänger/Sender an d'Audio-/PTT-Astellunge fir Är Hardware.
+<p class="note"><strong>Obligatoresch:</strong> Start de Service net, ier s du
+<code>/etc/svxlink/svxlink.conf</code> beaarbecht hues. Konfiguréier op d'mannst d'Identitéit
+vun der Statioun, d'Logik, Empfänger/Sender an d'Audio-/PTT-Astellunge fir deng Hardware.
 De Service liest dëse Pfad iwwer <code>/etc/default/svxlink</code>.</p>
 <p class="note">Wann <code>apt update</code> fir dës Quell en 404 mellt, gëtt de
-Codename vun Ärem System nach net gebaut (kuckt d'Tabell hei ënnen) &mdash; ännert dann de
+Codename vun dengem System nach net gebaut (kuck d'Tabell hei ënnen) &mdash; änner dann de
 Codename an <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> op ee vun
 deenen ënnerstëtzten. Duerno hëlt en normalt <code>sudo apt upgrade</code>
 automatesch nei deeglech Builds (<code>main</code>) oder nei Upstream-Releases
 (<code>release</code>).</p>
-<p class="note">Aktivéiert net béid Komponenten gläichzäiteg, ausser Dir wëllt déi
+<p class="note">Aktivéier net béid Komponenten gläichzäiteg, ausser du wëlls déi
 deeglech Builds: Si hunn ëmmer déi méi héich Versioun, dofir géif apt se
 amplaz vun de Releases installéieren. Fir eng bestehend Installatioun vu <code>main</code>
-op <code>release</code> ëmzestellen, ännert de Komponent an
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, féiert
-<code>sudo apt update</code> aus an installéiert dann d'Release-Versioun explizit
+op <code>release</code> ëmzestellen, änner de Komponent an
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, féier
+<code>sudo apt update</code> aus an installéier dann d'Release-Versioun explizit
 (et ass en Downgrade), z.&nbsp;B.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Notéiert, datt an
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Notéier, datt an
 <code>release</code>-Paketen (onverännerten Upstream-Quellcode) d'TCL-Skripter
 ënner <code>/usr/share/svxlink</code> net als Konfiguratiounsfichiere geschützt
-sinn; leet lokal Ännerungen an <code>events.d/local/</code> of.</p>
+sinn; lee lokal Ännerungen an <code>events.d/local/</code> of.</p>
 
 <h2>Konfiguratiounsännerungen iwwerhuelen</h2>
-<p>Nodeems Dir <code>/etc/svxlink/svxlink.conf</code> (oder e
+<p>Nodeems s du <code>/etc/svxlink/svxlink.conf</code> (oder e
 Modulfichier <code>/etc/svxlink/svxlink.d/*.conf</code>) op enger lafender
-Statioun beaarbecht hutt, luet d'Konfiguratioun nei, ouni eng aktiv Sessioun ofzebriechen:</p>
+Statioun beaarbecht hues, lued d'Konfiguratioun nei, ouni eng aktiv Sessioun ofzebriechen:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Dëst schéckt <code>SIGHUP</code>, op dat hin SvxLink seng
-Konfiguratioun nei aliest. Benotzt amplaz <code>sudo systemctl restart svxlink.service</code>,
+Konfiguratioun nei aliest. Benotz amplaz <code>sudo systemctl restart svxlink.service</code>,
 wann e Reload eng Ännerung schéngbar net iwwerhëlt (verschidden Astellungen, wéi zum Beispill
 wéi eng Logik-Kären oder Tounapparater geluede ginn, kënnen e komplette Restart brauchen).</p>
 
 <h2>Eng méi al Versioun installéieren</h2>
 <p>Rezent Versioune bleiwen nach eng Zäit am Pool disponibel, nodeems se
 ersat goufen (deeglech fir eng Woch, wöchentlech fir ee Mount, monatlech fir ee Joer &mdash;
-kuckt „Retention“ (Bewaardauer) an
+kuck „Retention“ (Bewaardauer) an
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
 sou datt e schlechten deegleche Build normalerweis zréckgesat ka ginn. Pakete vun Upstream-Releases
 (Komponent <code>release</code>) ginn ni geläscht:</p>
