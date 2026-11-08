@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Runs in a disposable native Debian/Ubuntu container, without a GitHub token.
+# Runs in a disposable Debian/Raspbian/Ubuntu container of the target
+# architecture (native, or QEMU-emulated for 32-bit ARM), without a GitHub
+# token.
 # The target architecture and distribution codename are taken from the
 # container itself, so the same script builds packages for other Raspberry
 # Pi OS/Debian/Ubuntu versions and architectures by simply running it in a
@@ -13,6 +15,12 @@ arch=$(dpkg --print-architecture)
 # shell code if it ever contained anything else.
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 [[ "$codename" =~ ^[a-z0-9]+$ ]]
+# "debian" or "raspbian": 32-bit ARM (armhf) is built in a Raspbian
+# container rather than Debian's own armhf, since Raspbian targets
+# ARMv6+VFP and so also runs on the Raspberry Pi 1/Zero/Zero W, which
+# Debian armhf (ARMv7) does not. The result installs on Debian armhf too.
+os_id=$(sed -n 's/^ID=//p' /etc/os-release | tr -d '"')
+[[ "$os_id" =~ ^[a-z0-9]+$ ]]
 apt-get update
 apt-get install -y --no-install-recommends \
   ca-certificates git cmake build-essential pkg-config dpkg-dev file \
@@ -107,10 +115,18 @@ cmake -S /source/src -B /build \
 # and ladspa-sdk above are meant to make them mandatory for this package,
 # so fail loudly instead of shipping a silently degraded build if any of
 # them was not actually detected.
-! grep -q "without it but support for the Speex audio codec" /build/configure.log
-! grep -q "without it but support for the Opus audio codec" /build/configure.log
-! grep -q "without it but support for loading LADSPA plugins" /build/configure.log
-! grep -q "Accessing GPIO pins using GPIOD will be unavailable" /build/configure.log
+# Written as explicit ifs rather than "! grep -q ...": bash deliberately
+# ignores errexit for a command negated with "!", so that form never fails.
+for missing_feature_msg in \
+  "without it but support for the Speex audio codec" \
+  "without it but support for the Opus audio codec" \
+  "without it but support for loading LADSPA plugins" \
+  "Accessing GPIO pins using GPIOD will be unavailable"; do
+  if grep -qF "$missing_feature_msg" /build/configure.log; then
+    echo "Required optional feature not detected: $missing_feature_msg" >&2
+    exit 1
+  fi
+done
 
 cmake --build /build --parallel "$(nproc)"
 
@@ -142,6 +158,15 @@ grep -q '/SipLogic\.so' <<< "$package_contents"
 printf '%s\n' "$version" > /output/VERSION
 printf '%s\n' "$codename" > /output/SUITE
 printf '%s\n' "$arch" > /output/ARCH
+if [[ "$os_id" == raspbian ]]; then
+  build_env_note="- Built in a clean Raspbian ${codename} (ARMv6+VFP) container, so it runs on
+  every Raspberry Pi model with 32-bit Raspberry Pi OS (including Pi 1/Zero/
+  Zero W) and also installs on Debian ${codename} armhf; package installation
+  is smoke-tested in clean Raspbian and Debian containers."
+else
+  build_env_note="- Built in a clean Debian ${codename} container; package installation is
+  smoke-tested in a clean container."
+fi
 cat > /output/BUILD-INFO.MD <<EOF
 Daily development build of svxlink-db9cr, not a stable release.
 
@@ -157,7 +182,7 @@ Daily development build of svxlink-db9cr, not a stable release.
   it conflicts with the distro's librtlsdr0/rtl-sdr packages.
 - Contributed SipLogic logic core enabled, linked against a from-source
   PJSIP/pjproject build (statically linked into SipLogic.so).
-- Built natively in Debian ${codename}; package installation is smoke-tested in a clean container.
+${build_env_note}
 - Radio hardware and audio operation have not been tested by CI.
 
 Install with \`sudo apt install ./svxlink_*.deb\` after downloading the package
@@ -265,4 +290,8 @@ dpkg-deb --build --root-owner-group "$qtel_pkgroot" \
 dpkg-deb -f "/output/qtel_${version}_${arch}.deb" Depends
 
 cd /output
-sha256sum ./*.deb > SHA256SUMS
+# Per-architecture name: all architectures of one suite share the same
+# daily prerelease (the tag is derived from the version, which carries the
+# suite but not the architecture), so a plain "SHA256SUMS" asset would be
+# overwritten by whichever architecture is published last.
+sha256sum ./*.deb > "SHA256SUMS-${arch}"

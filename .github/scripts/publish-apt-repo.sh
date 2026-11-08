@@ -154,8 +154,8 @@ repo_slug="${GITHUB_REPOSITORY:-criede/svxlink-db9cr}"
 # suites (added to the matrix but not yet listed here) just show their
 # codename without an extra description.
 declare -A suite_labels=(
-  [bookworm]="Debian 12 / Raspberry Pi OS Bookworm"
-  [trixie]="Debian 13 / Raspberry Pi OS Trixie"
+  [bookworm]="Debian 12 / Raspberry Pi OS Bookworm (64- and 32-bit)"
+  [trixie]="Debian 13 / Raspberry Pi OS Trixie (64- and 32-bit)"
 )
 
 suite_rows=""
@@ -295,8 +295,13 @@ ${package_rows}</table>
 <table>
 <tr><th>Codename</th><th>Matches</th><th>Architectures</th></tr>
 ${suite_rows}</table>
-
-<h2>Signing key</h2>
+<p class="note"><strong>32-bit systems:</strong> <code>armhf</code> packages
+are built against Raspbian (ARMv6+VFP), the base of 32-bit Raspberry Pi OS,
+so they run on every Raspberry Pi model including the Pi&nbsp;1, Zero and
+Zero&nbsp;W, and also install on Debian <code>armhf</code> (both are tested).
+<code>i386</code> (32-bit PCs) is built for Debian&nbsp;12 only: Debian&nbsp;13
+no longer supports installing i386 systems. The 32-bit packages contain the
+same features as the 64-bit ones.</p>
 <p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; imported automatically by the
 quickstart commands above.</p>
 

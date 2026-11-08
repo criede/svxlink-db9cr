@@ -7,6 +7,29 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- Daily packages are now also built for the 32-bit variants of the
+  supported systems: `armhf` for bookworm and trixie (32-bit Raspberry Pi
+  OS and Debian armhf) and `i386` for bookworm (Debian 12 on 32-bit PCs;
+  Debian 13 no longer supports installing i386). `armhf` is built in a
+  Raspbian container created per run with `mmdebstrap` (vendored,
+  fingerprint-checked archive key) under QEMU user-mode emulation, so the
+  packages target ARMv6+VFP and run on every Raspberry Pi including the
+  Pi 1/Zero/Zero W; they are installation-tested in both Raspbian and
+  Debian armhf. `i386` builds natively on an amd64 runner.
+- The build legs now run in parallel with `fail-fast: false` and hand
+  their packages over as short-lived Actions artifacts to a single new
+  `publish-daily-deb` job, which publishes every successful leg to the
+  prereleases and the APT repository in one `gh-pages` commit, replacing
+  the previous strictly sequential (`max-parallel: 1`) matrix. The
+  checksum file in the shared per-suite prerelease is now named
+  `SHA256SUMS-<arch>`, since the architectures of one suite previously
+  overwrote each other's `SHA256SUMS`; the prerelease title now names
+  the suite only.
+- Fixed the installation test's `ldd` checks and the build's
+  "required optional feature detected" checks, which could never fail:
+  they were written as `! cmd | grep -q ...`, and bash ignores `errexit`
+  for a pipeline negated with `!`. The installation test is now a
+  separate script, `.github/scripts/test-daily-deb.sh`.
 - Fixed a `gfs-retention.sh` bug where several builds sharing the exact
   same date (repeated manual `workflow_dispatch` runs on one day, a
   retry) were collapsed down to just one, since the "keep the newest per

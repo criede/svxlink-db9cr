@@ -54,16 +54,19 @@ afterwards.
 ## Daily package for Raspberry Pi OS and Debian
 
 After every successful sync, the `daily-deb` job runs as a matrix over all
-currently maintained Debian-based target versions and architectures, each
-in a native `debian:<suite>-slim` container on a runner matching the
-target architecture (no QEMU emulation):
+currently maintained Debian-based target versions and architectures,
+including every 32-bit variant those releases still ship as an
+installable OS:
 
-| Suite      | Debian version        | Architecture | Runner            | Covers |
-|------------|------------------------|--------------|--------------------|--------|
-| `bookworm` | Debian 12 (oldstable) | `arm64`      | `ubuntu-24.04-arm` | Raspberry Pi OS Bookworm, Debian 12 (arm64) |
-| `trixie`   | Debian 13 (stable)    | `arm64`      | `ubuntu-24.04-arm` | Raspberry Pi OS Trixie, Debian 13 (arm64) |
-| `bookworm` | Debian 12 (oldstable) | `amd64`      | `ubuntu-24.04`     | Debian 12 on Intel/AMD (amd64) |
-| `trixie`   | Debian 13 (stable)    | `amd64`      | `ubuntu-24.04`     | Debian 13 on Intel/AMD (amd64) |
+| Suite      | Debian version        | Architecture | Build image | Runner | Covers |
+|------------|------------------------|--------------|-------------|--------|--------|
+| `bookworm` | Debian 12 (oldstable) | `arm64`      | `debian:bookworm-slim` | `ubuntu-24.04-arm` (native) | Raspberry Pi OS Bookworm 64-bit, Debian 12 arm64 |
+| `trixie`   | Debian 13 (stable)    | `arm64`      | `debian:trixie-slim`   | `ubuntu-24.04-arm` (native) | Raspberry Pi OS Trixie 64-bit, Debian 13 arm64 |
+| `bookworm` | Debian 12 (oldstable) | `amd64`      | `debian:bookworm-slim` | `ubuntu-24.04` (native)     | Debian 12 on Intel/AMD (amd64) |
+| `trixie`   | Debian 13 (stable)    | `amd64`      | `debian:trixie-slim`   | `ubuntu-24.04` (native)     | Debian 13 on Intel/AMD (amd64) |
+| `bookworm` | Debian 12 (oldstable) | `i386`       | `debian:bookworm-slim` | `ubuntu-24.04` (native 32-bit userland) | Debian 12 on 32-bit PCs (i386) |
+| `bookworm` | Debian 12 (oldstable) | `armhf`      | Raspbian bookworm (built locally) | `ubuntu-24.04` (QEMU) | Raspberry Pi OS Bookworm 32-bit (all Pi models), Debian 12 armhf |
+| `trixie`   | Debian 13 (stable)    | `armhf`      | Raspbian trixie (built locally)   | `ubuntu-24.04` (QEMU) | Raspberry Pi OS Trixie 32-bit (all Pi models), Debian 13 armhf |
 
 Debian and Raspberry Pi OS share the same package base per codename (same
 library versions, same ABI); one build per suite/architecture therefore
@@ -73,10 +76,46 @@ these Debian versions changes support status (e.g. a new Debian version
 becomes stable), the matrix in `.github/workflows/build-and-publish.yml` is
 adjusted accordingly — older entries removed, new ones added.
 
-The matrix legs deliberately run sequentially (`max-parallel: 1`), since
-the publish step commits to the shared `gh-pages` branch and a parallel
-push there would be race-prone. Each leg builds exactly the commit output
-by the sync; on the daily schedule this whole job is skipped rather than
+32-bit specifics:
+
+- **armhf** is built in a Raspbian container instead of Debian's own
+  `armhf`: 32-bit Raspberry Pi OS is Raspbian, which targets ARMv6+VFP,
+  whereas Debian `armhf` targets ARMv7 — a Debian-built `armhf` package
+  would install on a Raspberry Pi 1/Zero/Zero W but crash there with
+  "Illegal instruction". The Raspbian build runs on every Pi and also
+  installs on Debian `armhf` (same package names, same ABI; `dpkg-shlibdeps`
+  only emits minimum versions both archives satisfy), so the installation
+  test runs in both a Raspbian and a `debian:<suite>-slim` `linux/arm/v7`
+  container. There is no official Raspbian image on Docker Hub, so the
+  workflow creates one per run with `mmdebstrap` from
+  `http://raspbian.raspberrypi.com/raspbian` (the mirror Raspberry Pi OS
+  itself uses; it offers no HTTPS, integrity comes from the signed
+  `InRelease`) and `docker import`s it. Raspbian's archive key is vendored
+  as `.github/keys/raspbian-archive-keyring.asc` (fingerprint
+  `A0DA38D0D76E8B5D638872819165938D90FDDD2E`, checked by the workflow)
+  rather than fetched at build time. GitHub's arm64 runners cannot execute
+  32-bit ARM code, so these legs run under QEMU user-mode emulation
+  (Ubuntu's `qemu-user-static`, no third-party action) on an amd64
+  runner, which makes them several times slower than the native legs
+  (timeout 300 instead of 45 minutes).
+- **i386** is built for bookworm only: Debian 13 dropped i386 as an
+  installable architecture (no kernel, no installer; only a multiarch
+  userland for amd64 systems is still built), so there is no Debian 13
+  32-bit PC system to target. It runs natively on an amd64 runner.
+- Other 32-bit Debian architectures (`armel`, `mipsel`) are not built;
+  neither is a target for Raspberry Pi OS, and SvxLink stations on them
+  are not a known use case.
+
+The build legs run in parallel with `fail-fast: false`: nothing in them
+writes shared state, and an architecture-specific failure (e.g. only in
+an emulated leg) should not withhold the healthy legs. Each successful
+leg uploads its packages as a short-lived Actions artifact; a single
+`publish-daily-deb` job (`if: !cancelled()`) then publishes every leg
+that built and passed its installation test, one after the other, into
+the GitHub prereleases and the `gh-pages` APT repository (one commit for
+all legs), so there is no push race on `gh-pages`. A failed leg still
+marks the run as failed. Each leg builds exactly the commit output by the
+sync; on the daily schedule the whole build is skipped rather than
 rebuilding an unchanged commit (see above). The server build does not
 include Qtel or sound files; these are a separate package respectively
 must be installed to match the station (see "Packages" below).
@@ -156,42 +195,43 @@ the CMake build type only means optimized machine code, not a stable
 release.
 
 After package inspection and an installation test in a fresh container of
-the respective suite, `.deb` and `SHA256SUMS` are uploaded per leg directly
-with the GitHub CLI into its own daily prerelease (tag and title include
-suite/architecture, so the legs do not overwrite each other). The tag
-points to the built commit. No prerelease is marked as "Latest". There are
-no Actions artifacts and no build cache; temporary files are removed after
-the upload. A failed leg does not publish a new prerelease. `fail-fast`
-is on (the default): a failing leg almost always means the same bug in
-the shared script would hit every other leg too, so remaining queued
-legs are cancelled immediately and the whole run is marked failed,
-rather than burning CI time repeating the same failure four times.
-`cleanup-old-releases` and `deploy-pages` still run afterwards
+the respective suite (`.github/scripts/test-daily-deb.sh`), each leg
+uploads its `.deb` files, `SHA256SUMS-<arch>` and metadata as an Actions
+artifact (3-day retention, only a hand-over to `publish-daily-deb`).
+That job uploads them with the GitHub CLI into the daily prerelease of
+the respective suite: the tag is derived from the version, which carries
+the suite but not the architecture, so all architectures of one suite
+share one prerelease (titled `Daily <version> — <suite>`), and the
+checksum file is named per architecture so they do not overwrite each
+other. The tag points to the built commit. No prerelease is marked as
+"Latest". There is no build cache; temporary files are removed after the
+upload. A failed leg uploads no artifact and therefore publishes
+nothing. `cleanup-old-releases` and `deploy-pages` still run afterwards
 (`if: always()`) regardless, to publish/prune whatever legs did
 complete — see "Retention" below.
 
 The `.github/scripts/build-daily-deb.sh` script determines the
-architecture (`dpkg --print-architecture`) and distribution codename
-(`VERSION_CODENAME` from `/etc/os-release`) from the respective build
-container itself instead of hardcoding them. An additional matrix entry
-for a further Raspberry Pi OS/Debian/Ubuntu version or architecture
-therefore simply calls the same script with a different `--platform`/base
-image and a runner matching that architecture (e.g. `ubuntu:24.04` for
-Ubuntu Noble, or `arch: armhf` on an arm runner for 32-bit Raspberry Pi
-OS); the version scheme, conflicts and the subsequent publishing adapt
+architecture (`dpkg --print-architecture`), distribution codename
+(`VERSION_CODENAME` from `/etc/os-release`) and base distribution (`ID`,
+`debian` or `raspbian`) from the respective build container itself
+instead of hardcoding them. An additional matrix entry for a further
+Raspberry Pi OS/Debian/Ubuntu version or architecture therefore simply
+calls the same script with a different `platform`/base image and a
+runner matching that architecture (e.g. `ubuntu:24.04` for Ubuntu
+Noble); the version scheme, conflicts and the subsequent publishing adapt
 automatically.
 
 ## APT repository on GitHub Pages
 
-After the daily prerelease, each matrix leg additionally publishes its
-package into a shared APT repository, committed to the `gh-pages` branch,
+After the daily prerelease, `publish-daily-deb` additionally publishes
+every leg's packages into a shared APT repository, committed to the `gh-pages` branch,
 so that all currently maintained versions can be fetched with `apt
 install` and updated automatically (see "Installing on Raspberry Pi OS
 and Debian" below). The `gh-pages` branch itself is only used as the
 persistent, incremental data store the retention/pool logic reads and
 writes; it is not what GitHub serves directly. A separate `deploy-pages`
-job (`needs: daily-deb`, `if: always()`) runs once per workflow run after
-all legs finish, checks out that branch's current content and publishes
+job (`needs: publish-daily-deb`, `if: always()`) runs once per workflow
+run after publishing finishes, checks out that branch's current content and publishes
 it via `actions/configure-pages`, `actions/upload-pages-artifact` and
 `actions/deploy-pages` — the `GitHub Actions` Pages source, not the
 classic `Deploy from a branch` one. `configure-pages` creates the Pages
@@ -229,10 +269,10 @@ pubkey.gpg                                   # public signing key
 ```
 
 `<suite>` is the distribution codename (currently `bookworm` and `trixie`,
-see matrix above), `<arch>` the Debian architecture (currently `arm64` and
-`amd64`). A later build for e.g. a 32-bit architecture or a new Debian
-version simply adds a further `binary-armhf` or `dists/<new suite>/...`
-branch; existing suites/architectures remain unchanged. Separate paths are
+see matrix above), `<arch>` the Debian architecture (currently `arm64`,
+`amd64`, `armhf` and, for bookworm only, `i386`). A later build for a
+further architecture or a new Debian version simply adds a further
+`binary-<arch>` or `dists/<new suite>/...` branch; existing suites/architectures remain unchanged. Separate paths are
 necessary
 because a `.deb` only ever matches exactly one distribution version and
 architecture, and APT clients only load packages from the
@@ -333,7 +373,7 @@ operation.
 For the pool, pruning happens as part of `publish-apt-repo.sh` on every
 run, right after the new package is added and before the index is
 rebuilt. For releases, a separate `cleanup-old-releases` job runs once
-per workflow run, after all `daily-deb` matrix legs have finished
+per workflow run, after `publish-daily-deb` has finished
 (`if: always()`, so it still runs even if a leg failed); it lists all
 `daily-*` releases, groups them by suite, and deletes each release
 together with its tag (`gh release delete <tag> --yes --cleanup-tag`) if
@@ -353,15 +393,17 @@ systems; only the codename in the repository line differs:
 
 | Operating system                   | Codename    |
 |-------------------------------------|-------------|
-| Raspberry Pi OS Trixie (64-bit)    | `trixie`    |
-| Raspberry Pi OS Bookworm (64-bit)  | `bookworm`  |
+| Raspberry Pi OS Trixie (64-bit and 32-bit)   | `trixie`    |
+| Raspberry Pi OS Bookworm (64-bit and 32-bit) | `bookworm`  |
 | Debian 13 (Trixie)                  | `trixie`    |
 | Debian 12 (Bookworm)                | `bookworm`  |
 
 Both codenames are currently maintained for `arm64` (Raspberry Pi OS,
-Debian) and `amd64` (Debian on Intel/AMD PCs and servers); see the matrix
-in the "Daily package" section above. A 32-bit Raspberry Pi OS (`armhf`)
-is not covered yet.
+Debian), `amd64` (Debian on Intel/AMD PCs and servers) and `armhf`
+(32-bit Raspberry Pi OS on every Pi model including Pi 1/Zero/Zero W,
+Debian armhf); `i386` (32-bit PCs) is available for Debian 12 only, as
+Debian 13 no longer supports installing i386 systems. See the matrix in
+the "Daily package" section above.
 
 On the target system, pick up the matching codename automatically and set
 up the repository:
@@ -466,7 +508,7 @@ the admin and/or upstream touched it since the last install:
 1. Push the workflows to the GitHub repository's default branch.
 2. Enable GitHub Actions in the repository, if not already done.
 3. Create the repository secret **APT_SIGNING_KEY** (see "Signing key"
-   above) — without this secret, the `daily-deb` job fails while signing
+   above) — without this secret, the `publish-daily-deb` job fails while signing
    the APT repository.
 4. If GitHub Pages has never been enabled for this repository, no
    further action is needed — `actions/configure-pages` creates it with
