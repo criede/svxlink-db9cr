@@ -106,14 +106,16 @@ jobs:
       # qemu-user-static package (registers with the "F" flag, so the
       # emulator also works inside containers) -- deliberately no
       # third-party action or binfmt installer image. mmdebstrap creates
-      # the Raspbian root filesystem.
+      # the Raspbian root filesystem; it refuses foreign architectures
+      # without arch-test (only a Recommends, hence skipped by
+      # --no-install-recommends).
       - name: Set up QEMU and mmdebstrap
         if: inputs.base == 'raspbian'
         shell: bash
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends qemu-user-static mmdebstrap
+          sudo apt-get install -y --no-install-recommends qemu-user-static mmdebstrap arch-test
           grep -qx 'enabled' /proc/sys/fs/binfmt_misc/qemu-arm
           grep -q '^flags:.*F' /proc/sys/fs/binfmt_misc/qemu-arm
 
