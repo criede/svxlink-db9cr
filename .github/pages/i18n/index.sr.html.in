@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SvxLink DB9CR APT репозиторијум</title>
+@@HREFLANG_LINKS@@
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+  pre { background: #f0f0f0; padding: 0.75rem 1rem; overflow-x: auto; border-radius: 4px; }
+  code { background: #f0f0f0; padding: 0.1rem 0.3rem; border-radius: 3px; }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; margin: 1rem 0; }
+  th, td { border: 1px solid #ccc; padding: 0.3rem 0.6rem; text-align: left; }
+  .note { color: #555; font-size: 0.95em; }
+  .langs { font-size: 0.85em; line-height: 1.8; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem; }
+  .langs a, .langs strong { white-space: nowrap; margin-right: 0.6em; }
+  .ai-notice { background: #fff4ce; border: 1px solid #e0c060; border-radius: 4px; padding: 0.5rem 0.75rem; }
+</style>
+</head>
+<body>
+@@LANG_SWITCHER@@
+<h1>SvxLink DB9CR APT репозиторијум</h1>
+@@AI_NOTICE@@
+<p>Пакети
+<a href="https://github.com/@@REPO_SLUG@@">svxlink-db9cr</a> за Raspberry Pi OS
+и Debian, у две компоненте &mdash; изаберите једну:</p>
+<ul>
+<li><code>main</code>: дневне развојне верзије из најновијег изворног кода
+овог форка, а не стабилна издања.</li>
+<li><code>release</code>: званична upstream издања SvxLink-а (26.05 и
+новија), изграђена из неизмењеног изворног кода upstream издања са истим
+подешавањима изградње и функцијама као и дневни пакети. Свако издање се чува;
+<code>apt upgrade</code> прелази на свако ново upstream издање.</li>
+</ul>
+<p>Детаље потражите у <a href="https://github.com/@@REPO_SLUG@@">репозиторијуму изворног кода</a>.</p>
+
+<h2>Upstream и локалне измене</h2>
+<p>Ово је свакодневно синхронизован форк пројекта
+<a href="https://github.com/sm0svx/svxlink">sm0svx/svxlink</a>,
+оригиналног пројекта SvxLink, са локалним паковањем и додатим функцијама
+поврх њега (RTL-SDR, SipLogic, засебан пакет <code>qtel</code>,
+овај APT репозиторијум и још много тога &mdash; потпуну листу погледајте у
+<a href="https://github.com/@@REPO_SLUG@@/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>).
+Да бисте у било ком тренутку тачно видели шта се разликује у односу на upstream,
+без ослањања на снимак стања овде који може да застари, упоредите тренутно стање
+на GitHub-у:
+<a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;master овог форка</a>.</p>
+
+<h2>Брзи почетак</h2>
+<p>Покрените на циљном систему (одговарајуће кодно име и архитектура се откривају аутоматски):</p>
+<pre><code># Увоз јавног кључа за потписивање
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
+  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+
+# Додавање извора репозиторијума. Изаберите компоненту:
+#   main     дневне развојне верзије
+#   release  званична upstream издања (26.05 и новија)
+component=main
+codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
+arch=$(dpkg --print-architecture)
+echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
+  sudo tee /etc/apt/sources.list.d/svxlink-db9cr.list
+
+sudo apt update
+sudo apt install svxlink
+
+# Обавезно пре првог покретања: подесите станицу, радио-уређај и звук.
+# Датотека из пакета је само шаблон и мора се прилагодити вашој конфигурацији.
+sudo editor /etc/svxlink/svxlink.conf
+
+# Омогућавање покретања SvxLink-а при подизању система и покретање одмах.
+sudo systemctl daemon-reload
+sudo systemctl enable --now svxlink.service
+
+# Провера стања сервиса и праћење његовог дневника.
+systemctl status svxlink.service
+journalctl -u svxlink.service -f
+
+# Опциони графички EchoLink клијент (захтева графичко радно окружење):
+# sudo apt install qtel</code></pre>
+<p class="note"><strong>Обавезно:</strong> Не покрећите сервис пре
+уређивања датотеке <code>/etc/svxlink/svxlink.conf</code>. Подесите барем
+идентитет станице, логику, пријемник/предајник и подешавања звука/PTT-а за ваш хардвер.
+Сервис чита ову путању преко <code>/etc/default/svxlink</code>.</p>
+<p class="note">Ако <code>apt update</code> пријави грешку 404 за овај извор,
+за кодно име вашег система још нема изграђених пакета (погледајте табелу испод) &mdash;
+уместо тога, у датотеци <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> промените
+кодно име у неко од подржаних. Након тога, уобичајено <code>sudo apt upgrade</code>
+аутоматски преузима нове дневне верзије (<code>main</code>) или нова upstream издања
+(<code>release</code>).</p>
+<p class="note">Не омогућавајте обе компоненте истовремено, осим ако желите
+дневне верзије: оне увек имају вишу верзију, па би их apt инсталирао
+уместо издања. Да бисте постојећу инсталацију пребацили са <code>main</code>
+на <code>release</code>, промените компоненту у
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, покрените
+<code>sudo apt update</code>, а затим изричито инсталирајте верзију издања
+(то је враћање на старију верзију), нпр.
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Имајте у виду да у
+пакетима <code>release</code> (неизмењен upstream изворни код) TCL скрипте
+у <code>/usr/share/svxlink</code> нису заштићене као конфигурационе
+датотеке; локалне измене чувајте у <code>events.d/local/</code>.</p>
+
+<h2>Примена измена конфигурације</h2>
+<p>Након уређивања <code>/etc/svxlink/svxlink.conf</code> (или било које
+модулске датотеке <code>/etc/svxlink/svxlink.d/*.conf</code>) на станици
+која ради, поново учитајте конфигурацију без прекидања активне сесије:</p>
+<pre><code>sudo systemctl reload svxlink.service</code></pre>
+<p class="note">Ово шаље <code>SIGHUP</code>, на који SvxLink поново учитава своју
+конфигурацију. Уместо тога користите <code>sudo systemctl restart svxlink.service</code>
+ако се чини да поновно учитавање не примењује неку измену (нека подешавања, на пример
+која се логичка језгра или звучни уређаји учитавају, могу захтевати потпуно поновно покретање).</p>
+
+<h2>Инсталирање старије верзије</h2>
+<p>Недавне верзије остају доступне у pool-у још неко време након што их
+замене новије (дневне недељу дана, недељне месец дана, месечне годину дана &mdash;
+погледајте одељак „Retention“ (задржавање) у
+<a href="https://github.com/@@REPO_SLUG@@/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
+тако да се лоша дневна верзија обично може вратити. Пакети upstream издања
+(компонента <code>release</code>) се никада не уклањају:</p>
+<pre><code>apt list -a svxlink   # или qtel; приказује све верзије које су још у репозиторијуму
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt-mark hold svxlink   # опционо: спречава да је "apt upgrade" поново ажурира
+# sudo apt-mark unhold svxlink   # касније, за наставак аутоматских ажурирања</code></pre>
+
+<h2>Пакети</h2>
+<table>
+<tr><th>Пакет</th><th>Садржај</th></tr>
+<tr><td><code>svxlink</code></td><td>Серверске компоненте (svxlink, remotetrx, svxreflector, логичка језгра, Tcl скрипте догађаја). Изграђен са: подршком за RTL-SDR преко директне USB везе (приложени RTL-SDR Blog форк librtlsdr/rtl_tcp за актуелне V3/V4 донгле; у сукобу са пакетима дистрибуције librtlsdr0/rtl-sdr), логичким језгром SipLogic које је допринела заједница (приложени PJSIP/pjproject, статички повезан), GPIO преко libgpiod и подршком за аудио кодеке и прикључке Speex/Opus/LADSPA. Инсталира systemd сервис. Не садржи Qtel ни звучне пакете.</td></tr>
+<tr><td><code>qtel</code></td><td>Графички EchoLink клијент (Qt6). Захтева графичко радно окружење и пакет <code>svxlink</code> потпуно исте верзије (дели његове библиотеке echolib/async).</td></tr>
+@@EXTRA_PACKAGE_ROWS@@</table>
+
+<h2>Подржани системи</h2>
+<table>
+<tr><th>Кодно име</th><th>Одговара</th><th>Архитектуре: <code>main</code> (дневне)</th><th>Архитектуре: <code>release</code></th></tr>
+@@SUITE_ROWS@@</table>
+<p class="note"><strong>32-битни системи:</strong> пакети <code>armhf</code>
+се граде за Raspbian (ARMv6+VFP), основу 32-битног Raspberry Pi OS-а,
+тако да раде на сваком моделу Raspberry Pi, укључујући Pi&nbsp;1, Zero и
+Zero&nbsp;W, а инсталирају се и на Debian <code>armhf</code> (оба су тестирана).
+<code>i386</code> (32-битни PC рачунари) се гради само за Debian&nbsp;12: Debian&nbsp;13
+више не подржава инсталирање i386 система. 32-битни пакети садрже
+исте функције као и 64-битни.</p>
+
+<h2>Кључ за потписивање</h2>
+<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; аутоматски се увози
+командама за брзи почетак изнад.</p>
+
+<h2>Прегледање датотека репозиторијума</h2>
+<p><a href="dists/">dists/</a> (индекси по suite-у, Release датотеке, Packages
+листе) &middot; <a href="pool/">pool/</a> (саме <code>.deb</code>
+датотеке) &middot; <a href="https://github.com/@@REPO_SLUG@@">репозиторијум
+изворног кода</a> на GitHub-у.</p>
+</body>
+</html>

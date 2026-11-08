@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="utf-8">
+<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Depoja APT e SvxLink DB9CR</title>
+@@HREFLANG_LINKS@@
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+  pre { background: #f0f0f0; padding: 0.75rem 1rem; overflow-x: auto; border-radius: 4px; }
+  code { background: #f0f0f0; padding: 0.1rem 0.3rem; border-radius: 3px; }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; margin: 1rem 0; }
+  th, td { border: 1px solid #ccc; padding: 0.3rem 0.6rem; text-align: left; }
+  .note { color: #555; font-size: 0.95em; }
+  .langs { font-size: 0.85em; line-height: 1.8; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem; }
+  .langs a, .langs strong { white-space: nowrap; margin-right: 0.6em; }
+  .ai-notice { background: #fff4ce; border: 1px solid #e0c060; border-radius: 4px; padding: 0.5rem 0.75rem; }
+</style>
+</head>
+<body>
+@@LANG_SWITCHER@@
+<h1>Depoja APT e SvxLink DB9CR</h1>
+@@AI_NOTICE@@
+<p>Paketa të
+<a href="https://github.com/@@REPO_SLUG@@">svxlink-db9cr</a> për Raspberry Pi OS
+dhe Debian, në dy komponentë &mdash; zgjidhni njërin:</p>
+<ul>
+<li><code>main</code>: ndërtime ditore zhvillimi nga kodi burimor më i fundit i
+këtij fork-u, jo versione të qëndrueshme.</li>
+<li><code>release</code>: versionet zyrtare upstream të SvxLink (26.05 dhe
+më të reja), të ndërtuara nga kodi burimor i pandryshuar i versioneve upstream me të njëjtat
+cilësime ndërtimi dhe veçori si paketat ditore. Çdo version ruhet;
+<code>apt upgrade</code> kalon te çdo version i ri upstream.</li>
+</ul>
+<p>Shihni <a href="https://github.com/@@REPO_SLUG@@">depon e kodit burimor</a>
+për detaje.</p>
+
+<h2>Upstream dhe ndryshimet lokale</h2>
+<p>Ky është një fork i sinkronizuar çdo ditë i
+<a href="https://github.com/sm0svx/svxlink">sm0svx/svxlink</a>,
+projektit origjinal SvxLink, me paketim lokal dhe veçori shtesë të
+vendosura sipër tij (RTL-SDR, SipLogic, paketa e veçantë <code>qtel</code>,
+kjo depo APT dhe të tjera &mdash; shihni
+<a href="https://github.com/@@REPO_SLUG@@/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>
+për listën e plotë). Për të parë saktësisht se çfarë ndryshon nga upstream në çdo
+moment, pa u mbështetur te një pamje e çastit këtu që vjetrohet, krahasoni
+drejtpërdrejt në GitHub:
+<a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;master i këtij fork-u</a>.</p>
+
+<h2>Fillim i shpejtë</h2>
+<p>Ekzekutojeni në sistemin e synuar (zbulon automatikisht emrin e kodit/arkitekturën e duhur):</p>
+<pre><code># Importoni çelësin publik të nënshkrimit
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
+  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+
+# Shtoni burimin e depos. Zgjidhni komponentin:
+#   main     ndërtime ditore zhvillimi
+#   release  versione zyrtare upstream (26.05 dhe më të reja)
+component=main
+codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
+arch=$(dpkg --print-architecture)
+echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
+  sudo tee /etc/apt/sources.list.d/svxlink-db9cr.list
+
+sudo apt update
+sudo apt install svxlink
+
+# E detyrueshme para nisjes së parë: konfiguroni stacionin, radion dhe audion tuaj.
+# Skedari i paketës është vetëm një shabllon dhe duhet përshtatur me konfigurimin tuaj.
+sudo editor /etc/svxlink/svxlink.conf
+
+# Aktivizoni SvxLink gjatë nisjes së sistemit dhe niseni tani.
+sudo systemctl daemon-reload
+sudo systemctl enable --now svxlink.service
+
+# Kontrolloni gjendjen e shërbimit dhe ndiqni regjistrin e tij.
+systemctl status svxlink.service
+journalctl -u svxlink.service -f
+
+# Klient grafik opsional për EchoLink (kërkon një mjedis desktopi):
+# sudo apt install qtel</code></pre>
+<p class="note"><strong>E detyrueshme:</strong> Mos e nisni shërbimin para se
+të redaktoni <code>/etc/svxlink/svxlink.conf</code>. Konfiguroni të paktën identitetin
+e stacionit, logjikën, marrësin/transmetuesin dhe cilësimet e audios/PTT për pajisjet tuaja.
+Shërbimi e lexon këtë shteg përmes <code>/etc/default/svxlink</code>.</p>
+<p class="note">Nëse <code>apt update</code> raporton gabimin 404 për këtë burim,
+për emrin e kodit të sistemit tuaj ende nuk ndërtohen paketa (shihni tabelën më poshtë) &mdash; në vend të kësaj,
+ndryshoni emrin e kodit në <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> në një nga
+ata që mbështeten. Më pas, një <code>sudo apt upgrade</code> i zakonshëm
+merr automatikisht ndërtimet e reja ditore (<code>main</code>) ose versionet e reja upstream
+(<code>release</code>).</p>
+<p class="note">Mos i aktivizoni të dy komponentët njëkohësisht, përveç nëse dëshironi
+ndërtimet ditore: ato kanë gjithmonë versionin më të lartë, kështu që apt do t'i
+instalonte në vend të versioneve release. Për të kaluar një instalim ekzistues nga <code>main</code>
+në <code>release</code>, ndryshoni komponentin në
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, ekzekutoni
+<code>sudo apt update</code>, pastaj instaloni në mënyrë të shprehur versionin release
+(është një kalim në version më të vjetër, downgrade), p.sh.
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Kini parasysh se në paketat
+<code>release</code> (kod burimor upstream i pandryshuar) skriptet TCL
+nën <code>/usr/share/svxlink</code> nuk mbrohen si skedarë
+konfigurimi; mbajini ndryshimet lokale në <code>events.d/local/</code>.</p>
+
+<h2>Zbatimi i ndryshimeve të konfigurimit</h2>
+<p>Pasi të keni redaktuar <code>/etc/svxlink/svxlink.conf</code> (ose çdo skedar moduli
+<code>/etc/svxlink/svxlink.d/*.conf</code>) në një stacion në punë,
+ringarkojeni konfigurimin pa ndërprerë një seancë aktive:</p>
+<pre><code>sudo systemctl reload svxlink.service</code></pre>
+<p class="note">Kjo dërgon <code>SIGHUP</code>, me marrjen e të cilit SvxLink rilexon
+konfigurimin e tij. Përdorni në vend të kësaj <code>sudo systemctl restart svxlink.service</code>
+nëse ringarkimi nuk duket se e merr parasysh një ndryshim (disa cilësime, si p.sh.
+cilat bërthama logjike ose pajisje zëri ngarkohen, mund të kërkojnë një rinisje të plotë).</p>
+
+<h2>Instalimi i një versioni më të vjetër</h2>
+<p>Versionet e fundit mbeten të disponueshme në pool për njëfarë kohe pasi
+zëvendësohen (ditore për një javë, javore për një muaj, mujore për një vit &mdash;
+shihni «Retention» (ruajtja) në
+<a href="https://github.com/@@REPO_SLUG@@/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
+kështu që një ndërtim ditor me probleme zakonisht mund të kthehet mbrapsht. Paketat e versioneve upstream
+(komponenti <code>release</code>) nuk hiqen kurrë:</p>
+<pre><code>apt list -a svxlink   # ose qtel; liston të gjitha versionet që janë ende në depo
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt-mark hold svxlink   # opsionale: ndalon që "apt upgrade" ta përditësojë përsëri
+# sudo apt-mark unhold svxlink   # më vonë, për të rifilluar përditësimet automatike</code></pre>
+
+<h2>Paketat</h2>
+<table>
+<tr><th>Paketa</th><th>Përmban</th></tr>
+<tr><td><code>svxlink</code></td><td>Komponentët e serverit (svxlink, remotetrx, svxreflector, bërthamat logjike, skriptet e ngjarjeve Tcl). Ndërtuar me: mbështetje RTL-SDR me lidhje të drejtpërdrejtë USB (fork i përfshirë librtlsdr/rtl_tcp i RTL-SDR Blog për dongle-t aktuale V3/V4; bie ndesh me librtlsdr0/rtl-sdr të shpërndarjes), bërthamën logjike SipLogic të kontribuar (PJSIP/pjproject i përfshirë, i lidhur statikisht), GPIO përmes libgpiod, si dhe mbështetje për kodekët audio dhe shtojcat Speex/Opus/LADSPA. Instalon një shërbim systemd. Nuk përfshin Qtel as paketa zërash.</td></tr>
+<tr><td><code>qtel</code></td><td>Klient grafik EchoLink (Qt6). Kërkon një mjedis desktopi dhe paketën <code>svxlink</code> me saktësisht të njëjtin version (ndan me të libraritë echolib/async).</td></tr>
+@@EXTRA_PACKAGE_ROWS@@</table>
+
+<h2>Sistemet e mbështetura</h2>
+<table>
+<tr><th>Emri i kodit</th><th>Përputhet me</th><th>Arkitekturat: <code>main</code> (ditore)</th><th>Arkitekturat: <code>release</code></th></tr>
+@@SUITE_ROWS@@</table>
+<p class="note"><strong>Sistemet 32-bit:</strong> paketat <code>armhf</code>
+ndërtohen për Raspbian (ARMv6+VFP), bazën e Raspberry Pi OS 32-bit,
+kështu që funksionojnë në çdo model Raspberry Pi, përfshirë Pi&nbsp;1, Zero dhe
+Zero&nbsp;W, dhe instalohen gjithashtu në Debian <code>armhf</code> (të dyja janë testuar).
+<code>i386</code> (PC 32-bit) ndërtohet vetëm për Debian&nbsp;12: Debian&nbsp;13
+nuk e mbështet më instalimin e sistemeve i386. Paketat 32-bit përmbajnë
+të njëjtat veçori si ato 64-bit.</p>
+
+<h2>Çelësi i nënshkrimit</h2>
+<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; importohet automatikisht nga
+komandat e fillimit të shpejtë më sipër.</p>
+
+<h2>Shfletoni skedarët e depos</h2>
+<p><a href="dists/">dists/</a> (indekset për çdo suite, skedarët Release, listat
+Packages) &middot; <a href="pool/">pool/</a> (vetë skedarët <code>.deb</code>)
+&middot; <a href="https://github.com/@@REPO_SLUG@@">depoja e kodit
+burimor</a> në GitHub.</p>
+</body>
+</html>

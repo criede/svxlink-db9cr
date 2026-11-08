@@ -1,0 +1,6 @@
+# Everything under .github/ is consumed on Linux runners (shell scripts,
+# workflows, page templates whose SHA-256 is compared against the
+# translations); keep LF line endings in every checkout, including on
+# Windows with core.autocrlf=true.
+* text=auto eol=lf
+*.asc text eol=lf

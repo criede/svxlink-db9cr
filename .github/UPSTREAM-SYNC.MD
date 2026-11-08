@@ -358,6 +358,38 @@ files are pruned per package/suite/architecture using the same retention
 policy as the daily releases (see "Retention" below) before rebuilding
 the index. A failed build does not publish anything here either.
 
+### Start page and translations
+
+The repository's start page (`index.html`) is rendered by
+`render-start-page.sh` (run by `publish-apt-repo.sh` after every package
+publish, and by the `Refresh start page` workflow whenever only the
+templates under `.github/pages/` change) from the English master template
+`.github/pages/index.html.in`, filling in only what depends on the
+repository state (the supported-systems table per component, a row for
+any package not described in the template, the language links). The
+same page is also published in the European languages listed in
+`.github/pages/languages.tsv` — the 24 official EU languages plus the
+national languages of the other European states (Norwegian, Icelandic,
+Albanian, Serbian, Bosnian, Macedonian, Ukrainian, Belarusian, Russian,
+Turkish, Luxembourgish, Catalan, Romansh) — as `index.<lang>.html`, from
+the translated templates in `.github/pages/i18n/`. Every page links to
+all languages (and declares them via `hreflang`); every translated page
+shows a notice in its own language that it is an AI-generated
+translation, with a link to the English original. The generator inserts
+that notice itself (text from `languages.tsv`), so it cannot be left out.
+
+The translations must be updated together with every change to the
+English template (rule in `AGENT.MD`). Each translation records the
+SHA-256 of the English template it was made from
+(`<meta name="source-sha256">`); `bash .github/scripts/check-translations.sh`
+lists which ones are current, outdated or missing and prints the hash to
+use. The `Check start page translations` workflow runs it with
+`--strict` on every change under `.github/pages/` and fails if any
+translation is behind; publishing still renders an outdated translation
+(with a workflow warning) rather than blocking package publication.
+`.github/.gitattributes` keeps LF line endings for everything under
+`.github/`, so the hash is the same in every checkout.
+
 ### Signing key
 
 For APT to trust the repository, `Release` is signed with a GPG key

@@ -7,6 +7,23 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- The APT repository start page is now available in all European
+  languages (24 official EU languages plus Norwegian, Icelandic,
+  Albanian, Serbian, Bosnian, Macedonian, Ukrainian, Belarusian, Russian,
+  Turkish, Luxembourgish, Catalan, Romansh) as `index.<lang>.html`, with
+  language links on every page and a notice on every translated page
+  that it is an AI-generated translation. It is rendered from templates
+  in `.github/pages/` instead of a heredoc in `publish-apt-repo.sh`;
+  translations record the hash of the English template they were made
+  from, `check-translations.sh` and a new `Check start page translations`
+  workflow flag outdated ones, and `AGENT.MD` requires updating all
+  translations with every change to the English page.
+- Start page rendering moved to `render-start-page.sh`; a new `Refresh
+  start page` workflow re-renders and deploys it when only the page
+  templates change, without waiting for a package build.
+- Fixed the start page's architecture columns showing every value twice,
+  and the page generation aborting (and with it the whole APT publish)
+  for a suite without a `release` component yet.
 - Packages of the official upstream SvxLink releases: the new
   `build-releases.yml` workflow builds every upstream release from 26.05
   on (currently 26.05, 26.05.1, 26.05.2) from the unmodified upstream

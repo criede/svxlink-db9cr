@@ -1,0 +1,35 @@
+name: Check start page translations
+
+# Fails (visibly, without blocking any package publishing) when the
+# English start page template changed but a translation was not updated
+# in the same change -- see the translation rule in AGENT.MD and
+# .github/scripts/check-translations.sh.
+
+on:
+  push:
+    paths:
+      - '.github/pages/**'
+      - '.github/scripts/check-translations.sh'
+  pull_request:
+    paths:
+      - '.github/pages/**'
+      - '.github/scripts/check-translations.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Translations up to date
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
+        with:
+          persist-credentials: false
+
+      - name: Check translations against the English template
+        shell: bash
+        run: bash .github/scripts/check-translations.sh --strict

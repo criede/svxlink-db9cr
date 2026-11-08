@@ -1,0 +1,100 @@
+name: Refresh start page
+
+# Re-renders the APT repository's start page and its translations
+# (render-start-page.sh) on gh-pages and deploys Pages, without building or
+# publishing any package. Package publishing renders the page too; this
+# covers changes to the page templates (.github/pages/) when no package
+# build follows soon, e.g. on days without upstream changes.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/pages/**'
+      - '.github/scripts/render-start-page.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-start-page-${{ github.repository }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    name: Render start page on gh-pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out templates and scripts
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
+        with:
+          persist-credentials: false
+
+      # Retried from a fresh clone if the push is rejected because a
+      # package publish pushed to gh-pages in the meantime (the page is
+      # regenerated from the then-current state, so re-rendering is safe).
+      - name: Render and push
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo_url="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          for attempt in 1 2 3 4 5; do
+            checkout="$(mktemp -d)"
+            git clone --quiet --branch gh-pages --single-branch --depth 1 "$repo_url" "$checkout"
+            git -C "$checkout" config user.name 'github-actions[bot]'
+            git -C "$checkout" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            REPO_DIR="$checkout" bash .github/scripts/render-start-page.sh
+            git -C "$checkout" add -A
+            if git -C "$checkout" diff --cached --quiet; then
+              echo 'Start page unchanged.' >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            git -C "$checkout" commit --quiet -m "Refresh start page (${GITHUB_SHA:0:12})"
+            if git -C "$checkout" push --quiet origin HEAD:refs/heads/gh-pages; then
+              echo 'Start page refreshed on gh-pages.' >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "Push rejected (attempt ${attempt}); retrying." >&2
+            rm -rf "$checkout"
+            sleep $((attempt * 15))
+          done
+          exit 1
+
+  deploy-pages:
+    name: Deploy APT repository to GitHub Pages
+    needs: render
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Shared with the package workflows' deploy jobs; see build-and-publish.yml.
+    concurrency:
+      group: pages-deploy-${{ github.repository }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out gh-pages content
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
+        with:
+          ref: gh-pages
+          persist-credentials: false
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0, Node.js 24
+
+      - name: Upload APT repository as Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0, internally Node.js 24
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1, Node.js 24

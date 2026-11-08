@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SvxLink DB9CR APT-arkiv</title>
+@@HREFLANG_LINKS@@
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+  pre { background: #f0f0f0; padding: 0.75rem 1rem; overflow-x: auto; border-radius: 4px; }
+  code { background: #f0f0f0; padding: 0.1rem 0.3rem; border-radius: 3px; }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; margin: 1rem 0; }
+  th, td { border: 1px solid #ccc; padding: 0.3rem 0.6rem; text-align: left; }
+  .note { color: #555; font-size: 0.95em; }
+  .langs { font-size: 0.85em; line-height: 1.8; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem; }
+  .langs a, .langs strong { white-space: nowrap; margin-right: 0.6em; }
+  .ai-notice { background: #fff4ce; border: 1px solid #e0c060; border-radius: 4px; padding: 0.5rem 0.75rem; }
+</style>
+</head>
+<body>
+@@LANG_SWITCHER@@
+<h1>SvxLink DB9CR APT-arkiv</h1>
+@@AI_NOTICE@@
+<p>Pakker av
+<a href="https://github.com/@@REPO_SLUG@@">svxlink-db9cr</a> for Raspberry Pi OS
+og Debian, i to komponenter &mdash; velg én:</p>
+<ul>
+<li><code>main</code>: daglige utviklingsbygg fra den nyeste kildekoden i
+denne forken, ikke stabile utgivelser.</li>
+<li><code>release</code>: de offisielle upstream-utgivelsene av SvxLink (26.05 og
+nyere), bygget fra den uendrede upstream-kildekoden for utgivelsen med de samme
+bygginnstillingene og funksjonene som de daglige pakkene. Alle utgivelser beholdes;
+<code>apt upgrade</code> går over til hver nye upstream-utgivelse.</li>
+</ul>
+<p>Se <a href="https://github.com/@@REPO_SLUG@@">kildekodearkivet</a>
+for detaljer.</p>
+
+<h2>Upstream og lokale endringer</h2>
+<p>Dette er en daglig synkronisert fork av
+<a href="https://github.com/sm0svx/svxlink">sm0svx/svxlink</a>, det
+opprinnelige SvxLink-prosjektet, med lokal pakking og ekstra funksjoner
+lagt oppå (RTL-SDR, SipLogic, den separate <code>qtel</code>-pakken,
+dette APT-arkivet og mer &mdash; se
+<a href="https://github.com/@@REPO_SLUG@@/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>
+for hele listen). For å se nøyaktig hva som er annerledes enn upstream når som helst,
+uten å stole på et øyeblikksbilde her som blir utdatert, kan du sammenligne
+direkte på GitHub:
+<a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;denne forkens master</a>.</p>
+
+<h2>Hurtigstart</h2>
+<p>Kjør på målsystemet (finner riktig kodenavn/arkitektur automatisk):</p>
+<pre><code># Importer den offentlige signeringsnøkkelen
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
+  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+
+# Legg til arkivkilden. Velg komponent:
+#   main     daglige utviklingsbygg
+#   release  offisielle upstream-utgivelser (26.05 og nyere)
+component=main
+codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
+arch=$(dpkg --print-architecture)
+echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
+  sudo tee /etc/apt/sources.list.d/svxlink-db9cr.list
+
+sudo apt update
+sudo apt install svxlink
+
+# Obligatorisk før første oppstart: konfigurer stasjonen, radioen og lyden din.
+# Den medfølgende filen er bare en mal og må tilpasses ditt oppsett.
+sudo editor /etc/svxlink/svxlink.conf
+
+# Aktiver SvxLink ved oppstart og start den nå.
+sudo systemctl daemon-reload
+sudo systemctl enable --now svxlink.service
+
+# Sjekk tjenestestatus og følg loggen.
+systemctl status svxlink.service
+journalctl -u svxlink.service -f
+
+# Valgfri grafisk EchoLink-klient (krever et skrivebordsmiljø):
+# sudo apt install qtel</code></pre>
+<p class="note"><strong>Påkrevd:</strong> Ikke start tjenesten før du har
+redigert <code>/etc/svxlink/svxlink.conf</code>. Konfigurer minst stasjonens
+identitet, logikk, mottaker/sender og lyd-/PTT-innstillinger for maskinvaren din.
+Tjenesten leser denne stien via <code>/etc/default/svxlink</code>.</p>
+<p class="note">Hvis <code>apt update</code> melder 404 for denne kilden, bygges
+systemets kodenavn ikke ennå (se tabellen nedenfor) &mdash; endre i stedet
+kodenavnet i <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> til et av
+de støttede. Deretter henter en vanlig <code>sudo apt upgrade</code>
+nye daglige bygg (<code>main</code>) eller nye upstream-utgivelser
+(<code>release</code>) automatisk.</p>
+<p class="note">Ikke aktiver begge komponentene samtidig med mindre du vil ha de
+daglige byggene: De har alltid den høyere versjonen, så apt ville installere dem
+i stedet for utgivelsene. For å bytte en eksisterende installasjon fra <code>main</code>
+til <code>release</code>, endre komponenten i
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, kjør
+<code>sudo apt update</code> og installer deretter utgivelsesversjonen eksplisitt
+(det er en nedgradering), f.eks.
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Merk at i
+<code>release</code>-pakker (uendret upstream-kildekode) er TCL-skriptene
+under <code>/usr/share/svxlink</code> ikke beskyttet som konfigurasjonsfiler;
+legg lokale endringer i <code>events.d/local/</code>.</p>
+
+<h2>Ta i bruk konfigurasjonsendringer</h2>
+<p>Etter å ha redigert <code>/etc/svxlink/svxlink.conf</code> (eller en
+modulfil <code>/etc/svxlink/svxlink.d/*.conf</code>) på en kjørende
+stasjon kan du laste den inn på nytt uten å bryte en aktiv økt:</p>
+<pre><code>sudo systemctl reload svxlink.service</code></pre>
+<p class="note">Dette sender <code>SIGHUP</code>, som får SvxLink til å lese
+konfigurasjonen sin på nytt. Bruk i stedet <code>sudo systemctl restart svxlink.service</code>
+hvis en ny innlasting ikke ser ut til å få med en endring (noen innstillinger, for eksempel
+hvilke logikkjerner eller lydenheter som lastes inn, kan kreve en full omstart).</p>
+
+<h2>Installere en eldre versjon</h2>
+<p>Nylige versjoner forblir tilgjengelige i poolen en stund etter at de er
+erstattet (daglig i en uke, ukentlig i en måned, månedlig i et år &mdash;
+se «Retention» (oppbevaring) i
+<a href="https://github.com/@@REPO_SLUG@@/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
+så et dårlig daglig bygg kan vanligvis rulles tilbake. Pakker med upstream-utgivelser
+(komponenten <code>release</code>) fjernes aldri:</p>
+<pre><code>apt list -a svxlink   # eller qtel; viser alle versjoner som fortsatt finnes i arkivet
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt-mark hold svxlink   # valgfritt: hindrer at "apt upgrade" oppgraderer den igjen
+# sudo apt-mark unhold svxlink   # senere, for å gjenoppta automatiske oppdateringer</code></pre>
+
+<h2>Pakker</h2>
+<table>
+<tr><th>Pakke</th><th>Innhold</th></tr>
+<tr><td><code>svxlink</code></td><td>Serverkomponenter (svxlink, remotetrx, svxreflector, logikkjerner, Tcl-hendelsesskript). Bygget med: RTL-SDR-støtte via direkte USB (medfølgende RTL-SDR Blog-fork av librtlsdr/rtl_tcp for gjeldende V3/V4-dongler; er i konflikt med distribusjonens librtlsdr0/rtl-sdr), den bidratte SipLogic-logikkjernen (medfølgende PJSIP/pjproject, statisk lenket), GPIO via libgpiod og støtte for lydkodekene og programtilleggene Speex/Opus/LADSPA. Installerer en systemd-tjeneste. Inneholder ikke Qtel eller lydpakker.</td></tr>
+<tr><td><code>qtel</code></td><td>Grafisk EchoLink-klient (Qt6). Krever et skrivebordsmiljø og <code>svxlink</code>-pakken i nøyaktig samme versjon (deler dens echolib/async-biblioteker).</td></tr>
+@@EXTRA_PACKAGE_ROWS@@</table>
+
+<h2>Støttede systemer</h2>
+<table>
+<tr><th>Kodenavn</th><th>Tilsvarer</th><th>Arkitekturer: <code>main</code> (daglig)</th><th>Arkitekturer: <code>release</code></th></tr>
+@@SUITE_ROWS@@</table>
+<p class="note"><strong>32-biters systemer:</strong> <code>armhf</code>-pakker
+bygges mot Raspbian (ARMv6+VFP), grunnlaget for 32-biters Raspberry Pi OS,
+så de kjører på alle Raspberry Pi-modeller, inkludert Pi&nbsp;1, Zero og
+Zero&nbsp;W, og kan også installeres på Debian <code>armhf</code> (begge er testet).
+<code>i386</code> (32-biters PC-er) bygges kun for Debian&nbsp;12: Debian&nbsp;13
+støtter ikke lenger installasjon av i386-systemer. 32-biterspakkene har
+de samme funksjonene som 64-biterspakkene.</p>
+
+<h2>Signeringsnøkkel</h2>
+<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; importeres automatisk av
+hurtigstartkommandoene ovenfor.</p>
+
+<h2>Bla gjennom arkivfilene</h2>
+<p><a href="dists/">dists/</a> (indekser per suite, Release-filer, Packages-lister)
+&middot; <a href="pool/">pool/</a> (de faktiske <code>.deb</code>-filene)
+&middot; <a href="https://github.com/@@REPO_SLUG@@">kildekodearkiv</a> på GitHub.</p>
+</body>
+</html>

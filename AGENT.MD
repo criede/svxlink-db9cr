@@ -27,6 +27,8 @@ still need to be documented.
 - `.github/workflows/build-deb.yml`: reusable per-target build/test job
   used by both; targets are listed in `.github/build-targets.json`.
 - `.github/scripts/`: the shell scripts those workflows run.
+- `.github/pages/`: APT repository start page templates (English master,
+  translations in `i18n/`, language list `languages.tsv`).
 
 ## Working method
 
@@ -61,10 +63,26 @@ still need to be documented.
 - The gh-pages APT repository's `index.html` must list every published
   package with the features/optional dependencies built into it (e.g.
   RTL-SDR support, SipLogic). Whenever a package's build flags or bundled
-  dependencies change, update the `index.html` generation in
-  `.github/scripts/publish-apt-repo.sh` (and `BUILD-INFO.MD`/
-  `UPSTREAM-SYNC.MD` where relevant) in the same change, not as a
+  dependencies change, update the start page template
+  `.github/pages/index.html.in` (its package table) and all its
+  translations (see the next rule), plus `BUILD-INFO.MD`/
+  `UPSTREAM-SYNC.MD` where relevant, in the same change, not as a
   follow-up — this listing must never fall behind what is actually built.
+- The start page exists in English (`.github/pages/index.html.in`, the
+  master) and in translations into the European languages listed in
+  `.github/pages/languages.tsv` (`.github/pages/i18n/index.<lang>.html.in`,
+  rendered to `index.<lang>.html` by `.github/scripts/render-start-page.sh`). Whenever the
+  English template changes, update **every** translation in the same
+  change, never as a follow-up: translate the changed text, keep the HTML
+  structure and `@@...@@` placeholders identical, and set each
+  translation's `<meta name="source-sha256" content="...">` to the hash
+  printed by `bash .github/scripts/check-translations.sh` (which must
+  then report every language as `current`; the `Check start page
+  translations` workflow fails otherwise). Every translated page carries
+  a notice that it is an AI-generated translation, with a link to the
+  English original; the generator inserts it from the notice column of
+  `languages.tsv`, so a new language needs its notice text there too.
+  Do not put that notice into the templates themselves.
 - Before adding an `apt-get install` package name in a workflow/build
   script, verify it actually exists for the target suite (and provides
   what is needed, e.g. a specific `.cmake` file) rather than guessing from

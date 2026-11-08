@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="mt">
+<head>
+<meta charset="utf-8">
+<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Repożitorju APT SvxLink DB9CR</title>
+@@HREFLANG_LINKS@@
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+  pre { background: #f0f0f0; padding: 0.75rem 1rem; overflow-x: auto; border-radius: 4px; }
+  code { background: #f0f0f0; padding: 0.1rem 0.3rem; border-radius: 3px; }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; margin: 1rem 0; }
+  th, td { border: 1px solid #ccc; padding: 0.3rem 0.6rem; text-align: left; }
+  .note { color: #555; font-size: 0.95em; }
+  .langs { font-size: 0.85em; line-height: 1.8; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem; }
+  .langs a, .langs strong { white-space: nowrap; margin-right: 0.6em; }
+  .ai-notice { background: #fff4ce; border: 1px solid #e0c060; border-radius: 4px; padding: 0.5rem 0.75rem; }
+</style>
+</head>
+<body>
+@@LANG_SWITCHER@@
+<h1>Repożitorju APT SvxLink DB9CR</h1>
+@@AI_NOTICE@@
+<p>Pakketti ta'
+<a href="https://github.com/@@REPO_SLUG@@">svxlink-db9cr</a> għal Raspberry Pi OS
+u Debian, f'żewġ komponenti &mdash; agħżel wieħed:</p>
+<ul>
+<li><code>main</code>: verżjonijiet ta' żvilupp mibnija kuljum mill-aħħar kodiċi sors
+ta' dan il-fork, mhux rilaxxi stabbli.</li>
+<li><code>release</code>: ir-rilaxxi uffiċjali ta' SvxLink upstream (26.05 u
+aktar ġodda), mibnija mill-kodiċi sors mhux modifikat tar-rilaxxi upstream bl-istess
+konfigurazzjoni tal-bini u l-istess funzjonijiet bħall-pakketti ta' kuljum. Kull rilaxx jinżamm;
+<code>apt upgrade</code> jgħaddi għal kull rilaxx ġdid upstream.</li>
+</ul>
+<p>Ara <a href="https://github.com/@@REPO_SLUG@@">ir-repożitorju tal-kodiċi sors</a>
+għad-dettalji.</p>
+
+<h2>Upstream u bidliet lokali</h2>
+<p>Dan huwa fork, sinkronizzat kuljum, ta'
+<a href="https://github.com/sm0svx/svxlink">sm0svx/svxlink</a>, il-proġett
+oriġinali ta' SvxLink, b'ippakkjar lokali u funzjonijiet addizzjonali
+miżjuda fuqu (RTL-SDR, SipLogic, il-pakkett separat <code>qtel</code>,
+dan ir-repożitorju APT, u aktar &mdash; ara
+<a href="https://github.com/@@REPO_SLUG@@/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>
+għal-lista sħiħa). Biex tara eżattament x'inhu differenti minn upstream fi
+kwalunkwe ħin, mingħajr ma tiddependi fuq stampa (snapshot) li hawn tista' tiskadi,
+qabbel direttament fuq GitHub:
+<a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;il-master ta' dan il-fork</a>.</p>
+
+<h2>Bidu malajr</h2>
+<p>Ħaddem dan fuq is-sistema fil-mira (jiskopri awtomatikament l-isem tal-kodiċi/l-arkitettura t-tajba):</p>
+<pre><code># Importa ċ-ċavetta pubblika tal-iffirmar
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
+  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+
+# Żid is-sors tar-repożitorju. Agħżel il-komponent:
+#   main     verżjonijiet ta' żvilupp ta' kuljum
+#   release  rilaxxi uffiċjali upstream (26.05 u aktar ġodda)
+component=main
+codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
+arch=$(dpkg --print-architecture)
+echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
+  sudo tee /etc/apt/sources.list.d/svxlink-db9cr.list
+
+sudo apt update
+sudo apt install svxlink
+
+# Obbligatorju qabel l-ewwel bidu: ikkonfigura l-istazzjon, ir-radju u l-awdjo tiegħek.
+# Il-fajl tal-pakkett huwa biss mudell u għandu jiġi adattat għall-konfigurazzjoni tiegħek.
+sudo editor /etc/svxlink/svxlink.conf
+
+# Attiva SvxLink mal-bidu tas-sistema u ibdih issa.
+sudo systemctl daemon-reload
+sudo systemctl enable --now svxlink.service
+
+# Iċċekkja l-istat tas-servizz u segwi l-log tiegħu.
+systemctl status svxlink.service
+journalctl -u svxlink.service -f
+
+# Klijent grafiku fakultattiv għal EchoLink (jeħtieġ ambjent desktop):
+# sudo apt install qtel</code></pre>
+<p class="note"><strong>Meħtieġ:</strong> Tibdiex is-servizz qabel ma
+teditja <code>/etc/svxlink/svxlink.conf</code>. Ikkonfigura mill-inqas l-identità
+tal-istazzjon, il-loġika, ir-riċevitur/trażmettitur u l-issettjar tal-awdjo/PTT għall-hardware tiegħek.
+Is-servizz jaqra din il-mogħdija permezz ta' <code>/etc/default/svxlink</code>.</p>
+<p class="note">Jekk <code>apt update</code> jirrapporta 404 għal dan is-sors,
+għadhom ma jinbnewx pakketti għall-isem tal-kodiċi tas-sistema tiegħek (ara t-tabella hawn taħt) &mdash; minflok,
+editja l-isem tal-kodiċi f'<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> għal wieħed minn
+dawk appoġġjati. Wara dan, <code>sudo apt upgrade</code> regolari
+jiġbed awtomatikament il-verżjonijiet il-ġodda ta' kuljum (<code>main</code>) jew ir-rilaxxi l-ġodda upstream
+(<code>release</code>).</p>
+<p class="note">Tattivax iż-żewġ komponenti fl-istess ħin sakemm ma tridx il-verżjonijiet
+ta' kuljum: dawn dejjem ikollhom il-verżjoni l-ogħla, u għalhekk apt kien jinstallahom
+minflok ir-rilaxxi. Biex taqleb installazzjoni eżistenti minn <code>main</code>
+għal <code>release</code>, biddel il-komponent
+f'<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, ħaddem
+<code>sudo apt update</code>, imbagħad installa l-verżjoni release b'mod espliċitu
+(hija downgrade, jiġifieri tmur għal verżjoni eqdem), eż.
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Innota li fil-pakketti
+<code>release</code> (kodiċi sors upstream mhux modifikat) l-iskripts TCL
+taħt <code>/usr/share/svxlink</code> mhumiex protetti bħala fajls tal-konfigurazzjoni;
+żomm il-bidliet lokali f'<code>events.d/local/</code>.</p>
+
+<h2>Kif tapplika bidliet fil-konfigurazzjoni</h2>
+<p>Wara li teditja <code>/etc/svxlink/svxlink.conf</code> (jew kwalunkwe fajl ta' modulu
+<code>/etc/svxlink/svxlink.d/*.conf</code>) fuq stazzjon li qed jaħdem,
+erġa' tella' l-konfigurazzjoni mingħajr ma taqta' sessjoni attiva:</p>
+<pre><code>sudo systemctl reload svxlink.service</code></pre>
+<p class="note">Dan jibgħat <code>SIGHUP</code>, li meta jirċevih SvxLink jerġa' jaqra
+l-konfigurazzjoni tiegħu. Uża minflok <code>sudo systemctl restart svxlink.service</code>
+jekk it-tagħbija mill-ġdid ma tidhirx li qed tapplika bidla (xi settings, bħal
+liema logic cores jew apparati tal-ħoss jiġu mtellgħin, jistgħu jeħtieġu bidu mill-ġdid sħiħ).</p>
+
+<h2>Installazzjoni ta' verżjoni eqdem</h2>
+<p>Il-verżjonijiet riċenti jibqgħu disponibbli fil-pool għal xi żmien wara li
+jiġu sostitwiti (kuljum għal ġimgħa, kull ġimgħa għal xahar, kull xahar għal sena &mdash;
+ara "Retention" (żamma)
+f'<a href="https://github.com/@@REPO_SLUG@@/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
+u għalhekk build ħażin ta' kuljum normalment jista' jitreġġa' lura. Il-pakketti tar-rilaxxi upstream
+(il-komponent <code>release</code>) qatt ma jitneħħew:</p>
+<pre><code>apt list -a svxlink   # jew qtel; juri l-verżjonijiet kollha li għadhom fir-repożitorju
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt-mark hold svxlink   # fakultattiv: ma jħallix lil "apt upgrade" jaġġornah mill-ġdid
+# sudo apt-mark unhold svxlink   # aktar tard, biex jerġgħu jibdew l-aġġornamenti awtomatiċi</code></pre>
+
+<h2>Pakketti</h2>
+<table>
+<tr><th>Pakkett</th><th>Fih</th></tr>
+<tr><td><code>svxlink</code></td><td>Komponenti tas-server (svxlink, remotetrx, svxreflector, logic cores, skripts tal-avvenimenti Tcl). Mibni b'dan li ġej: appoġġ RTL-SDR permezz ta' USB dirett (fork inkluż ta' RTL-SDR Blog librtlsdr/rtl_tcp għad-dongles attwali V3/V4; jidħol f'kunflitt mal-librtlsdr0/rtl-sdr tad-distribuzzjoni), il-logic core SipLogic ikkontribwit (PJSIP/pjproject inkluż, marbut statikament), GPIO permezz ta' libgpiod, u appoġġ għall-codecs u l-plugins tal-awdjo Speex/Opus/LADSPA. Jinstalla servizz systemd. Ma jinkludix Qtel jew pakketti tal-ħsejjes.</td></tr>
+<tr><td><code>qtel</code></td><td>Klijent grafiku għal EchoLink (Qt6). Jeħtieġ ambjent desktop u l-pakkett <code>svxlink</code> tal-istess verżjoni eżatta (jaqsam il-libreriji echolib/async tiegħu).</td></tr>
+@@EXTRA_PACKAGE_ROWS@@</table>
+
+<h2>Sistemi appoġġjati</h2>
+<table>
+<tr><th>Isem tal-kodiċi</th><th>Jikkorrispondi għal</th><th>Arkitetturi: <code>main</code> (ta' kuljum)</th><th>Arkitetturi: <code>release</code></th></tr>
+@@SUITE_ROWS@@</table>
+<p class="note"><strong>Sistemi ta' 32 bit:</strong> il-pakketti <code>armhf</code>
+huma mibnija għal Raspbian (ARMv6+VFP), il-bażi ta' Raspberry Pi OS ta' 32 bit,
+u għalhekk jaħdmu fuq kull mudell ta' Raspberry Pi, inklużi l-Pi&nbsp;1, iż-Zero u
+iż-Zero&nbsp;W, u jinstallaw ukoll fuq Debian <code>armhf</code> (it-tnejn huma ttestjati).
+<code>i386</code> (PCs ta' 32 bit) huwa mibni għal Debian&nbsp;12 biss: Debian&nbsp;13
+m'għadux jappoġġja l-installazzjoni ta' sistemi i386. Il-pakketti ta' 32 bit fihom
+l-istess funzjonijiet bħal dawk ta' 64 bit.</p>
+
+<h2>Ċavetta tal-iffirmar</h2>
+<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; importata awtomatikament mill-kmandi
+tal-bidu malajr ta' hawn fuq.</p>
+
+<h2>Ibbrawżja l-fajls tar-repożitorju</h2>
+<p><a href="dists/">dists/</a> (indiċi għal kull suite, fajls Release, listi
+Packages) &middot; <a href="pool/">pool/</a> (il-fajls <code>.deb</code>
+infushom) &middot; <a href="https://github.com/@@REPO_SLUG@@">ir-repożitorju tal-kodiċi
+sors</a> fuq GitHub.</p>
+</body>
+</html>
