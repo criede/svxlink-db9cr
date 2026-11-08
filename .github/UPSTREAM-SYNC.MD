@@ -244,9 +244,10 @@ releases are deliberately not built), for every target in
   (RTL-SDR Blog librtlsdr, SipLogic with PJSIP, GPIOD, Speex/Opus/LADSPA,
   systemd, the separate `qtel` package) are the same as for the daily
   packages. Qt6 needs C++17 while upstream forces `--std=c++11` into the
-  global flags, so the qtel build passes `-std=c++17` via
-  `CMAKE_CXX_FLAGS_RELEASE` (which CMake places after the global flags)
-  instead of patching the source. The build checks that `src/versions`
+  global flags (and overwrites `CMAKE_CXX_FLAGS_RELEASE` with a plain
+  `set()`), so the qtel build uses a tiny `CMAKE_CXX_COMPILER_LAUNCHER`
+  that appends `-std=c++17` as the last argument of every C++ compile
+  (the last `-std` wins for gcc) instead of patching the source. The build checks that `src/versions`
   of the checked-out tree really says `PROJECT=<tag>`.
 - **Version:** `<tag>-1~<suite>`, e.g. `26.05.2-1~trixie`. This sorts
   below the daily builds of the same or later code (`26.05.2.99.0+daily…`).

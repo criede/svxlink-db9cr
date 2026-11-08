@@ -266,15 +266,23 @@ EOF
 apt-get install -y --no-install-recommends \
   qt6-base-dev qt6-base-dev-tools qt6-tools-dev qt6-5compat-dev
 
-# -std=c++17 in CMAKE_CXX_FLAGS_RELEASE: upstream's src/CMakeLists.txt
-# appends FindSIGC's "--std=c++11" (libsigc++-2.0) to the global
-# CMAKE_CXX_FLAGS, but Qt6 needs C++17. CMake puts the per-config flags
-# after CMAKE_CXX_FLAGS on the compile line, so this wins without patching
-# the source -- needed for unmodified upstream release tags, which lack
-# this repository's per-target -std=c++17 fixes (harmless where present).
+# Qt6 needs C++17, but upstream's src/CMakeLists.txt appends FindSIGC's
+# "--std=c++11" (libsigc++-2.0) to the global CMAKE_CXX_FLAGS. Unmodified
+# upstream release tags lack this repository's per-target -std=c++17
+# fixes, and passing the flag via CMAKE_CXX_FLAGS_RELEASE does not work
+# either (upstream overwrites that variable with a plain set()). So a tiny
+# compiler launcher appends -std=c++17 as the very last argument of every
+# C++ compile, where it reliably wins over any earlier -std (last one
+# counts for gcc) -- no source patch needed, harmless where the per-target
+# fixes exist.
+cat > /usr/local/bin/cxx-std17-launcher <<'LAUNCHER_EOF'
+#!/bin/sh
+exec "$@" -std=c++17
+LAUNCHER_EOF
+chmod 0755 /usr/local/bin/cxx-std17-launcher
 cmake -S /source/src -B /build-qtel \
   -DCMAKE_BUILD_TYPE=Release -DUSE_QT=ON -DWITH_SYSTEMD=OFF -DDO_INSTALL_CHOWN=OFF \
-  '-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG -std=c++17' \
+  -DCMAKE_CXX_COMPILER_LAUNCHER=/usr/local/bin/cxx-std17-launcher \
   -DWITH_CONTRIB_SIP_LOGIC=OFF \
   -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SYSCONFDIR=/etc \
   -DCMAKE_INSTALL_LOCALSTATEDIR=/var

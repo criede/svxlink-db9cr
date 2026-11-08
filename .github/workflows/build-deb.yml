@@ -134,17 +134,21 @@ jobs:
           PLATFORM: ${{ inputs.platform }}
         run: |
           set -euo pipefail
-          keydir="$RUNNER_TEMP/raspbian-keyring"
-          mkdir -p "$keydir"
+          # Installed under /usr/share/keyrings rather than used from
+          # $RUNNER_TEMP: apt verifies signatures as the unprivileged _apt
+          # user, which cannot traverse /home/runner and then reports
+          # NO_PUBKEY even though the key was passed.
+          keyring=/usr/share/keyrings/raspbian-archive-keyring.gpg
           gpg --dearmor < tools/.github/keys/raspbian-archive-keyring.asc \
-            > "$keydir/raspbian-archive-keyring.gpg"
-          test "$(gpg --show-keys --with-colons "$keydir/raspbian-archive-keyring.gpg" \
+            > "$RUNNER_TEMP/raspbian-archive-keyring.gpg"
+          test "$(gpg --show-keys --with-colons "$RUNNER_TEMP/raspbian-archive-keyring.gpg" \
             | awk -F: '/^fpr:/{print $10; exit}')" = A0DA38D0D76E8B5D638872819165938D90FDDD2E
+          sudo install -D -m 0644 "$RUNNER_TEMP/raspbian-archive-keyring.gpg" "$keyring"
           sudo mmdebstrap --variant=minbase --architectures=armhf \
-            --keyring="$keydir/raspbian-archive-keyring.gpg" \
+            --keyring="$keyring" \
             --aptopt='Acquire::Retries "3"' \
             --setup-hook='mkdir -p "$1/etc/apt/trusted.gpg.d"' \
-            --setup-hook="copy-in $keydir/raspbian-archive-keyring.gpg /etc/apt/trusted.gpg.d/" \
+            --setup-hook="copy-in $keyring /etc/apt/trusted.gpg.d/" \
             "$SUITE" "$RUNNER_TEMP/raspbian-rootfs.tar" \
             "deb http://raspbian.raspberrypi.com/raspbian $SUITE main"
           sudo cat "$RUNNER_TEMP/raspbian-rootfs.tar" \

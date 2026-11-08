@@ -21,7 +21,7 @@ project's existing release notes are located under `src/doc/`.
   publishing into `.github/scripts/publish-packages.sh`, all shared by the
   daily and the release builds. Publishing retries on a rejected
   `gh-pages` push, and both Pages deploy jobs share a concurrency group.
-- The qtel build now passes `-std=c++17` via `CMAKE_CXX_FLAGS_RELEASE`, so
+- The qtel build now forces `-std=c++17` through a tiny compiler launcher (`CMAKE_CXX_COMPILER_LAUNCHER`), so
   Qt6 builds without source patches (needed for unmodified upstream tags).
 - Checksum files in GitHub releases are named `SHA256SUMS-<suite>-<arch>`.
 - The APT repository's `index.html` explains both components and lists
