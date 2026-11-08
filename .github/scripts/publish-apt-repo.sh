@@ -47,11 +47,26 @@ pool_dir="$REPO_DIR/pool/$SUITE/$COMPONENT/$letter/$pkg_name"
 mkdir -p "$pool_dir"
 cp "$DEB_FILE" "$pool_dir/"
 
+shopt -s nullglob
+
+# Enforce the "~deb<N>" version suffix: remove any package of this
+# suite/component/arch whose version still uses the pre-switch codename
+# form ("~bookworm", "~trixie", ...). Scoped to this COMPONENT and ARCH,
+# whose Packages index is rebuilt below in the same call, so no dangling
+# reference to a deleted file is left behind. This is a one-off effect for
+# the packages published before the "~deb<N>" switch and a no-op afterwards.
+for f in "$REPO_DIR/pool/$SUITE/$COMPONENT"/*/*/*_"${ARCH}".deb; do
+  base="$(basename "$f")"
+  if [[ ! "$base" =~ ~deb[0-9]+_"${ARCH}"\.deb$ ]]; then
+    echo "Pruning package with a pre-~deb<N> version: $base"
+    rm -f -- "$f"
+  fi
+done
+
 # Prune older versions of this package for this suite/arch according to
 # the grandfather-father-son retention policy. The build date is taken
 # from the "+daily<YYYYMMDD>" marker in the version string; files without
 # that marker are left untouched.
-shopt -s nullglob
 today="$(date -u +%Y%m%d)"
 dated_pairs=""
 for f in "$pool_dir"/"${pkg_name}"_*_"${ARCH}".deb; do

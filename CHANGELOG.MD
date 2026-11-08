@@ -7,6 +7,10 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- `publish-apt-repo.sh` removes pool packages that still use the old
+  codename version suffix (`~bookworm`/`~trixie`) when it republishes a
+  suite/component/arch, so the APT repository is cleaned of pre-`~deb<N>`
+  packages on the next publish without leaving dangling index entries.
 - Package versions now end in the Debian major version (`~deb12`,
   `~deb13`) instead of the codename (`~bookworm`, `~trixie`), like Debian's
   backports: dpkg sorts codenames alphabetically, so after an upgrade to
