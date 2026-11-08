@@ -1,0 +1,34 @@
+Package: qtel
+Version: 26.05.2-2~deb12
+Architecture: amd64
+Maintainer: SvxLink Community <svxlink@groups.io>
+Depends: svxlink (= 26.05.2-2~deb12), libc6 (>= 2.34), libgcc-s1 (>= 3.0), libgsm1 (>= 1.0.18), libqt6core5compat6 (>= 6.2.1), libqt6core6 (>= 6.4.0), libqt6gui6 (>= 6.1.2), libqt6network6 (>= 6.4.0), libqt6widgets6 (>= 6.1.2), libsigc++-2.0-0v5 (>= 2.8.0), libstdc++6 (>= 5.2)
+Filename: pool/bookworm/release/q/qtel/qtel_26.05.2-2~deb12_amd64.deb
+Size: 183256
+MD5sum: adfe6d9736a3969bd9965e70f0e48663
+SHA1: 0a2661a29cb79c3f478a5bf30f83719741ec3bee
+SHA256: 71964572c4287e95a72eb746f2c7447162b8d906d70376a9dfd60ee4260f11bb
+Section: hamradio
+Priority: optional
+Description: Graphical EchoLink client for SvxLink
+ Qtel is the graphical EchoLink client bundled with SvxLink. Built from
+ the same daily source as the svxlink package and pinned to the exact
+ same version, since it shares that package's echolib/async libraries.
+
+Package: svxlink
+Version: 26.05.2-2~deb12
+Architecture: amd64
+Maintainer: SvxLink Community <svxlink@groups.io>
+Installed-Size: 18073
+Depends: adduser, libc-bin, alsa-utils, vorbis-tools, tcl8.6, libasound2 (>= 1.0.16), libc6 (>= 2.35), libcurl4 (>= 7.16.2), libgcc-s1 (>= 4.0), libgcrypt20 (>= 1.10.0), libgpiod2 (>= 1.1), libgsm1 (>= 1.0.18), libjsoncpp25 (>= 1.9.5), libogg0 (>= 1.1.4~dfsg), libopus0 (>= 1.1), libpopt0 (>= 1.14), libsigc++-2.0-0v5 (>= 2.8.0), libspeex1 (>= 1.2~), libssl3 (>= 3.0.0), libstdc++6 (>= 11), libtcl8.6 (>= 8.6.0), libusb-1.0-0 (>= 2:1.0.21)
+Conflicts: svxlink-server, svxreflector, remotetrx, librtlsdr0, rtl-sdr
+Filename: pool/bookworm/release/s/svxlink/svxlink_26.05.2-2~deb12_amd64.deb
+Size: 5206376
+MD5sum: 198d1987f298f52a8711642271a1a59a
+SHA1: 1efc515f0077573fbf12584588d4c0a43e28f2b8
+SHA256: 9f83dc0581c430c085dc1f0e1dba92a36837261ab13571d7454981a919f5c008
+Section: devel
+Priority: optional
+Description: Advanced voice services system for ham radio use
+ The SvxLink project develops an advanced voice services system for ham radio use. It can be run on a simplex frequency or act as a repeater controller.
+
