@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-repository</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -82,20 +82,24 @@ daarbovenop (RTL-SDR, SipLogic, het aparte pakket <code>qtel</code>,
 deze APT-repository en meer &mdash; zie
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>
 voor de volledige lijst). Om op elk moment precies te zien wat er anders is dan upstream,
-zonder te vertrouwen op een momentopname hier die veroudert, kunt u
+zonder te vertrouwen op een momentopname hier die veroudert, kun je
 live vergelijken op GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;master van deze fork</a>.</p>
 
-<h2>Snel aan de slag</h2>
+<h2 id="quickstart">Snel aan de slag</h2>
 <p>Uit te voeren op het doelsysteem (detecteert automatisch de juiste codenaam/architectuur):</p>
 <pre><code># De publieke ondertekeningssleutel importeren
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (alleen de sleutel met deze vingerafdruk wordt geaccepteerd: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
 # De repository-bron toevoegen. Kies de component:
 #   main     dagelijkse ontwikkelbuilds
 #   release  officiële upstream-releases (26.05 en nieuwer)
-component=main
+component=release
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -104,8 +108,8 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Verplicht vóór de eerste start: configureer uw station, zender/ontvanger en audio.
-# Het meegeleverde bestand is slechts een sjabloon en moet aan uw opstelling worden aangepast.
+# Verplicht vóór de eerste start: configureer je station, zender/ontvanger en audio.
+# Het meegeleverde bestand is slechts een sjabloon en moet aan je opstelling worden aangepast.
 sudo editor /etc/svxlink/svxlink.conf
 
 # SvxLink bij het opstarten inschakelen en nu starten.
@@ -118,22 +122,22 @@ journalctl -u svxlink.service -f
 
 # Optionele grafische EchoLink-client (vereist een desktopomgeving):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Vereist:</strong> start de service niet voordat u
+<p class="note"><strong>Vereist:</strong> start de service niet voordat je
 <code>/etc/svxlink/svxlink.conf</code> hebt bewerkt. Configureer ten minste de
-stationsidentiteit, logica, ontvanger/zender en de audio-/PTT-instellingen voor uw hardware.
+stationsidentiteit, logica, ontvanger/zender en de audio-/PTT-instellingen voor je hardware.
 De service leest dit pad via <code>/etc/default/svxlink</code>.</p>
 <p class="note">Als <code>apt update</code> een 404 meldt voor deze bron, wordt de
-codenaam van uw systeem nog niet gebouwd (zie de tabel hieronder) &mdash; wijzig dan de
+codenaam van je systeem nog niet gebouwd (zie de tabel hieronder) &mdash; wijzig dan de
 codenaam in <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> in een van
 de ondersteunde. Daarna haalt een gewone <code>sudo apt upgrade</code>
 automatisch nieuwe dagelijkse builds (<code>main</code>) of nieuwe upstream-releases
 (<code>release</code>) op.</p>
-<p class="note">Schakel niet beide componenten tegelijk in, tenzij u de
+<p class="note">Schakel niet beide componenten tegelijk in, tenzij je de
 dagelijkse builds wilt: die hebben altijd de hogere versie, dus apt zou ze
 installeren in plaats van de releases. Om een bestaande installatie van <code>main</code>
-naar <code>release</code> om te zetten, wijzigt u de component in
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, voert u
-<code>sudo apt update</code> uit en installeert u daarna expliciet de releaseversie
+naar <code>release</code> om te zetten, wijzig je de component in
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, voer je
+<code>sudo apt update</code> uit en installeer je daarna expliciet de releaseversie
 (het is een downgrade), bijv.
 <code>sudo apt install svxlink=26.05.2-1~trixie</code>. Let op: in
 <code>release</code>-pakketten (ongewijzigde upstream-broncode) zijn de TCL-scripts
@@ -143,7 +147,7 @@ bewaar lokale wijzigingen in <code>events.d/local/</code>.</p>
 <h2>Configuratiewijzigingen toepassen</h2>
 <p>Na het bewerken van <code>/etc/svxlink/svxlink.conf</code> (of een
 modulebestand <code>/etc/svxlink/svxlink.d/*.conf</code>) op een draaiend
-station herlaadt u de configuratie zonder een actieve sessie te verbreken:</p>
+station herlaad je de configuratie zonder een actieve sessie te verbreken:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Dit verstuurt <code>SIGHUP</code>, waarop SvxLink zijn
 configuratie opnieuw inleest. Gebruik in plaats daarvan <code>sudo systemctl restart svxlink.service</code>
@@ -165,7 +169,7 @@ sudo apt-mark hold svxlink   # optioneel: voorkomt dat "apt upgrade" hem weer bi
 <h2>Pakketten</h2>
 <table>
 <tr><th>Pakket</th><th>Inhoud</th></tr>
-<tr><td><code>svxlink</code></td><td>Servercomponenten (svxlink, remotetrx, svxreflector, logic cores, Tcl-eventscripts). Gebouwd met: RTL-SDR-ondersteuning via directe USB (meegeleverde RTL-SDR Blog-fork van librtlsdr/rtl_tcp voor huidige V3/V4-dongles; conflicteert met librtlsdr0/rtl-sdr van de distributie), de bijgedragen SipLogic logic core (meegeleverd PJSIP/pjproject, statisch gelinkt), GPIO via libgpiod, en ondersteuning voor de audiocodecs en plug-ins Speex/Opus/LADSPA. Installeert een systemd-service. Bevat geen Qtel en geen geluidspakketten.</td></tr>
+<tr><td><code>svxlink</code></td><td>Servercomponenten (svxlink, remotetrx, svxreflector, logic cores, Tcl-eventscripts). Gebouwd met: RTL-SDR-ondersteuning via directe USB (meegeleverde RTL-SDR Blog-fork van librtlsdr/rtl_tcp voor huidige V3/V4-dongles; conflicteert met librtlsdr0/rtl-sdr van de distributie), de bijgedragen SipLogic logic core (meegeleverd PJSIP/pjproject, statisch gelinkt), GPIO via libgpiod, en ondersteuning voor de audiocodecs en plug-ins Speex/Opus/LADSPA. Installeert een systemd-service. Bevat geen Qtel en geen geluidspakketten. Bevat een udev-regel die de SvxLink-service en aangemelde desktopgebruikers toegang geeft tot RTL-SDR-USB-dongles.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafische EchoLink-client (Qt6). Vereist een desktopomgeving en het pakket <code>svxlink</code> van precies dezelfde versie (deelt de echolib/async-bibliotheken daarvan).</td></tr>
 </table>
 
@@ -184,7 +188,7 @@ ondersteunt de installatie van i386-systemen niet meer. De 32-bitpakketten bevat
 dezelfde functies als de 64-bitpakketten.</p>
 
 <h2>Ondertekeningssleutel</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; wordt automatisch geïmporteerd door de
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; wordt automatisch geïmporteerd door de
 bovenstaande snelstartcommando's.</p>
 
 <h2>Repository-bestanden bekijken</h2>

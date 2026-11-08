@@ -2,7 +2,7 @@
 <html lang="et">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-hoidla</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; See lehekülg on tõlgitud automaatselt tehisintellekti abil ja võib sisaldada vigu. Määrav on ingliskeelne versioon. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Projekti
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> paketid Raspberry Pi OS-i
-ja Debiani jaoks kahes komponendis &mdash; valige üks:</p>
+ja Debiani jaoks kahes komponendis &mdash; vali üks:</p>
 <ul>
 <li><code>main</code>: igapäevased arendusversioonid selle forgi uusimast
 lähtekoodist, mitte stabiilsed väljalasked.</li>
@@ -71,7 +71,7 @@ uuemad), kompileeritud muutmata upstream-väljalaske lähtekoodist samade
 kompileerimisseadete ja funktsioonidega nagu igapäevased paketid. Kõik väljalasked säilitatakse;
 <code>apt upgrade</code> liigub igale uuele upstream-väljalaskele.</li>
 </ul>
-<p>Üksikasjad leiate <a href="https://github.com/criede/svxlink-db9cr">lähtekoodihoidlast</a>.
+<p>Üksikasjad leiad <a href="https://github.com/criede/svxlink-db9cr">lähtekoodihoidlast</a>.
 </p>
 
 <h2>Upstream ja kohalikud muudatused</h2>
@@ -82,20 +82,24 @@ lisafunktsioonid (RTL-SDR, SipLogic, eraldi <code>qtel</code>-pakett,
 see APT-hoidla ja muud &mdash; täielik loetelu on failis
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>).
 Et näha täpselt, mis on upstreamist mis tahes ajahetkel erinev,
-ilma et peaksite tuginema siin olevale aeguvale hetktõmmisele, võrrelge
+ilma et peaksid tuginema siin olevale aeguvale hetktõmmisele, võrdle
 otse GitHubis:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstreami master&nbsp;&hellip;&nbsp;selle forgi master</a>.</p>
 
-<h2>Kiirjuhend</h2>
-<p>Käivitage sihtsüsteemis (tuvastab õige koodnime/arhitektuuri automaatselt):</p>
-<pre><code># Importige avalik allkirjastamisvõti
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+<h2 id="quickstart">Kiirjuhend</h2>
+<p>Käivita sihtsüsteemis (tuvastab õige koodnime/arhitektuuri automaatselt):</p>
+<pre><code># Impordi avalik allkirjastamisvõti
+# (aktsepteeritakse ainult selle sõrmejäljega võtit: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
-# Lisage hoidla allikas. Valige komponent:
+# Lisa hoidla allikas. Vali komponent:
 #   main     igapäevased arendusversioonid
 #   release  ametlikud upstream-väljalasked (26.05 ja uuemad)
-component=main
+component=release
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -104,49 +108,49 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Kohustuslik enne esimest käivitamist: seadistage oma jaam, raadio ja heli.
-# Paketiga kaasas olev fail on ainult mall ja see tuleb kohandada teie seadistusele.
+# Kohustuslik enne esimest käivitamist: seadista oma jaam, raadio ja heli.
+# Paketiga kaasas olev fail on ainult mall ja see tuleb kohandada sinu seadistusele.
 sudo editor /etc/svxlink/svxlink.conf
 
-# Lubage SvxLinki käivitumine alglaadimisel ja käivitage see kohe.
+# Luba SvxLinki käivitumine alglaadimisel ja käivita see kohe.
 sudo systemctl daemon-reload
 sudo systemctl enable --now svxlink.service
 
-# Kontrollige teenuse olekut ja jälgige selle logi.
+# Kontrolli teenuse olekut ja jälgi selle logi.
 systemctl status svxlink.service
 journalctl -u svxlink.service -f
 
 # Valikuline graafiline EchoLinki klient (vajab töölauakeskkonda):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Nõutav:</strong> Ärge käivitage teenust enne faili
-<code>/etc/svxlink/svxlink.conf</code> muutmist. Seadistage vähemalt jaama
+<p class="note"><strong>Nõutav:</strong> Ära käivita teenust enne faili
+<code>/etc/svxlink/svxlink.conf</code> muutmist. Seadista vähemalt jaama
 identiteet, loogika, vastuvõtja/saatja ning heli/PTT seaded vastavalt oma riistvarale.
 Teenus loeb seda asukohta faili <code>/etc/default/svxlink</code> kaudu.</p>
-<p class="note">Kui <code>apt update</code> teatab selle allika kohta veast 404, siis teie
-süsteemi koodnime jaoks veel pakette ei kompileerita (vt allolevat tabelit) &mdash; muutke
+<p class="note">Kui <code>apt update</code> teatab selle allika kohta veast 404, siis sinu
+süsteemi koodnime jaoks veel pakette ei kompileerita (vt allolevat tabelit) &mdash; muuda
 failis <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> koodnimi mõneks
 toetatud koodnimeks. Seejärel võtab tavaline <code>sudo apt upgrade</code>
 automaatselt kasutusele uued igapäevased versioonid (<code>main</code>) või uued upstream-väljalasked
 (<code>release</code>).</p>
-<p class="note">Ärge lubage mõlemat komponenti korraga, kui te just ei soovi
+<p class="note">Ära luba mõlemat komponenti korraga, kui sa just ei soovi
 igapäevaseid versioone: neil on alati kõrgem versiooninumber, seega paigaldaks apt need
 väljalasete asemele. Olemasoleva paigalduse vahetamiseks komponendilt <code>main</code>
-komponendile <code>release</code> muutke komponenti failis
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, käivitage
-<code>sudo apt update</code> ja seejärel paigaldage väljalaskeversioon selgesõnaliselt
+komponendile <code>release</code> muuda komponenti failis
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, käivita
+<code>sudo apt update</code> ja seejärel paigalda väljalaskeversioon selgesõnaliselt
 (tegemist on versiooni alandamisega), nt
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Pange tähele, et
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Pane tähele, et
 <code>release</code>-pakettides (muutmata upstream-lähtekood) ei ole kataloogis
 <code>/usr/share/svxlink</code> olevad TCL-skriptid konfiguratsioonifailidena
-kaitstud; hoidke kohalikke muudatusi kataloogis <code>events.d/local/</code>.</p>
+kaitstud; hoia kohalikke muudatusi kataloogis <code>events.d/local/</code>.</p>
 
 <h2>Konfiguratsioonimuudatuste rakendamine</h2>
 <p>Pärast faili <code>/etc/svxlink/svxlink.conf</code> (või mis tahes
 <code>/etc/svxlink/svxlink.d/*.conf</code> moodulifaili) muutmist töötavas
-jaamas laadige see uuesti ilma aktiivset seanssi katkestamata:</p>
+jaamas laadi see uuesti ilma aktiivset seanssi katkestamata:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">See saadab signaali <code>SIGHUP</code>, mille peale SvxLink loeb oma
-konfiguratsiooni uuesti. Kasutage selle asemel käsku <code>sudo systemctl restart svxlink.service</code>,
+konfiguratsiooni uuesti. Kasuta selle asemel käsku <code>sudo systemctl restart svxlink.service</code>,
 kui uuesti laadimine ei näi muudatust rakendavat (mõned seaded, näiteks
 milliseid loogikatuumasid või heliseadmeid laaditakse, võivad vajada täielikku taaskäivitamist).</p>
 
@@ -165,7 +169,7 @@ sudo apt-mark hold svxlink   # valikuline: takistab, et "apt upgrade" seda uuest
 <h2>Paketid</h2>
 <table>
 <tr><th>Pakett</th><th>Sisu</th></tr>
-<tr><td><code>svxlink</code></td><td>Serverikomponendid (svxlink, remotetrx, svxreflector, loogikatuumad, Tcl-sündmusskriptid). Kompileeritud järgmisega: RTL-SDR otse-USB tugi (kaasas RTL-SDR Blogi librtlsdr/rtl_tcp fork praeguste V3/V4 donglite jaoks; on vastuolus distributsiooni pakettidega librtlsdr0/rtl-sdr), kogukonna panustatud SipLogic loogikatuum (kaasas PJSIP/pjproject, staatiliselt lingitud), GPIO libgpiodi kaudu ning Speex/Opus/LADSPA helikoodekite ja pistikprogrammide tugi. Paigaldab systemd-teenuse. Ei sisalda Qteli ega helipakette.</td></tr>
+<tr><td><code>svxlink</code></td><td>Serverikomponendid (svxlink, remotetrx, svxreflector, loogikatuumad, Tcl-sündmusskriptid). Kompileeritud järgmisega: RTL-SDR otse-USB tugi (kaasas RTL-SDR Blogi librtlsdr/rtl_tcp fork praeguste V3/V4 donglite jaoks; on vastuolus distributsiooni pakettidega librtlsdr0/rtl-sdr), kogukonna panustatud SipLogic loogikatuum (kaasas PJSIP/pjproject, staatiliselt lingitud), GPIO libgpiodi kaudu ning Speex/Opus/LADSPA helikoodekite ja pistikprogrammide tugi. Paigaldab systemd-teenuse. Ei sisalda Qteli ega helipakette. Sisaldab udev-reeglit, mis annab SvxLinki teenusele ja töölauale sisse loginud kasutajatele juurdepääsu RTL-SDR USB-donglitele.</td></tr>
 <tr><td><code>qtel</code></td><td>Graafiline EchoLinki klient (Qt6). Vajab töölauakeskkonda ja täpselt sama versiooniga <code>svxlink</code>-paketti (kasutab selle echolib/async teeke).</td></tr>
 </table>
 
@@ -184,7 +188,7 @@ ei toeta enam i386-süsteemide paigaldamist. 32-bitistel pakettidel on
 samad funktsioonid kui 64-bitistel.</p>
 
 <h2>Allkirjastamisvõti</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; imporditakse automaatselt ülaltoodud
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; imporditakse automaatselt ülaltoodud
 kiirjuhendi käskudega.</p>
 
 <h2>Hoidla failide sirvimine</h2>

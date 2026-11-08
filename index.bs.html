@@ -2,7 +2,7 @@
 <html lang="bs">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT repozitorij SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Ova stranica je automatski prevedena pomoću umjetne inteligencije i može sadržavati greške. Mjerodavna je engleska verzija. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Paketi
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> za Raspberry Pi OS
-i Debian, u dvije komponente &mdash; odaberite jednu:</p>
+i Debian, u dvije komponente &mdash; odaberi jednu:</p>
 <ul>
 <li><code>main</code>: dnevni razvojni buildovi iz najnovijeg izvornog koda
 ovog forka, a ne stabilna izdanja.</li>
@@ -71,7 +71,7 @@ novija), izgrađena iz neizmijenjenog izvornog koda izdanja s istim
 postavkama izgradnje i funkcijama kao dnevni paketi. Svako izdanje se zadržava;
 <code>apt upgrade</code> prelazi na svako novo izdanje izvornog projekta.</li>
 </ul>
-<p>Detalje potražite u <a href="https://github.com/criede/svxlink-db9cr">repozitoriju izvornog koda</a>.
+<p>Detalje potraži u <a href="https://github.com/criede/svxlink-db9cr">repozitoriju izvornog koda</a>.
 </p>
 
 <h2>Izvorni projekat i lokalne izmjene</h2>
@@ -81,21 +81,25 @@ originalnog projekta SvxLink, s vlastitim pakovanjem i dodatnim funkcijama
 povrh njega (RTL-SDR, SipLogic, zaseban paket <code>qtel</code>,
 ovaj APT repozitorij i drugo &mdash; potpuna lista nalazi se u
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>).
-Da biste u bilo kojem trenutku vidjeli tačno po čemu se fork razlikuje od izvornog projekta,
-bez oslanjanja na zastarjeli snimak na ovom mjestu, uporedite
+Da bi u bilo kojem trenutku vidio tačno po čemu se fork razlikuje od izvornog projekta,
+bez oslanjanja na zastarjeli snimak na ovom mjestu, uporedi
 uživo na GitHubu:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">master izvornog projekta&nbsp;&hellip;&nbsp;master ovog forka</a>.</p>
 
-<h2>Brzi početak</h2>
-<p>Pokrenite na ciljnom sistemu (ispravno kodno ime i arhitektura otkrivaju se automatski):</p>
+<h2 id="quickstart">Brzi početak</h2>
+<p>Pokreni na ciljnom sistemu (ispravno kodno ime i arhitektura otkrivaju se automatski):</p>
 <pre><code># Uvoz javnog ključa za potpisivanje
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (prihvata se samo ključ s ovim otiskom: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
-# Dodavanje izvora repozitorija. Odaberite komponentu:
+# Dodavanje izvora repozitorija. Odaberi komponentu:
 #   main     dnevni razvojni buildovi
 #   release  zvanična izdanja izvornog projekta (26.05 i novija)
-component=main
+component=release
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -104,56 +108,56 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Obavezno prije prvog pokretanja: konfigurišite stanicu, radio i zvuk.
-# Datoteka iz paketa je samo šablon i mora se prilagoditi vašoj postavci.
+# Obavezno prije prvog pokretanja: konfiguriši stanicu, radio i zvuk.
+# Datoteka iz paketa je samo šablon i mora se prilagoditi tvojoj postavci.
 sudo editor /etc/svxlink/svxlink.conf
 
-# Omogućite SvxLink pri pokretanju sistema i pokrenite ga odmah.
+# Omogući SvxLink pri pokretanju sistema i pokreni ga odmah.
 sudo systemctl daemon-reload
 sudo systemctl enable --now svxlink.service
 
-# Provjerite stanje servisa i pratite njegov log.
+# Provjeri stanje servisa i prati njegov log.
 systemctl status svxlink.service
 journalctl -u svxlink.service -f
 
 # Opcionalni grafički EchoLink klijent (potrebno je grafičko okruženje):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Obavezno:</strong> Ne pokrećite servis prije
-uređivanja datoteke <code>/etc/svxlink/svxlink.conf</code>. Konfigurišite barem
+<p class="note"><strong>Obavezno:</strong> Ne pokreći servis prije
+uređivanja datoteke <code>/etc/svxlink/svxlink.conf</code>. Konfiguriši barem
 identifikaciju stanice, logiku, prijemnik/predajnik te postavke zvuka/PTT-a
 za svoj hardver. Servis čita ovu putanju preko <code>/etc/default/svxlink</code>.</p>
 <p class="note">Ako <code>apt update</code> za ovaj izvor prijavi grešku 404,
-za kodno ime vašeg sistema paketi se još ne izgrađuju (pogledajte tabelu ispod) &mdash;
-umjesto toga promijenite kodno ime u <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> u neko
+za kodno ime tvog sistema paketi se još ne izgrađuju (pogledaj tabelu ispod) &mdash;
+umjesto toga promijeni kodno ime u <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> u neko
 od podržanih. Nakon toga uobičajeni <code>sudo apt upgrade</code>
 automatski preuzima nove dnevne buildove (<code>main</code>) ili nova izdanja
 izvornog projekta (<code>release</code>).</p>
-<p class="note">Ne omogućavajte obje komponente istovremeno, osim ako želite
+<p class="note">Ne omogućavaj obje komponente istovremeno, osim ako želiš
 dnevne buildove: oni uvijek imaju višu verziju, pa bi ih apt instalirao
-umjesto izdanja. Da biste postojeću instalaciju prebacili s <code>main</code>
-na <code>release</code>, promijenite komponentu u
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, pokrenite
-<code>sudo apt update</code>, a zatim izričito instalirajte verziju izdanja
+umjesto izdanja. Da bi postojeću instalaciju prebacio s <code>main</code>
+na <code>release</code>, promijeni komponentu u
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, pokreni
+<code>sudo apt update</code>, a zatim izričito instaliraj verziju izdanja
 (radi se o vraćanju na nižu verziju), npr.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Imajte na umu da u paketima
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Imaj na umu da u paketima
 <code>release</code> (neizmijenjeni izvorni kod izvornog projekta) TCL skripte
 u <code>/usr/share/svxlink</code> nisu zaštićene kao konfiguracijske
-datoteke; lokalne izmjene čuvajte u <code>events.d/local/</code>.</p>
+datoteke; lokalne izmjene čuvaj u <code>events.d/local/</code>.</p>
 
 <h2>Primjena izmjena konfiguracije</h2>
 <p>Nakon uređivanja <code>/etc/svxlink/svxlink.conf</code> (ili bilo koje datoteke modula
 <code>/etc/svxlink/svxlink.d/*.conf</code>) na pokrenutoj
-stanici ponovo učitajte konfiguraciju bez prekidanja aktivne sesije:</p>
+stanici ponovo učitaj konfiguraciju bez prekidanja aktivne sesije:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Time se šalje signal <code>SIGHUP</code>, na koji SvxLink ponovo čita
-svoju konfiguraciju. Ako se čini da ponovno učitavanje nije preuzelo izmjenu, umjesto toga koristite
+svoju konfiguraciju. Ako se čini da ponovno učitavanje nije preuzelo izmjenu, umjesto toga koristi
 <code>sudo systemctl restart svxlink.service</code> (neke postavke, naprimjer
 koje se logičke jezgre ili zvučni uređaji učitavaju, mogu zahtijevati potpuno ponovno pokretanje).</p>
 
 <h2>Instalacija starije verzije</h2>
 <p>Novije verzije ostaju dostupne u poolu još neko vrijeme nakon što ih
 zamijene novije (dnevne sedmicu dana, sedmične mjesec dana, mjesečne godinu dana &mdash;
-pogledajte odjeljak „Retention“ (zadržavanje) u
+pogledaj odjeljak „Retention“ (zadržavanje) u
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
 pa se loš dnevni build obično može vratiti na prethodni. Paketi izdanja izvornog projekta
 (komponenta <code>release</code>) nikada se ne uklanjaju:</p>
@@ -165,7 +169,7 @@ sudo apt-mark hold svxlink   # opcionalno: sprečava da ga "apt upgrade" ponovo 
 <h2>Paketi</h2>
 <table>
 <tr><th>Paket</th><th>Sadržaj</th></tr>
-<tr><td><code>svxlink</code></td><td>Serverske komponente (svxlink, remotetrx, svxreflector, logičke jezgre, Tcl skripte događaja). Izgrađeno s: podrškom za RTL-SDR direktno preko USB-a (priložen fork librtlsdr/rtl_tcp od RTL-SDR Bloga za aktuelne prijemnike V3/V4; u konfliktu s paketima librtlsdr0/rtl-sdr iz distribucije), doprinesenom logičkom jezgrom SipLogic (priložen PJSIP/pjproject, statički linkovan), GPIO-om preko libgpiod te podrškom za audio kodeke i dodatke Speex/Opus/LADSPA. Instalira systemd servis. Ne sadrži Qtel niti zvučne pakete.</td></tr>
+<tr><td><code>svxlink</code></td><td>Serverske komponente (svxlink, remotetrx, svxreflector, logičke jezgre, Tcl skripte događaja). Izgrađeno s: podrškom za RTL-SDR direktno preko USB-a (priložen fork librtlsdr/rtl_tcp od RTL-SDR Bloga za aktuelne prijemnike V3/V4; u konfliktu s paketima librtlsdr0/rtl-sdr iz distribucije), doprinesenom logičkom jezgrom SipLogic (priložen PJSIP/pjproject, statički linkovan), GPIO-om preko libgpiod te podrškom za audio kodeke i dodatke Speex/Opus/LADSPA. Instalira systemd servis. Ne sadrži Qtel niti zvučne pakete. Sadrži udev pravilo koje servisu SvxLink i prijavljenim korisnicima radne površine daje pristup RTL-SDR USB donglovima.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafički EchoLink klijent (Qt6). Zahtijeva grafičko okruženje i paket <code>svxlink</code> potpuno iste verzije (dijeli njegove biblioteke echolib/async).</td></tr>
 </table>
 
@@ -184,7 +188,7 @@ više ne podržava instalaciju i386 sistema. 32-bitni paketi sadrže
 iste funkcije kao i 64-bitni.</p>
 
 <h2>Ključ za potpisivanje</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; automatski ga uvoze
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; automatski ga uvoze
 gornje komande za brzi početak.</p>
 
 <h2>Pregledanje datoteka repozitorija</h2>

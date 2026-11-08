@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repozytorium APT SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -86,16 +86,20 @@ macierzystego, bez polegania na nieaktualnym zrzucie w tym miejscu, porównaj
 na żywo w serwisie GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">master projektu macierzystego&nbsp;&hellip;&nbsp;master tego forka</a>.</p>
 
-<h2>Szybki start</h2>
+<h2 id="quickstart">Szybki start</h2>
 <p>Uruchom w systemie docelowym (właściwa nazwa kodowa i architektura są wykrywane automatycznie):</p>
 <pre><code># Zaimportuj publiczny klucz podpisujący
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (akceptowany jest tylko klucz z tym odciskiem: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
 # Dodaj źródło repozytorium. Wybierz komponent:
 #   main     codzienne kompilacje rozwojowe
 #   release  oficjalne wydania projektu macierzystego (26.05 i nowsze)
-component=main
+component=release
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -105,7 +109,7 @@ sudo apt update
 sudo apt install svxlink
 
 # Obowiązkowo przed pierwszym uruchomieniem: skonfiguruj stację, radio i audio.
-# Plik z pakietu jest tylko szablonem i musi zostać dostosowany do Twojej konfiguracji.
+# Plik z pakietu jest tylko szablonem i musi zostać dostosowany do twojej konfiguracji.
 sudo editor /etc/svxlink/svxlink.conf
 
 # Włącz SvxLink przy starcie systemu i uruchom go teraz.
@@ -123,7 +127,7 @@ edycją pliku <code>/etc/svxlink/svxlink.conf</code>. Skonfiguruj co najmniej
 identyfikację stacji, logikę, odbiornik/nadajnik oraz ustawienia audio/PTT
 dla swojego sprzętu. Usługa odczytuje tę ścieżkę poprzez <code>/etc/default/svxlink</code>.</p>
 <p class="note">Jeśli <code>apt update</code> zgłasza błąd 404 dla tego źródła,
-pakiety dla nazwy kodowej Twojego systemu nie są jeszcze budowane (zobacz tabelę poniżej) &mdash;
+pakiety dla nazwy kodowej twojego systemu nie są jeszcze budowane (zobacz tabelę poniżej) &mdash;
 zmień wtedy nazwę kodową w <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> na jedną
 z obsługiwanych. Następnie zwykłe <code>sudo apt upgrade</code>
 automatycznie pobiera nowe kompilacje codzienne (<code>main</code>) lub nowe wydania
@@ -165,7 +169,7 @@ sudo apt-mark hold svxlink   # opcjonalnie: zapobiega ponownej aktualizacji prze
 <h2>Pakiety</h2>
 <table>
 <tr><th>Pakiet</th><th>Zawartość</th></tr>
-<tr><td><code>svxlink</code></td><td>Komponenty serwerowe (svxlink, remotetrx, svxreflector, rdzenie logiki, skrypty zdarzeń Tcl). Zbudowany z: obsługą RTL-SDR przez bezpośrednie USB (dołączony fork librtlsdr/rtl_tcp od RTL-SDR Blog dla aktualnych odbiorników V3/V4; koliduje z dystrybucyjnymi librtlsdr0/rtl-sdr), dodatkowym rdzeniem logiki SipLogic (dołączony PJSIP/pjproject, linkowany statycznie), GPIO przez libgpiod oraz obsługą kodeków audio i wtyczek Speex/Opus/LADSPA. Instaluje usługę systemd. Nie zawiera Qtel ani pakietów dźwiękowych.</td></tr>
+<tr><td><code>svxlink</code></td><td>Komponenty serwerowe (svxlink, remotetrx, svxreflector, rdzenie logiki, skrypty zdarzeń Tcl). Zbudowany z: obsługą RTL-SDR przez bezpośrednie USB (dołączony fork librtlsdr/rtl_tcp od RTL-SDR Blog dla aktualnych odbiorników V3/V4; koliduje z dystrybucyjnymi librtlsdr0/rtl-sdr), dodatkowym rdzeniem logiki SipLogic (dołączony PJSIP/pjproject, linkowany statycznie), GPIO przez libgpiod oraz obsługą kodeków audio i wtyczek Speex/Opus/LADSPA. Instaluje usługę systemd. Nie zawiera Qtel ani pakietów dźwiękowych. Zawiera regułę udev, która daje usłudze SvxLink i użytkownikom zalogowanym do pulpitu dostęp do donglów USB RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Graficzny klient EchoLink (Qt6). Wymaga środowiska graficznego oraz pakietu <code>svxlink</code> w dokładnie tej samej wersji (współdzieli jego biblioteki echolib/async).</td></tr>
 </table>
 
@@ -184,7 +188,7 @@ nie obsługuje już instalacji systemów i386. Pakiety 32-bitowe mają
 te same funkcje co 64-bitowe.</p>
 
 <h2>Klucz podpisujący</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; importowany automatycznie przez
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; importowany automatycznie przez
 powyższe polecenia szybkiego startu.</p>
 
 <h2>Przeglądanie plików repozytorium</h2>

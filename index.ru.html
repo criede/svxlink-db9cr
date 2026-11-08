@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT-репозиторий SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Эта страница переведена автоматически с помощью искусственного интеллекта и может содержать ошибки. Определяющей является английская версия. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Пакеты
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> для Raspberry Pi OS
-и Debian в двух компонентах &mdash; выберите один:</p>
+и Debian в двух компонентах &mdash; выбери один:</p>
 <ul>
 <li><code>main</code>: ежедневные сборки для разработки из самого свежего исходного кода
 этого форка, а не стабильные релизы.</li>
@@ -81,20 +81,24 @@
 этот APT-репозиторий и другое &mdash; полный список см. в
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>).
 Чтобы в любой момент точно увидеть, чем форк отличается от upstream, не полагаясь
-на снимок, который здесь может устареть, сравните актуальное состояние
+на снимок, который здесь может устареть, сравни актуальное состояние
 на GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;master этого форка</a>.</p>
 
-<h2>Быстрый старт</h2>
-<p>Выполните на целевой системе (нужные кодовое имя и архитектура определяются автоматически):</p>
+<h2 id="quickstart">Быстрый старт</h2>
+<p>Выполни на целевой системе (нужные кодовое имя и архитектура определяются автоматически):</p>
 <pre><code># Импорт открытого ключа подписи
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (принимается только ключ с этим отпечатком: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
-# Добавление источника репозитория. Выберите компонент:
+# Добавление источника репозитория. Выбери компонент:
 #   main     ежедневные сборки для разработки
 #   release  официальные релизы upstream (26.05 и новее)
-component=main
+component=release
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -103,8 +107,8 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Обязательно перед первым запуском: настройте станцию, радиостанцию и аудио.
-# Файл из пакета является лишь шаблоном и должен быть адаптирован к вашей конфигурации.
+# Обязательно перед первым запуском: настрой станцию, радиостанцию и аудио.
+# Файл из пакета является лишь шаблоном и должен быть адаптирован к твоей конфигурации.
 sudo editor /etc/svxlink/svxlink.conf
 
 # Включить автозапуск SvxLink при загрузке и запустить его сейчас.
@@ -117,35 +121,35 @@ journalctl -u svxlink.service -f
 
 # Необязательный графический клиент EchoLink (требуется окружение рабочего стола):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Обязательно:</strong> Не запускайте службу до
-редактирования <code>/etc/svxlink/svxlink.conf</code>. Настройте как минимум
+<p class="note"><strong>Обязательно:</strong> Не запускай службу до
+редактирования <code>/etc/svxlink/svxlink.conf</code>. Настрой как минимум
 идентификацию станции, логику, приёмник/передатчик и параметры аудио/PTT для
-вашего оборудования. Служба получает этот путь через <code>/etc/default/svxlink</code>.</p>
+твоего оборудования. Служба получает этот путь через <code>/etc/default/svxlink</code>.</p>
 <p class="note">Если <code>apt update</code> сообщает об ошибке 404 для этого источника,
-для кодового имени вашей системы ещё нет сборок (см. таблицу ниже) &mdash; вместо этого
-измените кодовое имя в <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> на одно
+для кодового имени твоей системы ещё нет сборок (см. таблицу ниже) &mdash; вместо этого
+измени кодовое имя в <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> на одно
 из поддерживаемых. После этого обычная команда <code>sudo apt upgrade</code>
 автоматически получает новые ежедневные сборки (<code>main</code>) или новые релизы upstream
 (<code>release</code>).</p>
-<p class="note">Не включайте оба компонента одновременно, если только вам не нужны
+<p class="note">Не включай оба компонента одновременно, если только тебе не нужны
 ежедневные сборки: у них всегда более высокая версия, поэтому apt установил бы их
 вместо релизов. Чтобы перевести существующую установку с <code>main</code>
-на <code>release</code>, измените компонент в
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, выполните
-<code>sudo apt update</code>, а затем явно установите версию релиза
+на <code>release</code>, измени компонент в
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, выполни
+<code>sudo apt update</code>, а затем явно установи версию релиза
 (это понижение версии), например
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Обратите внимание, что в пакетах
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Обрати внимание, что в пакетах
 <code>release</code> (неизменённый исходный код upstream) скрипты TCL
 в <code>/usr/share/svxlink</code> не защищены как конфигурационные
-файлы; храните локальные изменения в <code>events.d/local/</code>.</p>
+файлы; храни локальные изменения в <code>events.d/local/</code>.</p>
 
 <h2>Применение изменений конфигурации</h2>
 <p>После редактирования <code>/etc/svxlink/svxlink.conf</code> (или любого
 файла модуля <code>/etc/svxlink/svxlink.d/*.conf</code>) на работающей
-станции перезагрузите конфигурацию без разрыва активного сеанса:</p>
+станции перезагрузи конфигурацию без разрыва активного сеанса:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Эта команда отправляет <code>SIGHUP</code>, по которому SvxLink повторно считывает
-свою конфигурацию. Используйте вместо этого <code>sudo systemctl restart svxlink.service</code>,
+свою конфигурацию. Используй вместо этого <code>sudo systemctl restart svxlink.service</code>,
 если перезагрузка, по-видимому, не применяет изменение (некоторые параметры, например,
 какие ядра логики или звуковые устройства загружаются, могут требовать полного перезапуска).</p>
 
@@ -165,7 +169,7 @@ sudo apt-mark hold svxlink   # необязательно: не даёт "apt up
 <h2>Пакеты</h2>
 <table>
 <tr><th>Пакет</th><th>Содержимое</th></tr>
-<tr><td><code>svxlink</code></td><td>Серверные компоненты (svxlink, remotetrx, svxreflector, ядра логики, скрипты событий Tcl). Собран с: поддержкой RTL-SDR через прямое USB-подключение (встроенный форк librtlsdr/rtl_tcp от RTL-SDR Blog для современных донглов V3/V4; конфликтует с пакетами дистрибутива librtlsdr0/rtl-sdr), предоставленным сообществом ядром логики SipLogic (встроенный PJSIP/pjproject, статически скомпонован), GPIO через libgpiod и поддержкой аудиокодеков и плагинов Speex/Opus/LADSPA. Устанавливает службу systemd. Не содержит Qtel и звуковые пакеты.</td></tr>
+<tr><td><code>svxlink</code></td><td>Серверные компоненты (svxlink, remotetrx, svxreflector, ядра логики, скрипты событий Tcl). Собран с: поддержкой RTL-SDR через прямое USB-подключение (встроенный форк librtlsdr/rtl_tcp от RTL-SDR Blog для современных донглов V3/V4; конфликтует с пакетами дистрибутива librtlsdr0/rtl-sdr), предоставленным сообществом ядром логики SipLogic (встроенный PJSIP/pjproject, статически скомпонован), GPIO через libgpiod и поддержкой аудиокодеков и плагинов Speex/Opus/LADSPA. Устанавливает службу systemd. Не содержит Qtel и звуковые пакеты. Содержит правило udev, которое даёт службе SvxLink и пользователям, вошедшим в рабочий стол, доступ к USB-донглам RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Графический клиент EchoLink (Qt6). Требует окружения рабочего стола и пакета <code>svxlink</code> точно той же версии (использует его библиотеки echolib/async).</td></tr>
 </table>
 
@@ -184,7 +188,7 @@ Zero&nbsp;W, а также устанавливаются на Debian <code>armh
 те же функции, что и 64-битные.</p>
 
 <h2>Ключ подписи</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; импортируется автоматически
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; импортируется автоматически
 командами быстрого старта выше.</p>
 
 <h2>Просмотр файлов репозитория</h2>

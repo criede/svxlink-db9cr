@@ -2,7 +2,7 @@
 <html lang="fi">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR -APT-pakettivarasto</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -86,16 +86,20 @@ hetkenä, ilman että täällä oleva tilannekuva vanhenee, vertaa
 suoraan GitHubissa:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstreamin master&nbsp;&hellip;&nbsp;tämän forkin master</a>.</p>
 
-<h2>Pika-aloitus</h2>
+<h2 id="quickstart">Pika-aloitus</h2>
 <p>Suorita kohdejärjestelmässä (tunnistaa oikean koodinimen/arkkitehtuurin automaattisesti):</p>
 <pre><code># Tuo julkinen allekirjoitusavain
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (vain tällä sormenjäljellä varustettu avain hyväksytään: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
 # Lisää varastolähde. Valitse komponentti:
 #   main     päivittäiset kehitysversiot
 #   release  viralliset upstream-julkaisut (26.05 ja uudemmat)
-component=main
+component=release
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -165,7 +169,7 @@ sudo apt-mark hold svxlink   # valinnainen: estää "apt upgrade" -komentoa päi
 <h2>Paketit</h2>
 <table>
 <tr><th>Paketti</th><th>Sisältö</th></tr>
-<tr><td><code>svxlink</code></td><td>Palvelinkomponentit (svxlink, remotetrx, svxreflector, logiikkaytimet, Tcl-tapahtumaskriptit). Käännetty seuraavilla: RTL-SDR-tuki suoraan USB:n kautta (mukana RTL-SDR Blogin librtlsdr/rtl_tcp-fork nykyisille V3/V4-dongleille; on ristiriidassa jakelun librtlsdr0/rtl-sdr-pakettien kanssa), yhteisön tuottama SipLogic-logiikkaydin (mukana PJSIP/pjproject, staattisesti linkitetty), GPIO libgpiodin kautta sekä Speex/Opus/LADSPA-äänikoodekki- ja liitännäistuki. Asentaa systemd-palvelun. Ei sisällä Qteliä eikä äänipaketteja.</td></tr>
+<tr><td><code>svxlink</code></td><td>Palvelinkomponentit (svxlink, remotetrx, svxreflector, logiikkaytimet, Tcl-tapahtumaskriptit). Käännetty seuraavilla: RTL-SDR-tuki suoraan USB:n kautta (mukana RTL-SDR Blogin librtlsdr/rtl_tcp-fork nykyisille V3/V4-dongleille; on ristiriidassa jakelun librtlsdr0/rtl-sdr-pakettien kanssa), yhteisön tuottama SipLogic-logiikkaydin (mukana PJSIP/pjproject, staattisesti linkitetty), GPIO libgpiodin kautta sekä Speex/Opus/LADSPA-äänikoodekki- ja liitännäistuki. Asentaa systemd-palvelun. Ei sisällä Qteliä eikä äänipaketteja. Sisältää udev-säännön, joka antaa SvxLink-palvelulle ja työpöydälle kirjautuneille käyttäjille pääsyn RTL-SDR-USB-tikkuihin.</td></tr>
 <tr><td><code>qtel</code></td><td>Graafinen EchoLink-asiakasohjelma (Qt6). Vaatii työpöytäympäristön ja täsmälleen saman version <code>svxlink</code>-paketista (käyttää sen echolib/async-kirjastoja).</td></tr>
 </table>
 
@@ -184,7 +188,7 @@ ei enää tue i386-järjestelmien asentamista. 32-bittisissä paketeissa on
 samat ominaisuudet kuin 64-bittisissä.</p>
 
 <h2>Allekirjoitusavain</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; tuodaan automaattisesti yllä olevilla
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; tuodaan automaattisesti yllä olevilla
 pika-aloituksen komennoilla.</p>
 
 <h2>Selaa varaston tiedostoja</h2>

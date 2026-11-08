@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repositorio APT de SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Esta página ha sido traducida automáticamente mediante inteligencia artificial y puede contener errores. La versión en inglés es la de referencia. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Paquetes de
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> para Raspberry Pi OS
-y Debian, en dos componentes &mdash; elija uno:</p>
+y Debian, en dos componentes &mdash; elige uno:</p>
 <ul>
 <li><code>main</code>: compilaciones de desarrollo diarias a partir del código fuente más reciente de
 este fork, no versiones estables.</li>
@@ -71,7 +71,7 @@ posteriores), compiladas a partir del código fuente original sin modificar, con
 configuración de compilación y las mismas funciones que los paquetes diarios. Se conservan todas las versiones;
 <code>apt upgrade</code> pasa a cada nueva versión del proyecto original.</li>
 </ul>
-<p>Consulte el <a href="https://github.com/criede/svxlink-db9cr">repositorio de código fuente</a>
+<p>Consulta el <a href="https://github.com/criede/svxlink-db9cr">repositorio de código fuente</a>
 para más detalles.</p>
 
 <h2>Proyecto original y cambios locales</h2>
@@ -79,23 +79,27 @@ para más detalles.</p>
 <a href="https://github.com/sm0svx/svxlink">sm0svx/svxlink</a>, el
 proyecto SvxLink original, con empaquetado local y funciones adicionales
 añadidas encima (RTL-SDR, SipLogic, el paquete independiente <code>qtel</code>,
-este repositorio APT y más &mdash; consulte
+este repositorio APT y más &mdash; consulta
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>
 para la lista completa). Para ver exactamente qué difiere del proyecto original en cualquier
-momento, sin depender de una instantánea que aquí quedaría desactualizada, compare
+momento, sin depender de una instantánea que aquí quedaría desactualizada, compara
 en directo en GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">master original&nbsp;&hellip;&nbsp;master de este fork</a>.</p>
 
-<h2>Inicio rápido</h2>
-<p>Ejecute en el sistema de destino (detecta automáticamente el nombre en clave y la arquitectura correctos):</p>
+<h2 id="quickstart">Inicio rápido</h2>
+<p>Ejecuta en el sistema de destino (detecta automáticamente el nombre en clave y la arquitectura correctos):</p>
 <pre><code># Importar la clave pública de firma
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (solo se acepta la clave con esta huella: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
-# Añadir la fuente del repositorio. Elija el componente:
+# Añadir la fuente del repositorio. Elige el componente:
 #   main     compilaciones de desarrollo diarias
 #   release  versiones oficiales del proyecto original (26.05 y posteriores)
-component=main
+component=release
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -104,8 +108,8 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Obligatorio antes del primer arranque: configure su estación, radio y audio.
-# El archivo incluido es solo una plantilla y debe adaptarse a su instalación.
+# Obligatorio antes del primer arranque: configura tu estación, radio y audio.
+# El archivo incluido es solo una plantilla y debe adaptarse a tu instalación.
 sudo editor /etc/svxlink/svxlink.conf
 
 # Habilitar SvxLink en el arranque e iniciarlo ahora.
@@ -118,42 +122,42 @@ journalctl -u svxlink.service -f
 
 # Cliente gráfico de EchoLink opcional (requiere un entorno de escritorio):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Obligatorio:</strong> no inicie el servicio antes de
-editar <code>/etc/svxlink/svxlink.conf</code>. Configure al menos la identidad
-de la estación, la lógica, el receptor/transmisor y los ajustes de audio/PTT para su hardware.
+<p class="note"><strong>Obligatorio:</strong> no inicies el servicio antes de
+editar <code>/etc/svxlink/svxlink.conf</code>. Configura al menos la identidad
+de la estación, la lógica, el receptor/transmisor y los ajustes de audio/PTT para tu hardware.
 El servicio lee esta ruta a través de <code>/etc/default/svxlink</code>.</p>
 <p class="note">Si <code>apt update</code> devuelve un error 404 para esta fuente, el
-nombre en clave de su sistema aún no se compila (vea la tabla de abajo) &mdash; en ese caso, cambie el
+nombre en clave de tu sistema aún no se compila (ve la tabla de abajo) &mdash; en ese caso, cambia el
 nombre en clave en <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> por uno de
 los admitidos. Después, un <code>sudo apt upgrade</code> normal
 obtiene automáticamente las nuevas compilaciones diarias (<code>main</code>) o las nuevas versiones del proyecto original
 (<code>release</code>).</p>
-<p class="note">No habilite ambos componentes a la vez, a menos que quiera las
+<p class="note">No habilites ambos componentes a la vez, a menos que quieras las
 compilaciones diarias: siempre tienen la versión más alta, por lo que apt las instalaría
 en lugar de las versiones oficiales. Para cambiar una instalación existente de <code>main</code>
-a <code>release</code>, cambie el componente en
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, ejecute
-<code>sudo apt update</code> y, a continuación, instale explícitamente la versión release
+a <code>release</code>, cambia el componente en
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, ejecuta
+<code>sudo apt update</code> y, a continuación, instala explícitamente la versión release
 (se trata de un downgrade, es decir, de una versión inferior), por ejemplo
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Tenga en cuenta que en los paquetes
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Ten en cuenta que en los paquetes
 <code>release</code> (código fuente original sin modificar) los scripts TCL
 en <code>/usr/share/svxlink</code> no están protegidos como archivos de
-configuración; guarde los cambios locales en <code>events.d/local/</code>.</p>
+configuración; guarda los cambios locales en <code>events.d/local/</code>.</p>
 
 <h2>Aplicar cambios de configuración</h2>
 <p>Después de editar <code>/etc/svxlink/svxlink.conf</code> (o cualquier archivo de módulo
 <code>/etc/svxlink/svxlink.d/*.conf</code>) en una estación en funcionamiento,
-recárguelo sin interrumpir una sesión activa:</p>
+recárgalo sin interrumpir una sesión activa:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Esto envía la señal <code>SIGHUP</code>, ante la cual SvxLink vuelve a leer su
-configuración. Use en su lugar <code>sudo systemctl restart svxlink.service</code>
+configuración. Usa en su lugar <code>sudo systemctl restart svxlink.service</code>
 si una recarga no parece aplicar un cambio (algunos ajustes, como
 qué núcleos lógicos o dispositivos de sonido se cargan, pueden requerir un reinicio completo).</p>
 
 <h2>Instalar una versión anterior</h2>
 <p>Las versiones recientes siguen disponibles en el pool durante un tiempo después de ser
 reemplazadas (una por día durante una semana, una por semana durante un mes, una por mes durante un año &mdash;
-consulte «Retention» (retención) en
+consulta «Retention» (retención) en
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
 por lo que normalmente se puede volver atrás tras una compilación diaria defectuosa. Los paquetes de versiones del proyecto original
 (componente <code>release</code>) nunca se eliminan:</p>
@@ -165,7 +169,7 @@ sudo apt-mark hold svxlink   # opcional: evita que "apt upgrade" vuelva a actual
 <h2>Paquetes</h2>
 <table>
 <tr><th>Paquete</th><th>Contenido</th></tr>
-<tr><td><code>svxlink</code></td><td>Componentes de servidor (svxlink, remotetrx, svxreflector, núcleos lógicos, scripts de eventos Tcl). Compilado con: soporte RTL-SDR por USB directo (fork de librtlsdr/rtl_tcp de RTL-SDR Blog incluido, para los dongles V3/V4 actuales; entra en conflicto con librtlsdr0/rtl-sdr de la distribución), el núcleo lógico SipLogic aportado por la comunidad (PJSIP/pjproject incluido, enlazado estáticamente), GPIO mediante libgpiod, y soporte de códecs de audio y plugins Speex/Opus/LADSPA. Instala un servicio systemd. No incluye Qtel ni paquetes de sonido.</td></tr>
+<tr><td><code>svxlink</code></td><td>Componentes de servidor (svxlink, remotetrx, svxreflector, núcleos lógicos, scripts de eventos Tcl). Compilado con: soporte RTL-SDR por USB directo (fork de librtlsdr/rtl_tcp de RTL-SDR Blog incluido, para los dongles V3/V4 actuales; entra en conflicto con librtlsdr0/rtl-sdr de la distribución), el núcleo lógico SipLogic aportado por la comunidad (PJSIP/pjproject incluido, enlazado estáticamente), GPIO mediante libgpiod, y soporte de códecs de audio y plugins Speex/Opus/LADSPA. Instala un servicio systemd. No incluye Qtel ni paquetes de sonido. Incluye una regla udev que da acceso a los dongles USB RTL-SDR al servicio SvxLink y a los usuarios con sesión de escritorio iniciada.</td></tr>
 <tr><td><code>qtel</code></td><td>Cliente gráfico de EchoLink (Qt6). Requiere un entorno de escritorio y el paquete <code>svxlink</code> exactamente de la misma versión (comparte sus bibliotecas echolib/async).</td></tr>
 </table>
 
@@ -184,7 +188,7 @@ ya no admite la instalación de sistemas i386. Los paquetes de 32 bits incluyen 
 mismas funciones que los de 64 bits.</p>
 
 <h2>Clave de firma</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; se importa automáticamente con los
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; se importa automáticamente con los
 comandos de inicio rápido anteriores.</p>
 
 <h2>Explorar los archivos del repositorio</h2>

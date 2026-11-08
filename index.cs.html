@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT repozitář SvxLink DB9CR</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Tato stránka byla přeložena automaticky pomocí umělé inteligence a může obsahovat chyby. Závazná je anglická verze. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Balíčky
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> pro Raspberry Pi OS
-a Debian ve dvou komponentách &mdash; vyberte si jednu:</p>
+a Debian ve dvou komponentách &mdash; vyber si jednu:</p>
 <ul>
 <li><code>main</code>: denní vývojová sestavení z nejnovějšího zdrojového kódu
 tohoto forku, nikoli stabilní vydání.</li>
@@ -71,7 +71,7 @@ a novější), sestavená z nezměněného zdrojového kódu vydání se stejný
 nastavením sestavení a funkcemi jako denní balíčky. Každé vydání je zachováno;
 <code>apt upgrade</code> přechází na každé nové vydání mateřského projektu.</li>
 </ul>
-<p>Podrobnosti najdete ve <a href="https://github.com/criede/svxlink-db9cr">zdrojovém repozitáři</a>.
+<p>Podrobnosti najdeš ve <a href="https://github.com/criede/svxlink-db9cr">zdrojovém repozitáři</a>.
 </p>
 
 <h2>Mateřský projekt a místní změny</h2>
@@ -81,21 +81,25 @@ původního projektu SvxLink, s vlastním balíčkováním a rozšířeními fun
 navrch (RTL-SDR, SipLogic, samostatný balíček <code>qtel</code>,
 tento APT repozitář a další &mdash; úplný seznam viz
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>).
-Chcete-li kdykoli zjistit, čím přesně se fork liší od mateřského projektu,
-aniž byste se spoléhali na zastaralý snímek na této stránce, porovnejte
+Chceš-li kdykoli zjistit, čím přesně se fork liší od mateřského projektu,
+aniž by ses spoléhal na zastaralý snímek na této stránce, porovnej
 to živě na GitHubu:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">master mateřského projektu&nbsp;&hellip;&nbsp;master tohoto forku</a>.</p>
 
-<h2>Rychlý start</h2>
-<p>Spusťte na cílovém systému (správné kódové jméno a architektura se zjistí automaticky):</p>
+<h2 id="quickstart">Rychlý start</h2>
+<p>Spusť na cílovém systému (správné kódové jméno a architektura se zjistí automaticky):</p>
 <pre><code># Import veřejného podpisového klíče
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (přijme se jen klíč s tímto otiskem: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
-# Přidání zdroje repozitáře. Zvolte komponentu:
+# Přidání zdroje repozitáře. Zvol komponentu:
 #   main     denní vývojová sestavení
 #   release  oficiální vydání mateřského projektu (26.05 a novější)
-component=main
+component=release
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -104,8 +108,8 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Povinné před prvním spuštěním: nakonfigurujte stanici, rádio a audio.
-# Soubor z balíčku je pouze šablona a musí být přizpůsoben vaší sestavě.
+# Povinné před prvním spuštěním: nakonfiguruj stanici, rádio a audio.
+# Soubor z balíčku je pouze šablona a musí být přizpůsoben tvé sestavě.
 sudo editor /etc/svxlink/svxlink.conf
 
 # Povolení SvxLink při startu systému a jeho okamžité spuštění.
@@ -118,35 +122,35 @@ journalctl -u svxlink.service -f
 
 # Volitelný grafický klient EchoLink (vyžaduje grafické prostředí):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Povinné:</strong> Nespouštějte službu před
-úpravou souboru <code>/etc/svxlink/svxlink.conf</code>. Nastavte alespoň
+<p class="note"><strong>Povinné:</strong> Nespouštěj službu před
+úpravou souboru <code>/etc/svxlink/svxlink.conf</code>. Nastav alespoň
 identifikaci stanice, logiku, přijímač/vysílač a nastavení audia/PTT
 pro svůj hardware. Služba čte tuto cestu přes <code>/etc/default/svxlink</code>.</p>
 <p class="note">Pokud <code>apt update</code> hlásí pro tento zdroj chybu 404,
-pro kódové jméno vašeho systému se zatím nesestavuje (viz tabulka níže) &mdash;
-změňte kódové jméno v <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> na některé
+pro kódové jméno tvého systému se zatím nesestavuje (viz tabulka níže) &mdash;
+změň kódové jméno v <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> na některé
 z podporovaných. Poté běžný příkaz <code>sudo apt upgrade</code>
 automaticky stáhne nová denní sestavení (<code>main</code>) nebo nová vydání
 mateřského projektu (<code>release</code>).</p>
-<p class="note">Nepovolujte obě komponenty současně, pokud nechcete
+<p class="note">Nepovoluj obě komponenty současně, pokud nechceš
 denní sestavení: ta mají vždy vyšší verzi, takže by je apt nainstaloval
-místo vydání. Chcete-li přepnout stávající instalaci z <code>main</code>
-na <code>release</code>, změňte komponentu v
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, spusťte
-<code>sudo apt update</code> a poté explicitně nainstalujte verzi vydání
+místo vydání. Chceš-li přepnout stávající instalaci z <code>main</code>
+na <code>release</code>, změň komponentu v
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, spusť
+<code>sudo apt update</code> a poté explicitně nainstaluj verzi vydání
 (jde o downgrade, tj. přechod na nižší verzi), např.
 <code>sudo apt install svxlink=26.05.2-1~trixie</code>. Upozorňujeme, že v balíčcích
 <code>release</code> (nezměněný zdrojový kód mateřského projektu) nejsou skripty TCL
 v <code>/usr/share/svxlink</code> chráněny jako konfigurační
-soubory; místní změny ukládejte do <code>events.d/local/</code>.</p>
+soubory; místní změny ukládej do <code>events.d/local/</code>.</p>
 
 <h2>Použití změn konfigurace</h2>
 <p>Po úpravě <code>/etc/svxlink/svxlink.conf</code> (nebo libovolného souboru modulu
 <code>/etc/svxlink/svxlink.d/*.conf</code>) na běžící
-stanici konfiguraci znovu načtěte bez přerušení aktivní relace:</p>
+stanici konfiguraci znovu načti bez přerušení aktivní relace:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Tím se odešle signál <code>SIGHUP</code>, na který SvxLink znovu načte
-svou konfiguraci. Pokud se zdá, že opětovné načtení změnu nepřevzalo, použijte místo toho
+svou konfiguraci. Pokud se zdá, že opětovné načtení změnu nepřevzalo, použij místo toho
 <code>sudo systemctl restart svxlink.service</code> (některá nastavení, například
 které logická jádra nebo zvuková zařízení se načítají, mohou vyžadovat úplný restart).</p>
 
@@ -165,7 +169,7 @@ sudo apt-mark hold svxlink   # volitelné: zabrání tomu, aby ji "apt upgrade" 
 <h2>Balíčky</h2>
 <table>
 <tr><th>Balíček</th><th>Obsah</th></tr>
-<tr><td><code>svxlink</code></td><td>Serverové komponenty (svxlink, remotetrx, svxreflector, logická jádra, skripty událostí Tcl). Sestaveno s: podporou RTL-SDR přímo přes USB (přibalený fork librtlsdr/rtl_tcp od RTL-SDR Blog pro aktuální přijímače V3/V4; koliduje s distribučními balíčky librtlsdr0/rtl-sdr), přispěným logickým jádrem SipLogic (přibalený PJSIP/pjproject, staticky linkovaný), GPIO přes libgpiod a podporou audio kodeků a pluginů Speex/Opus/LADSPA. Instaluje službu systemd. Neobsahuje Qtel ani zvukové balíčky.</td></tr>
+<tr><td><code>svxlink</code></td><td>Serverové komponenty (svxlink, remotetrx, svxreflector, logická jádra, skripty událostí Tcl). Sestaveno s: podporou RTL-SDR přímo přes USB (přibalený fork librtlsdr/rtl_tcp od RTL-SDR Blog pro aktuální přijímače V3/V4; koliduje s distribučními balíčky librtlsdr0/rtl-sdr), přispěným logickým jádrem SipLogic (přibalený PJSIP/pjproject, staticky linkovaný), GPIO přes libgpiod a podporou audio kodeků a pluginů Speex/Opus/LADSPA. Instaluje službu systemd. Neobsahuje Qtel ani zvukové balíčky. Obsahuje pravidlo udev, které službě SvxLink a přihlášeným uživatelům desktopu umožňuje přístup k USB donglům RTL-SDR.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafický klient EchoLink (Qt6). Vyžaduje grafické prostředí a balíček <code>svxlink</code> v přesně stejné verzi (sdílí jeho knihovny echolib/async).</td></tr>
 </table>
 
@@ -184,7 +188,7 @@ již nepodporuje instalaci systémů i386. 32bitové balíčky obsahují
 stejné funkce jako 64bitové.</p>
 
 <h2>Podpisový klíč</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; importuje se automaticky
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; importuje se automaticky
 výše uvedenými příkazy rychlého startu.</p>
 
 <h2>Procházení souborů repozitáře</h2>

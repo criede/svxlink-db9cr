@@ -2,7 +2,7 @@
 <html lang="nb">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-arkiv</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -86,16 +86,20 @@ uten å stole på et øyeblikksbilde her som blir utdatert, kan du sammenligne
 direkte på GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;denne forkens master</a>.</p>
 
-<h2>Hurtigstart</h2>
+<h2 id="quickstart">Hurtigstart</h2>
 <p>Kjør på målsystemet (finner riktig kodenavn/arkitektur automatisk):</p>
 <pre><code># Importer den offentlige signeringsnøkkelen
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (bare nøkkelen med dette fingeravtrykket godtas: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
 # Legg til arkivkilden. Velg komponent:
 #   main     daglige utviklingsbygg
 #   release  offisielle upstream-utgivelser (26.05 og nyere)
-component=main
+component=release
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -165,7 +169,7 @@ sudo apt-mark hold svxlink   # valgfritt: hindrer at "apt upgrade" oppgraderer d
 <h2>Pakker</h2>
 <table>
 <tr><th>Pakke</th><th>Innhold</th></tr>
-<tr><td><code>svxlink</code></td><td>Serverkomponenter (svxlink, remotetrx, svxreflector, logikkjerner, Tcl-hendelsesskript). Bygget med: RTL-SDR-støtte via direkte USB (medfølgende RTL-SDR Blog-fork av librtlsdr/rtl_tcp for gjeldende V3/V4-dongler; er i konflikt med distribusjonens librtlsdr0/rtl-sdr), den bidratte SipLogic-logikkjernen (medfølgende PJSIP/pjproject, statisk lenket), GPIO via libgpiod og støtte for lydkodekene og programtilleggene Speex/Opus/LADSPA. Installerer en systemd-tjeneste. Inneholder ikke Qtel eller lydpakker.</td></tr>
+<tr><td><code>svxlink</code></td><td>Serverkomponenter (svxlink, remotetrx, svxreflector, logikkjerner, Tcl-hendelsesskript). Bygget med: RTL-SDR-støtte via direkte USB (medfølgende RTL-SDR Blog-fork av librtlsdr/rtl_tcp for gjeldende V3/V4-dongler; er i konflikt med distribusjonens librtlsdr0/rtl-sdr), den bidratte SipLogic-logikkjernen (medfølgende PJSIP/pjproject, statisk lenket), GPIO via libgpiod og støtte for lydkodekene og programtilleggene Speex/Opus/LADSPA. Installerer en systemd-tjeneste. Inneholder ikke Qtel eller lydpakker. Inneholder en udev-regel som gir SvxLink-tjenesten og brukere som er logget inn på skrivebordet, tilgang til RTL-SDR-USB-dongler.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafisk EchoLink-klient (Qt6). Krever et skrivebordsmiljø og <code>svxlink</code>-pakken i nøyaktig samme versjon (deler dens echolib/async-biblioteker).</td></tr>
 </table>
 
@@ -184,7 +188,7 @@ støtter ikke lenger installasjon av i386-systemer. 32-biterspakkene har
 de samme funksjonene som 64-biterspakkene.</p>
 
 <h2>Signeringsnøkkel</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; importeres automatisk av
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; importeres automatisk av
 hurtigstartkommandoene ovenfor.</p>
 
 <h2>Bla gjennom arkivfilene</h2>

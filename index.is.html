@@ -2,7 +2,7 @@
 <html lang="is">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-pakkasafn</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -86,16 +86,20 @@ tíma, án þess að treysta á skyndimynd hér sem gæti úrelst, berðu saman
 beint á GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">master upprunaverkefnisins&nbsp;&hellip;&nbsp;master þessarar kvíslar</a>.</p>
 
-<h2>Fljótleg byrjun</h2>
+<h2 id="quickstart">Fljótleg byrjun</h2>
 <p>Keyrðu á markkerfinu (rétt kóðaheiti/högun er greind sjálfkrafa):</p>
 <pre><code># Flyttu inn opinbera undirritunarlykilinn
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (aðeins lykillinn með þetta fingrafar er samþykktur: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
 # Bættu pakkasafninu við sem uppsprettu. Veldu hluta (component):
 #   main     daglegar þróunarsmíðar
 #   release  opinberar útgáfur upprunaverkefnisins (26.05 og nýrri)
-component=main
+component=release
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -165,7 +169,7 @@ sudo apt-mark hold svxlink   # valfrjálst: kemur í veg fyrir að "apt upgrade"
 <h2>Pakkar</h2>
 <table>
 <tr><th>Pakki</th><th>Inniheldur</th></tr>
-<tr><td><code>svxlink</code></td><td>Þjónshlutar (svxlink, remotetrx, svxreflector, rökfræðikjarnar, Tcl-atburðaskriftur). Smíðað með: stuðningi við RTL-SDR beint um USB (meðfylgjandi librtlsdr/rtl_tcp-kvísl frá RTL-SDR Blog fyrir núverandi V3/V4-kubba; stangast á við librtlsdr0/rtl-sdr dreifingarinnar), SipLogic-rökfræðikjarnanum frá samfélaginu (meðfylgjandi PJSIP/pjproject, statískt tengt), GPIO í gegnum libgpiod og stuðningi við Speex/Opus/LADSPA-hljóðkóðara og viðbætur. Setur upp systemd-þjónustu. Inniheldur hvorki Qtel né hljóðpakka.</td></tr>
+<tr><td><code>svxlink</code></td><td>Þjónshlutar (svxlink, remotetrx, svxreflector, rökfræðikjarnar, Tcl-atburðaskriftur). Smíðað með: stuðningi við RTL-SDR beint um USB (meðfylgjandi librtlsdr/rtl_tcp-kvísl frá RTL-SDR Blog fyrir núverandi V3/V4-kubba; stangast á við librtlsdr0/rtl-sdr dreifingarinnar), SipLogic-rökfræðikjarnanum frá samfélaginu (meðfylgjandi PJSIP/pjproject, statískt tengt), GPIO í gegnum libgpiod og stuðningi við Speex/Opus/LADSPA-hljóðkóðara og viðbætur. Setur upp systemd-þjónustu. Inniheldur hvorki Qtel né hljóðpakka. Inniheldur udev-reglu sem veitir SvxLink-þjónustunni og notendum sem eru innskráðir á skjáborðið aðgang að RTL-SDR USB-lyklum.</td></tr>
 <tr><td><code>qtel</code></td><td>Myndrænn EchoLink-biðlari (Qt6). Krefst skjáborðsumhverfis og <code>svxlink</code>-pakkans í nákvæmlega sömu útgáfu (deilir echolib/async-söfnum hans).</td></tr>
 </table>
 
@@ -184,7 +188,7 @@ styður ekki lengur uppsetningu i386-kerfa. 32 bita pakkarnir hafa
 sömu eiginleika og 64 bita pakkarnir.</p>
 
 <h2>Undirritunarlykill</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; fluttur inn sjálfkrafa með
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; fluttur inn sjálfkrafa með
 skipunum í fljótlegu byrjuninni hér að ofan.</p>
 
 <h2>Skoða skrár pakkasafnsins</h2>

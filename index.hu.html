@@ -2,7 +2,7 @@
 <html lang="hu">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="1336551a294ef3b25c67d7336c70ca2bc137aaf21ff617860d9d91da1e8d6c93">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-tároló</title>
 <link rel="alternate" hreflang="en" href="index.html">
@@ -62,7 +62,7 @@
 <p class="ai-notice" role="note">&#9888; Ezt az oldalt mesterséges intelligencia fordította automatikusan, ezért hibákat tartalmazhat. Az angol változat az irányadó. (<a href="index.html" hreflang="en" lang="en">English</a>)</p>
 <p>Az
 <a href="https://github.com/criede/svxlink-db9cr">svxlink-db9cr</a> csomagjai Raspberry Pi OS
-és Debian rendszerekhez, két komponensben &mdash; válasszon egyet:</p>
+és Debian rendszerekhez, két komponensben &mdash; válassz egyet:</p>
 <ul>
 <li><code>main</code>: napi fejlesztői buildek ennek a forknak a legfrissebb
 forráskódjából, nem stabil kiadások.</li>
@@ -80,21 +80,25 @@ eredeti SvxLink projekt naponta szinkronizált forkja, amelyre helyi
 csomagolás és funkcióbővítések épülnek (RTL-SDR, SipLogic, a különálló <code>qtel</code> csomag,
 ez az APT-tároló és egyebek &mdash; a teljes listát lásd a
 <a href="https://github.com/criede/svxlink-db9cr/blob/master/CHANGELOG.MD">CHANGELOG.MD</a>
-fájlban). Ha bármely időpontban pontosan látni szeretné, miben tér el a fork az
-upstreamtől, anélkül hogy egy itt elavuló pillanatképre hagyatkozna, hasonlítsa
+fájlban). Ha bármely időpontban pontosan látni szeretnéd, miben tér el a fork az
+upstreamtől, anélkül hogy egy itt elavuló pillanatképre hagyatkoznál, hasonlítsd
 össze élőben a GitHubon:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;e fork mastere</a>.</p>
 
-<h2>Gyors kezdés</h2>
-<p>Futtassa a célrendszeren (automatikusan felismeri a megfelelő kódnevet/architektúrát):</p>
+<h2 id="quickstart">Gyors kezdés</h2>
+<p>Futtasd a célrendszeren (automatikusan felismeri a megfelelő kódnevet/architektúrát):</p>
 <pre><code># A nyilvános aláírókulcs importálása
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (csak az ezzel az ujjlenyomattal rendelkező kulcsot fogadja el: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
-# A tárolóforrás hozzáadása. Válassza ki a komponenst:
+# A tárolóforrás hozzáadása. Válaszd ki a komponenst:
 #   main     napi fejlesztői buildek
 #   release  hivatalos upstream kiadások (26.05 és újabbak)
-component=main
+component=release
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
 echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
@@ -103,8 +107,8 @@ echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https:/
 sudo apt update
 sudo apt install svxlink
 
-# Kötelező az első indítás előtt: konfigurálja az állomást, a rádiót és a hangot.
-# A csomagban lévő fájl csak sablon, és a saját összeállításához kell igazítani.
+# Kötelező az első indítás előtt: konfiguráld az állomást, a rádiót és a hangot.
+# A csomagban lévő fájl csak sablon, és a saját összeállításodhoz kell igazítani.
 sudo editor /etc/svxlink/svxlink.conf
 
 # Az SvxLink engedélyezése rendszerindításkor és azonnali elindítása.
@@ -117,35 +121,35 @@ journalctl -u svxlink.service -f
 
 # Opcionális grafikus EchoLink-kliens (asztali környezetet igényel):
 # sudo apt install qtel</code></pre>
-<p class="note"><strong>Kötelező:</strong> Ne indítsa el a szolgáltatást, mielőtt
-szerkesztené a <code>/etc/svxlink/svxlink.conf</code> fájlt. Állítsa be legalább az
-állomásazonosítót, a logikát, a vevő/adó és a hang/PTT beállításait a hardveréhez.
+<p class="note"><strong>Kötelező:</strong> Ne indítsd el a szolgáltatást, mielőtt
+szerkesztenéd a <code>/etc/svxlink/svxlink.conf</code> fájlt. Állítsd be legalább az
+állomásazonosítót, a logikát, a vevő/adó és a hang/PTT beállításait a hardveredhez.
 A szolgáltatás ezt az elérési utat a <code>/etc/default/svxlink</code> fájlon keresztül kapja meg.</p>
 <p class="note">Ha az <code>apt update</code> 404-es hibát jelez ennél a forrásnál, a
-rendszere kódnevéhez még nem készülnek csomagok (lásd az alábbi táblázatot) &mdash; ehelyett
-írja át a kódnevet a <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> fájlban
+rendszered kódnevéhez még nem készülnek csomagok (lásd az alábbi táblázatot) &mdash; ehelyett
+írd át a kódnevet a <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> fájlban
 az egyik támogatottra. Ezt követően egy szokásos <code>sudo apt upgrade</code>
 automatikusan telepíti az új napi buildeket (<code>main</code>) vagy az új upstream kiadásokat
 (<code>release</code>).</p>
-<p class="note">Ne engedélyezze egyszerre mindkét komponenst, hacsak nem a napi
-buildeket szeretné: ezeknek mindig magasabb a verziószáma, így az apt ezeket
+<p class="note">Ne engedélyezd egyszerre mindkét komponenst, hacsak nem a napi
+buildeket szeretnéd: ezeknek mindig magasabb a verziószáma, így az apt ezeket
 telepítené a kiadások helyett. Egy meglévő telepítés <code>main</code> komponensről
-<code>release</code> komponensre váltásához módosítsa a komponenst a
-<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> fájlban, futtassa a
-<code>sudo apt update</code> parancsot, majd telepítse kifejezetten a kiadási verziót
+<code>release</code> komponensre váltásához módosítsd a komponenst a
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> fájlban, futtasd a
+<code>sudo apt update</code> parancsot, majd telepítsd kifejezetten a kiadási verziót
 (ez visszalépés egy alacsonyabb verzióra, azaz downgrade), pl.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Vegye figyelembe, hogy a
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Vedd figyelembe, hogy a
 <code>release</code> csomagokban (módosítatlan upstream forráskód) a
 <code>/usr/share/svxlink</code> alatti TCL-szkriptek nincsenek konfigurációs
-fájlként védve; a helyi módosításokat tartsa az <code>events.d/local/</code> könyvtárban.</p>
+fájlként védve; a helyi módosításokat tartsd az <code>events.d/local/</code> könyvtárban.</p>
 
 <h2>Konfigurációs módosítások alkalmazása</h2>
-<p>Ha futó állomáson szerkesztette a <code>/etc/svxlink/svxlink.conf</code> fájlt (vagy bármely
-<code>/etc/svxlink/svxlink.d/*.conf</code> modulfájlt), töltse be újra a
+<p>Ha futó állomáson szerkesztetted a <code>/etc/svxlink/svxlink.conf</code> fájlt (vagy bármely
+<code>/etc/svxlink/svxlink.d/*.conf</code> modulfájlt), töltsd be újra a
 konfigurációt egy aktív munkamenet megszakítása nélkül:</p>
 <pre><code>sudo systemctl reload svxlink.service</code></pre>
 <p class="note">Ez <code>SIGHUP</code> jelet küld, amelynek hatására az SvxLink újraolvassa a
-konfigurációját. Ha az újratöltés után egy módosítás nem tűnik érvényesnek, használja helyette a
+konfigurációját. Ha az újratöltés után egy módosítás nem tűnik érvényesnek, használd helyette a
 <code>sudo systemctl restart svxlink.service</code> parancsot (egyes beállítások, például
 hogy mely logikamagok vagy hangeszközök töltődnek be, teljes újraindítást igényelhetnek).</p>
 
@@ -164,7 +168,7 @@ sudo apt-mark hold svxlink   # opcionális: megakadályozza, hogy az "apt upgrad
 <h2>Csomagok</h2>
 <table>
 <tr><th>Csomag</th><th>Tartalom</th></tr>
-<tr><td><code>svxlink</code></td><td>Szerverkomponensek (svxlink, remotetrx, svxreflector, logikamagok, Tcl-eseményszkriptek). Beépített funkciók: RTL-SDR közvetlen USB-támogatás (mellékelt RTL-SDR Blog librtlsdr/rtl_tcp fork a jelenlegi V3/V4 dongle-okhoz; ütközik a disztribúció librtlsdr0/rtl-sdr csomagjaival), a külső hozzájárulásként készült SipLogic logikamag (mellékelt PJSIP/pjproject, statikusan linkelve), GPIO a libgpiod segítségével, valamint Speex/Opus/LADSPA hangkodek- és bővítménytámogatás. Telepít egy systemd szolgáltatást. Nem tartalmazza a Qtel programot és a hangcsomagokat.</td></tr>
+<tr><td><code>svxlink</code></td><td>Szerverkomponensek (svxlink, remotetrx, svxreflector, logikamagok, Tcl-eseményszkriptek). Beépített funkciók: RTL-SDR közvetlen USB-támogatás (mellékelt RTL-SDR Blog librtlsdr/rtl_tcp fork a jelenlegi V3/V4 dongle-okhoz; ütközik a disztribúció librtlsdr0/rtl-sdr csomagjaival), a külső hozzájárulásként készült SipLogic logikamag (mellékelt PJSIP/pjproject, statikusan linkelve), GPIO a libgpiod segítségével, valamint Speex/Opus/LADSPA hangkodek- és bővítménytámogatás. Telepít egy systemd szolgáltatást. Nem tartalmazza a Qtel programot és a hangcsomagokat. Tartalmaz egy udev-szabályt, amely hozzáférést ad az RTL-SDR USB-donglékhoz a SvxLink szolgáltatásnak és az asztali munkamenetbe bejelentkezett felhasználóknak.</td></tr>
 <tr><td><code>qtel</code></td><td>Grafikus EchoLink-kliens (Qt6). Asztali környezetet és pontosan azonos verziójú <code>svxlink</code> csomagot igényel (közösen használja annak echolib/async könyvtárait).</td></tr>
 </table>
 
@@ -183,7 +187,7 @@ már nem támogatja i386 rendszerek telepítését. A 32 bites csomagok ugyanazo
 funkciókat tartalmazzák, mint a 64 bitesek.</p>
 
 <h2>Aláírókulcs</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; a fenti gyors kezdési parancsok
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; a fenti gyors kezdési parancsok
 automatikusan importálják.</p>
 
 <h2>A tároló fájljainak böngészése</h2>
