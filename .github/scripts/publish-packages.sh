@@ -31,6 +31,113 @@ if [[ "${#legs[@]}" -eq 0 ]]; then
   exit 0
 fi
 
+# Validate every leg before anything is published. The artifacts are
+# written by the build container, which runs third-party and upstream build
+# code as root, while this job holds the APT signing key and a write token:
+# nothing in an artifact is trusted beyond what is checked here. The kind,
+# suite, architecture and (for releases) upstream tag are taken from what
+# the workflow itself decided -- EXPECTED_KIND and the artifact name, which
+# comes from the workflow's matrix -- and every metadata file and package
+# must agree with them. Only regular files of the expected names are
+# accepted, and only the svxlink and qtel packages, so a compromised build
+# cannot get other packages (e.g. a fake openssh-server) signed into the
+# repository or a daily build into the "release" component.
+#   EXPECTED_KIND        daily | release (required)
+#   EXPECTED_SOURCE_SHA  for daily: the commit that was meant to be built
+: "${EXPECTED_KIND:?}"
+[[ "$EXPECTED_KIND" == daily || "$EXPECTED_KIND" == release ]]
+
+fail_leg() {
+  echo "::error::Refusing to publish $(basename "$1"): $2"
+  exit 1
+}
+
+validate_leg() {
+  local leg="$1" name suite arch tag="" version f base pkg want_version
+  name="$(basename "$leg")"
+  if [[ "$EXPECTED_KIND" == daily ]]; then
+    [[ "$name" =~ ^daily-deb-([a-z0-9]+)-([a-z0-9]+)$ ]] || fail_leg "$leg" "unexpected artifact name"
+    suite="${BASH_REMATCH[1]}"; arch="${BASH_REMATCH[2]}"
+  else
+    [[ "$name" =~ ^release-deb-([0-9]+(\.[0-9]+)*)-([a-z0-9]+)-([a-z0-9]+)$ ]] || fail_leg "$leg" "unexpected artifact name"
+    tag="${BASH_REMATCH[1]}"; suite="${BASH_REMATCH[3]}"; arch="${BASH_REMATCH[4]}"
+  fi
+
+  # Only regular files with known names; no symlinks, directories or extras.
+  for f in "$leg"* "$leg".[!.]*; do
+    [[ -e "$f" || -L "$f" ]] || continue
+    base="$(basename "$f")"
+    [[ -f "$f" && ! -L "$f" ]] || fail_leg "$leg" "not a regular file: $base"
+    case "$base" in
+      VERSION|SUITE|ARCH|KIND|SOURCE_SHA|UPSTREAM_TAG|BUILD-INFO.MD) ;;
+      "SHA256SUMS-${suite}-${arch}") ;;
+      svxlink_*.deb|qtel_*.deb) ;;
+      *) fail_leg "$leg" "unexpected file: $base" ;;
+    esac
+  done
+
+  [[ "$(cat "${leg}KIND")" == "$EXPECTED_KIND" ]] || fail_leg "$leg" "KIND mismatch"
+  [[ "$(cat "${leg}SUITE")" == "$suite" ]] || fail_leg "$leg" "SUITE mismatch"
+  [[ "$(cat "${leg}ARCH")" == "$arch" ]] || fail_leg "$leg" "ARCH mismatch"
+  [[ "$(cat "${leg}UPSTREAM_TAG")" == "$tag" ]] || fail_leg "$leg" "UPSTREAM_TAG mismatch"
+  [[ "$(cat "${leg}SOURCE_SHA")" =~ ^[0-9a-f]{40}$ ]] || fail_leg "$leg" "malformed SOURCE_SHA"
+  if [[ "$EXPECTED_KIND" == daily && -n "${EXPECTED_SOURCE_SHA:-}" ]]; then
+    [[ "$(cat "${leg}SOURCE_SHA")" == "$EXPECTED_SOURCE_SHA" ]] || fail_leg "$leg" "SOURCE_SHA is not the commit that was to be built"
+  fi
+
+  version="$(cat "${leg}VERSION")"
+  if [[ "$EXPECTED_KIND" == daily ]]; then
+    [[ "$version" =~ ^[0-9]+(\.[0-9]+)*\+daily[0-9]{8}\.[0-9]+\.[0-9]+\.g[0-9a-f]{12}-1~${suite}$ ]] \
+      || fail_leg "$leg" "unexpected daily version: $version"
+  else
+    want_version="${tag}-1~${suite}"
+    [[ "$version" == "$want_version" ]] || fail_leg "$leg" "unexpected release version: $version"
+  fi
+
+  # Exactly one svxlink and one qtel package, whose control fields match.
+  for pkg in svxlink qtel; do
+    local debs=("$leg${pkg}"_*.deb)
+    [[ "${#debs[@]}" -eq 1 ]] || fail_leg "$leg" "expected exactly one ${pkg} package"
+    [[ "$(dpkg-deb -f "${debs[0]}" Package)" == "$pkg" ]] || fail_leg "$leg" "Package field of ${debs[0]##*/}"
+    [[ "$(dpkg-deb -f "${debs[0]}" Version)" == "$version" ]] || fail_leg "$leg" "Version field of ${debs[0]##*/}"
+    [[ "$(dpkg-deb -f "${debs[0]}" Architecture)" == "$arch" ]] || fail_leg "$leg" "Architecture field of ${debs[0]##*/}"
+  done
+
+  # The checksum file must cover exactly these packages, and match them.
+  (cd "$leg" && sha256sum --quiet --strict -c "SHA256SUMS-${suite}-${arch}") >/dev/null \
+    || fail_leg "$leg" "SHA256SUMS does not match the packages"
+  [[ "$(wc -l < "${leg}SHA256SUMS-${suite}-${arch}")" -eq 2 ]] || fail_leg "$leg" "SHA256SUMS lists unexpected files"
+}
+
+for leg in "${legs[@]}"; do
+  validate_leg "$leg"
+done
+
+# Release notes are written here from the validated values, not taken from
+# the build container's BUILD-INFO.MD (which a compromised build could fill
+# with e.g. altered install instructions).
+write_notes() {
+  local kind="$1" version="$2" suite="$3" source_sha="$4" tag="$5" out="$6"
+  local repo_url="https://github.com/${GH_REPO}"
+  local pages_url="https://${GH_REPO%%/*}.github.io/${GH_REPO#*/}/"
+  {
+    if [[ "$kind" == release ]]; then
+      printf 'Packages of the unmodified upstream SvxLink release %s (sm0svx/svxlink tag `%s`),\n' "$tag" "$tag"
+      printf 'built with the svxlink-db9cr build settings.\n\n'
+    else
+      printf 'Daily development build of svxlink-db9cr, not a stable release.\n\n'
+    fi
+    printf -- '- Target: Debian/Raspberry Pi OS %s\n' "$suite"
+    printf -- '- Package version: %s\n' "$version"
+    printf -- '- Source commit: %s\n\n' "$source_sha"
+    printf 'Packages: `svxlink` (server components, systemd service) and the optional\n'
+    printf '`qtel` (graphical EchoLink client). What is built into them, and how to\n'
+    printf 'install them via the APT repository (recommended): %s\n' "$pages_url"
+    printf 'Details: %s\n' "$repo_url"
+  } > "$out"
+}
+notes_dir="$(mktemp -d)"
+
 # Release legs in ascending upstream version order, so that when several
 # releases are published in one run the newest one is created last; daily
 # legs keep their (alphabetical) order.
@@ -118,8 +225,10 @@ for leg in "${legs[@]}"; do
   if gh release view "$tag" >/dev/null 2>&1; then
     gh release upload "$tag" "${assets[@]}" --clobber
   else
+    notes="${notes_dir}/$(basename "$leg").md"
+    write_notes "$kind" "$version" "$suite" "$source_sha" "${upstream_tag:-}" "$notes"
     create_release "$source_sha" "$tag" "${assets[@]}" \
-      --title "$title" --notes-file "${leg}BUILD-INFO.MD" "${create_args[@]}"
+      --title "$title" --notes-file "$notes" "${create_args[@]}"
   fi
   echo "${kind} ${suite}/${arch}: $(gh release view "$tag" --json url --jq .url)" >> "$summary"
 done

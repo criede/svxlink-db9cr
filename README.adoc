@@ -28,7 +28,8 @@ https://github.com/sm0svx/svxlink/issues[the upstream project].
 
 * *APT repository* (recommended, updates via `apt upgrade`):
   https://criede.github.io/svxlink-db9cr/ -- see the
-  https://criede.github.io/svxlink-db9cr/#quickstart[quickstart]. Component
+  https://criede.github.io/svxlink-db9cr/#quickstart[quickstart] (signing key
+  fingerprint `E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844`). Component
   `release`: the official upstream releases (26.05 and newer), built from the
   unmodified upstream source and kept permanently; component `main`: daily
   builds of this fork's `master`.

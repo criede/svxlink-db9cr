@@ -448,6 +448,14 @@ exports it freshly from the imported private key on every run to
 compromise) automatically produces a new `pubkey.gpg`; users then need to
 import the key again (see below).
 
+The key's fingerprint, `E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844`,
+is pinned in `.github/keys/apt-signing-key.fingerprint`: both publish jobs
+refuse to sign with any other key, and the quickstart (README, start page)
+imports only the key with this fingerprint from the downloaded `pubkey.gpg`,
+so a replaced `pubkey.gpg` on gh-pages cannot make new installations trust a
+different key. A deliberate key change therefore also means updating that
+file and the quickstart (start page template and all translations).
+
 ### Retention
 
 Both the daily GitHub prereleases and the packages kept in the APT
@@ -549,8 +557,12 @@ up the repository:
 
 ```sh
 # Import the public signing key
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (only the key with this fingerprint is accepted: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
 # Add the repository source, restricted to the key and to the local
 # codename/architecture combination. Component: "release" (default) for

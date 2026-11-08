@@ -213,6 +213,18 @@ jobs:
             echo "::endgroup::"
           done
 
+      # The build container runs as root and could leave symlinks pointing
+      # at host files in its output; upload only plain regular files.
+      - name: Check build output for non-regular files
+        shell: bash
+        run: |
+          set -euo pipefail
+          odd="$(find "$RUNNER_TEMP/daily-deb" -maxdepth 1 -mindepth 1 ! -type f ! -name qtel-pkgroot)"
+          if [[ -n "$odd" ]]; then
+            echo "::error::Unexpected non-regular files in build output: $odd"
+            exit 1
+          fi
+
       - name: Upload built packages for publishing
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2, Node.js 24
         with:

@@ -2,7 +2,7 @@
 <html lang="nb">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-arkiv</title>
 @@HREFLANG_LINKS@@
@@ -52,8 +52,12 @@ direkte på GitHub:
 <h2 id="quickstart">Hurtigstart</h2>
 <p>Kjør på målsystemet (finner riktig kodenavn/arkitektur automatisk):</p>
 <pre><code># Importer den offentlige signeringsnøkkelen
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (bare nøkkelen med dette fingeravtrykket godtas: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
 # Legg til arkivkilden. Velg komponent:
 #   main     daglige utviklingsbygg
@@ -145,7 +149,7 @@ støtter ikke lenger installasjon av i386-systemer. 32-biterspakkene har
 de samme funksjonene som 64-biterspakkene.</p>
 
 <h2>Signeringsnøkkel</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; importeres automatisk av
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; importeres automatisk av
 hurtigstartkommandoene ovenfor.</p>
 
 <h2>Bla gjennom arkivfilene</h2>

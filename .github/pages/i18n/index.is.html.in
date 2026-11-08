@@ -2,7 +2,7 @@
 <html lang="is">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-pakkasafn</title>
 @@HREFLANG_LINKS@@
@@ -52,8 +52,12 @@ beint á GitHub:
 <h2 id="quickstart">Fljótleg byrjun</h2>
 <p>Keyrðu á markkerfinu (rétt kóðaheiti/högun er greind sjálfkrafa):</p>
 <pre><code># Flyttu inn opinbera undirritunarlykilinn
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (aðeins lykillinn með þetta fingrafar er samþykktur: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
 # Bættu pakkasafninu við sem uppsprettu. Veldu hluta (component):
 #   main     daglegar þróunarsmíðar
@@ -145,7 +149,7 @@ styður ekki lengur uppsetningu i386-kerfa. 32 bita pakkarnir hafa
 sömu eiginleika og 64 bita pakkarnir.</p>
 
 <h2>Undirritunarlykill</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; fluttur inn sjálfkrafa með
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; fluttur inn sjálfkrafa með
 skipunum í fljótlegu byrjuninni hér að ofan.</p>
 
 <h2>Skoða skrár pakkasafnsins</h2>

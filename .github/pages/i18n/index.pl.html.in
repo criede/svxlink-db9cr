@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repozytorium APT SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -52,8 +52,12 @@ na żywo w serwisie GitHub:
 <h2 id="quickstart">Szybki start</h2>
 <p>Uruchom w systemie docelowym (właściwa nazwa kodowa i architektura są wykrywane automatycznie):</p>
 <pre><code># Zaimportuj publiczny klucz podpisujący
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (akceptowany jest tylko klucz z tym odciskiem: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
 # Dodaj źródło repozytorium. Wybierz komponent:
 #   main     codzienne kompilacje rozwojowe
@@ -145,7 +149,7 @@ nie obsługuje już instalacji systemów i386. Pakiety 32-bitowe mają
 te same funkcje co 64-bitowe.</p>
 
 <h2>Klucz podpisujący</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; importowany automatycznie przez
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; importowany automatycznie przez
 powyższe polecenia szybkiego startu.</p>
 
 <h2>Przeglądanie plików repozytorium</h2>

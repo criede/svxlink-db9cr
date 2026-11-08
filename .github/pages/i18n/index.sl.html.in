@@ -2,7 +2,7 @@
 <html lang="sl">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repozitorij APT SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -52,8 +52,12 @@ v živo na GitHubu:
 <h2 id="quickstart">Hiter začetek</h2>
 <p>Zaženi na ciljnem sistemu (pravilno kodno ime in arhitektura se zaznata samodejno):</p>
 <pre><code># Uvoz javnega podpisnega ključa
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (sprejme se samo ključ s tem prstnim odtisom: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
 # Dodajanje vira repozitorija. Izberi komponento:
 #   main     dnevne razvojne gradnje
@@ -145,7 +149,7 @@ ne podpira več namestitve sistemov i386. 32-bitni paketi vsebujejo
 enake funkcije kot 64-bitni.</p>
 
 <h2>Podpisni ključ</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; samodejno ga uvozijo
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; samodejno ga uvozijo
 zgornji ukazi za hiter začetek.</p>
 
 <h2>Brskanje po datotekah repozitorija</h2>

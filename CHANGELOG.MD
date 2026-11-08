@@ -7,6 +7,27 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- Security hardening of the packaging and publishing pipeline:
+  - `postinst` no longer follows symlinks when changing the owner of the
+    state directories (a symlinked directory planted by the `svxlink` user
+    could otherwise hand e.g. `/etc` to it on the next upgrade); CPack's
+    plain `chown` lines are rewritten to act only on symlink-free paths, with
+    `-h`. The installation test checks this with a planted symlink.
+  - The third-party sources bundled into the packages (RTL-SDR Blog
+    librtlsdr, PJSIP/pjproject) are pinned to reviewed commits instead of
+    being built from their moving default branches.
+  - The RTL-SDR udev rule is generated from validated USB IDs only; no
+    upstream rule text (which could carry e.g. a `RUN+=` key executed as
+    root) is copied into the package.
+  - The publish jobs validate every build artifact against what the
+    workflow itself decided (kind, suite, architecture, tag, source
+    commit), accept only the `svxlink` and `qtel` packages with matching
+    control fields, write the release notes themselves, take their scripts
+    only from the workflow's own commit (never from a dispatched
+    `source_sha`), and refuse to sign with any key but the pinned one.
+    Build outputs with symlinks are rejected before upload.
+  - The quickstart imports only the signing key with the published
+    fingerprint (start page in all languages, README, UPSTREAM-SYNC.MD).
 - `README.adoc` links https://github.com/criede/openelp (packaged OpenELP
   EchoLink proxy fork with SvxLink-protecting security fixes) under
   "Resources".

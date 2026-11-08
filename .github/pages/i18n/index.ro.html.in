@@ -2,7 +2,7 @@
 <html lang="ro">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Depozitul APT SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -52,8 +52,12 @@ moment, fără a te baza pe un instantaneu de aici care se poate învechi, compa
 <h2 id="quickstart">Pornire rapidă</h2>
 <p>Rulează pe sistemul țintă (detectează automat numele de cod și arhitectura corecte):</p>
 <pre><code># Importă cheia publică de semnare
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (este acceptată doar cheia cu această amprentă: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
 # Adaugă sursa depozitului. Alege componenta:
 #   main     build-uri zilnice de dezvoltare
@@ -146,7 +150,7 @@ nu mai suportă instalarea sistemelor i386. Pachetele pe 32 de biți conțin
 aceleași funcționalități ca cele pe 64 de biți.</p>
 
 <h2>Cheia de semnare</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; importată automat de
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; importată automat de
 comenzile de pornire rapidă de mai sus.</p>
 
 <h2>Răsfoirea fișierelor depozitului</h2>

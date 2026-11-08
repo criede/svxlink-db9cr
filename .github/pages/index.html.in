@@ -51,8 +51,12 @@ live on GitHub:
 <h2 id="quickstart">Quickstart</h2>
 <p>Run on the target system (detects the right codename/architecture automatically):</p>
 <pre><code># Import the public signing key
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (only the key with this fingerprint is accepted: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
 # Add the repository source. Choose the component:
 #   main     daily development builds
@@ -144,7 +148,7 @@ no longer supports installing i386 systems. The 32-bit packages contain the
 same features as the 64-bit ones.</p>
 
 <h2>Signing key</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; imported automatically by the
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; imported automatically by the
 quickstart commands above.</p>
 
 <h2>Browse repository files</h2>

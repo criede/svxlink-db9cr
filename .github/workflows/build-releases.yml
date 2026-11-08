@@ -122,6 +122,9 @@ jobs:
           echo "$APT_SIGNING_KEY" | gpg --batch --import
           fpr=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr:/{print $10; exit}')
           test -n "$fpr"
+          # Only the repository's known signing key may sign it (fingerprint
+          # pinned in .github/keys/, also published in the quickstart).
+          test "$fpr" = "$(tr -d '[:space:]' < .github/keys/apt-signing-key.fingerprint)"
           echo "::add-mask::$fpr"
           echo "fingerprint=$fpr" >> "$GITHUB_OUTPUT"
 
@@ -131,6 +134,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
           GPG_KEY_FPR: ${{ steps.gpgimport.outputs.fingerprint }}
           LEGS_DIR: ${{ runner.temp }}/release-debs
+          EXPECTED_KIND: release
         shell: bash
         run: bash .github/scripts/publish-packages.sh
 

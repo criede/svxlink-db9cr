@@ -2,7 +2,7 @@
 <html lang="bg">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT хранилище на SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -51,8 +51,12 @@
 <h2 id="quickstart">Бърз старт</h2>
 <p>Изпълни на целевата система (правилните кодово име и архитектура се откриват автоматично):</p>
 <pre><code># Импортиране на публичния ключ за подписване
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (приема се само ключът с този отпечатък: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
 # Добавяне на източника на хранилището. Избери компонент:
 #   main     ежедневни компилации за разработка
@@ -145,7 +149,7 @@ Zero&nbsp;W, а също се инсталират и на Debian <code>armhf</c
 същите функции като 64-битовите.</p>
 
 <h2>Ключ за подписване</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; импортира се автоматично от
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; импортира се автоматично от
 командите за бърз старт по-горе.</p>
 
 <h2>Преглед на файловете в хранилището</h2>

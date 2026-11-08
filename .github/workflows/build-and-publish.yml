@@ -52,7 +52,7 @@ jobs:
       - name: Check out build target list
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
         with:
-          ref: ${{ inputs.source_sha || github.sha }}
+          # The trusted workflow commit, not source_sha (see publish job).
           sparse-checkout: .github/build-targets.json
           sparse-checkout-cone-mode: false
           persist-credentials: false
@@ -106,10 +106,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Check out source
+      # Scripts for this job (which holds the signing key and a write token)
+      # always come from the commit this workflow itself runs from, never
+      # from source_sha: a manual dispatch with an arbitrary source_sha
+      # must not be able to run code of its choosing next to the key.
+      - name: Check out publishing scripts
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
         with:
-          ref: ${{ inputs.source_sha || github.sha }}
           persist-credentials: false
 
       - name: Download built packages
@@ -135,6 +138,9 @@ jobs:
           echo "$APT_SIGNING_KEY" | gpg --batch --import
           fpr=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr:/{print $10; exit}')
           test -n "$fpr"
+          # Only the repository's known signing key may sign it (fingerprint
+          # pinned in .github/keys/, also published in the quickstart).
+          test "$fpr" = "$(tr -d '[:space:]' < .github/keys/apt-signing-key.fingerprint)"
           echo "::add-mask::$fpr"
           echo "fingerprint=$fpr" >> "$GITHUB_OUTPUT"
 
@@ -146,6 +152,8 @@ jobs:
           GH_REPO: ${{ github.repository }}
           GPG_KEY_FPR: ${{ steps.gpgimport.outputs.fingerprint }}
           LEGS_DIR: ${{ runner.temp }}/daily-debs
+          EXPECTED_KIND: daily
+          EXPECTED_SOURCE_SHA: ${{ inputs.source_sha || github.sha }}
         shell: bash
         run: bash .github/scripts/publish-packages.sh
 

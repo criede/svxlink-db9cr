@@ -43,6 +43,15 @@ test -n "$siplogic_so"
 assert_libs_resolved /usr/bin/svxlink
 assert_libs_resolved "$siplogic_so"
 
+# Regression test: postinst must not follow a symlinked state directory
+# (which the svxlink user could plant) when it re-runs on an upgrade, or it
+# would hand the link target, e.g. /etc, to svxlink.
+rm -rf /var/spool/svxlink/qso_recorder
+mkdir -p /tmp/postinst-victim
+ln -s /tmp/postinst-victim /var/spool/svxlink/qso_recorder
+/var/lib/dpkg/info/svxlink.postinst configure
+test "$(stat -c %U:%G /tmp/postinst-victim)" = root:root
+
 test "$(dpkg-query -W -f='${Architecture}' qtel)" = "$EXPECTED_ARCH"
 test -x /usr/bin/qtel
 assert_libs_resolved /usr/bin/qtel

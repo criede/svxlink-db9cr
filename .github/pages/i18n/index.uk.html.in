@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="f9b0618c88f31c5732b8c61b813b41909f5aa9bd635e74084f8c2c9fb61be584">
+<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT-репозиторій SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -51,8 +51,12 @@
 <h2 id="quickstart">Швидкий старт</h2>
 <p>Виконай на цільовій системі (потрібні кодова назва та архітектура визначаються автоматично):</p>
 <pre><code># Імпорт відкритого ключа підпису
-curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
+# (приймається лише ключ із цим відбитком: E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844)
+tmp=$(mktemp -d)
+curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | gpg --quiet --homedir "$tmp" --import
+gpg --homedir "$tmp" --export E9CFE9467D003148AB93EBAC4ED44F5351D81844 | \
+  sudo tee /usr/share/keyrings/svxlink-db9cr.gpg >/dev/null
+rm -rf "$tmp"
 
 # Додавання джерела репозиторію. Обери компонент:
 #   main     щоденні збірки для розробки
@@ -145,7 +149,7 @@ Zero&nbsp;W, а також встановлюються на Debian <code>armhf<
 ті самі функції, що й 64-бітні.</p>
 
 <h2>Ключ підпису</h2>
-<p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; імпортується автоматично
+<p><a href="pubkey.gpg">pubkey.gpg</a> (<code>E9CF E946 7D00 3148 AB93  EBAC 4ED4 4F53 51D8 1844</code>) &mdash; імпортується автоматично
 командами швидкого старту вище.</p>
 
 <h2>Перегляд файлів репозиторію</h2>
