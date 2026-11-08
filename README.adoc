@@ -96,3 +96,6 @@ These are some of the resources connected to SvxLink:
 * https://criede.github.io/svxlink-db9cr/#quickstart[APT Repository Quickstart]
   -- Install svxlink-db9cr packages (upstream releases or daily builds) for
   Raspberry Pi OS and Debian via apt
+* https://github.com/criede/openelp[criede/openelp] -- Packaged fork of
+  OpenELP, the open source EchoLink proxy, with security fixes that protect
+  SvxLink nodes reaching EchoLink through the proxy

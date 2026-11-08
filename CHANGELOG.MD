@@ -7,6 +7,9 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- `README.adoc` links https://github.com/criede/openelp (packaged OpenELP
+  EchoLink proxy fork with SvxLink-protecting security fixes) under
+  "Resources".
 - RTL-SDR direct USB access now works for the `svxlink` service: the
   package ships `/usr/lib/udev/rules.d/60-svxlink-rtlsdr.rules` (generated
   from the RTL-SDR Blog fork's rules, group `svxlink` plus `uaccess`),
