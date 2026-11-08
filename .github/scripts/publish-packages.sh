@@ -55,43 +55,36 @@ highest_release() {
 }
 latest_release=""
 
-# Tags must point to a commit that exists in this repository. Daily builds
-# always do; an upstream release tag's commit normally does too (upstream
-# master, which this fork merges, contains it), but fall back to the
-# default branch rather than fail if it does not.
-#
-# The GITHUB_TOKEN may also not create a tag on a commit that itself
-# changes files under .github/workflows/ (HTTP 403 "Resource not
-# accessible by integration"; it lacks the "workflows" permission). The
-# daily builds of synced upstream merges never hit this (the sync never
-# touches workflows), but a manual build of a commit that changes a
-# workflow does. Then the tag goes to the nearest ancestor that changes
-# no workflow; the release notes still name the exact source commit.
-commit_exists() {
-  gh api "repos/${GH_REPO}/commits/$1" --silent >/dev/null 2>&1
+# Where the release's tag points. Preferably the exact source commit, but
+# the GITHUB_TOKEN may only create a tag on a commit whose
+# .github/workflows/ files are identical to the default branch's
+# (otherwise HTTP 403 "Resource not accessible by integration": creating
+# that ref would count as changing workflows, which needs the "workflows"
+# permission the token does not have). That holds for the daily builds of
+# synced upstream merges (the sync never touches workflows), but not for
+# upstream release tag commits (upstream's own, different workflows) or a
+# manual build of an older commit with different workflows. Those get
+# their tag on the default branch instead; the release notes always name
+# the exact source commit and, for releases, the upstream tag.
+workflows_fingerprint() {
+  gh api "repos/${GH_REPO}/contents/.github/workflows?ref=$1" \
+    --jq '[.[] | .name + ":" + .sha] | sort | join(",")' 2>/dev/null || true
 }
-workflow_free_ancestor() {
-  local c
-  while IFS= read -r c; do
-    if [[ "$(gh api "repos/${GH_REPO}/commits/$c" \
-        --jq '[.files[].filename | startswith(".github/workflows/")] | any')" == false ]]; then
-      printf '%s\n' "$c"
-      return 0
-    fi
-  done < <(gh api "repos/${GH_REPO}/commits?sha=$1&per_page=20" --jq '.[].sha')
-  return 1
-}
+default_branch_fingerprint=""
 create_release() {
   # $1 = source commit; remaining arguments = gh release create arguments.
-  local sha="$1" fallback
+  local sha="$1"
   shift
-  if commit_exists "$sha"; then
+  if [[ -z "$default_branch_fingerprint" ]]; then
+    default_branch_fingerprint="$(workflows_fingerprint \
+      "$(gh api "repos/${GH_REPO}" --jq .default_branch)")"
+  fi
+  if [[ -n "$default_branch_fingerprint" \
+        && "$(workflows_fingerprint "$sha")" == "$default_branch_fingerprint" ]]; then
     if gh release create "$@" --target "$sha"; then return 0; fi
-    echo "Could not create the tag on ${sha}; trying the nearest ancestor that changes no workflow." >&2
-    if fallback="$(workflow_free_ancestor "$sha")" && [[ "$fallback" != "$sha" ]]; then
-      if gh release create "$@" --target "$fallback"; then return 0; fi
-    fi
-    echo "Falling back to the default branch for the tag." >&2
+    echo "Could not create the tag on ${sha}; using the default branch instead." >&2
+  else
+    echo "Workflows of ${sha} differ from the default branch's; tagging the default branch instead." >&2
   fi
   gh release create "$@"
 }

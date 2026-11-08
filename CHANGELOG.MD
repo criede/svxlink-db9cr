@@ -24,10 +24,17 @@ project's existing release notes are located under `src/doc/`.
 - The qtel build now forces `-std=c++17` through a tiny compiler launcher (`CMAKE_CXX_COMPILER_LAUNCHER`), so
   Qt6 builds without source patches (needed for unmodified upstream tags).
 - Checksum files in GitHub releases are named `SHA256SUMS-<suite>-<arch>`.
-- Publishing falls back to the nearest ancestor commit that changes no
-  workflow file when GitHub refuses to create a release tag on the build
-  commit itself (the `GITHUB_TOKEN` lacks the `workflows` permission;
-  only affects manual builds of workflow-changing commits).
+- GitHub release tags point to the build commit only if its
+  `.github/workflows/` files match the default branch's, otherwise to the
+  default branch: the `GITHUB_TOKEN` (no `workflows` permission) gets
+  HTTP 403 when creating a tag on a commit with different workflows. This
+  always applies to upstream release tag commits (`release-<tag>`) and to
+  manual builds of older commits; the release notes name the exact
+  source commit.
+- Documented choosing between the APT components `main` (daily) and
+  `release` (upstream releases), switching between them, rolling back to
+  an earlier release, and that the TCL scripts are dpkg conffiles only in
+  `main` packages (UPSTREAM-SYNC.MD and the repository's `index.html`).
 - Raspbian build image: explicitly include `apt` (only "important" in
   Raspbian bookworm, so missing from minbase), set `PATH` on the
   imported image, and give the build keyring a name that does not clash

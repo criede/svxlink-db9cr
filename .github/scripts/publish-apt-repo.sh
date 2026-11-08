@@ -287,7 +287,15 @@ picks up new daily builds (<code>main</code>) or new upstream releases
 (<code>release</code>) automatically.</p>
 <p class="note">Do not enable both components at once unless you want the
 daily builds: they always have the higher version, so apt would install them
-over the releases.</p>
+over the releases. To switch an existing installation from <code>main</code>
+to <code>release</code>, change the component in
+<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, run
+<code>sudo apt update</code>, then install the release version explicitly
+(it is a downgrade), e.g.
+<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Note that in
+<code>release</code> packages (unmodified upstream source) the TCL scripts
+under <code>/usr/share/svxlink</code> are not protected as configuration
+files; keep local changes in <code>events.d/local/</code>.</p>
 
 <h2>Applying configuration changes</h2>
 <p>After editing <code>/etc/svxlink/svxlink.conf</code> (or any

@@ -211,7 +211,10 @@ the respective suite: the tag is derived from the version, which carries
 the suite but not the architecture, so all architectures of one suite
 share one prerelease (titled `Daily <version> — <suite>`), and the
 checksum file is named per suite/architecture so they do not overwrite
-each other. The tag points to the built commit. No prerelease is marked as
+each other. The tag points to the built commit (or, if that commit's
+`.github/workflows/` files differ from the default branch's, e.g. for a
+manual build of an older commit, to the default branch — see the
+`release-<tag>` note under "Upstream release packages" for why). No prerelease is marked as
 "Latest". There is no build cache; temporary files are removed after the
 upload. A failed leg uploads no artifact and therefore publishes
 nothing. `cleanup-old-releases` and `deploy-pages` still run afterwards
@@ -253,12 +256,18 @@ releases are deliberately not built), for every target in
   below the daily builds of the same or later code (`26.05.2.99.0+daily…`).
 - **Publishing:** one GitHub release `release-<tag>` per upstream release
   (not a prerelease; the highest version is marked "Latest"), holding
-  the packages of all suites/architectures, pointing to the upstream tag's
-  commit; and the APT repository's `release` component
+  the packages of all suites/architectures; and the APT repository's
+  `release` component
   (`dists/<suite>/release/…`, `pool/<suite>/release/…`). Neither is ever
   pruned: `prune-daily-releases.sh` only touches `daily-*` releases, and
   `publish-apt-repo.sh` only prunes files carrying a `+daily<date>`
-  version marker.
+  version marker. The `release-<tag>` tag points to this repository's
+  default branch at publishing time, not to the upstream tag's commit:
+  the `GITHUB_TOKEN` may only create a tag on a commit whose
+  `.github/workflows/` files match the default branch's (otherwise
+  HTTP 403, as that would count as changing workflows), and upstream
+  commits carry upstream's own workflows. The release notes name the
+  upstream tag and its exact commit.
 - **When:** the workflow runs daily at 05:47 UTC (after the upstream sync)
   and on manual dispatch. Its `plan` job (`plan-release-builds.sh`)
   compares the upstream releases against the `release` pool on
@@ -467,6 +476,29 @@ Debian armhf); `i386` (32-bit PCs) is available for Debian 12 only, as
 Debian 13 no longer supports installing i386 systems. See the matrix in
 the "Daily package" section above.
 
+### Choosing a component: `main` or `release`
+
+The repository offers two components; the choice is made per system, in
+the repository line below:
+
+| Component | Contains | Source | Updates via `apt upgrade` | Kept |
+|-----------|----------|--------|----------------------------|------|
+| `main`    | Daily development builds | This fork's `master` (upstream `master` plus the local changes listed in `CHANGELOG.MD`) | Every new daily build | Retention window (see "Retention") |
+| `release` | Official upstream SvxLink releases, 26.05 and newer | The unmodified upstream release tag | Each new upstream release | Forever |
+
+Both components contain the same packages (`svxlink`, `qtel`) with the
+same build settings and features (RTL-SDR, SipLogic, GPIOD, Speex/Opus/
+LADSPA, systemd service) for the same suites/architectures. The
+differences come from the source: `release` packages contain none of
+this fork's source changes (e.g. the TCL scripts are not dpkg conffiles
+there, see below) and only change when upstream publishes a release.
+
+Use `release` for a station that should run a known, released version;
+use `main` to follow current development. Configure only one of them:
+with both enabled, apt always prefers `main`, since a daily build always
+carries a higher version than the release it is based on (e.g.
+`26.05.2.99.0+daily…` > `26.05.2-1~trixie`).
+
 On the target system, pick up the matching codename automatically and set
 up the repository:
 
@@ -514,9 +546,35 @@ codename in `/etc/apt/sources.list.d/svxlink-db9cr.list` manually to one
 of the values listed above, or wait for the matrix to be extended.
 
 After that, a regular `sudo apt upgrade` automatically delivers the
-latest daily version for the installed system. These are daily development
-builds, not stable releases — see the notes above on scope and test
-coverage.
+latest version of the chosen component for the installed system: the
+newest daily build (`main`) or the newest upstream release (`release`).
+Daily builds are development builds, not stable releases — see the notes
+above on scope and test coverage.
+
+### Switching between `main` and `release`
+
+Change the component in the repository line and update. Moving from
+`main` to `release` is a downgrade (the daily builds carry the higher
+version), so request the release version explicitly:
+
+```sh
+sudo sed -i 's/ main$/ release/' /etc/apt/sources.list.d/svxlink-db9cr.list
+sudo apt update
+apt list -a svxlink   # shows the release versions now available
+sudo apt install svxlink=26.05.2-1~trixie qtel=26.05.2-1~trixie   # qtel only if installed
+```
+
+Moving from `release` to `main` is a normal upgrade:
+
+```sh
+sudo sed -i 's/ release$/ main/' /etc/apt/sources.list.d/svxlink-db9cr.list
+sudo apt update && sudo apt upgrade
+```
+
+The configuration under `/etc/svxlink` is kept either way (dpkg
+conffiles). After switching to `release`, review local edits to the TCL
+scripts under `/usr/share/svxlink`: they are conffiles only in `main`
+packages (see below), so a `release` package may replace them.
 
 ### Rolling back to an older build
 
@@ -531,11 +589,15 @@ apt list -a svxlink   # substitute qtel to roll that package back instead
 sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
 ```
 
+With the `release` component, every published upstream release stays
+installable permanently, so going back to an earlier release works the
+same way, e.g. `sudo apt install svxlink=26.05.1-1~trixie`.
+
 To pin a package at that version so `apt upgrade` does not pull it
 forward again until you decide to, add `apt-mark hold svxlink` (and
 `apt-mark unhold svxlink` later to resume automatic updates).
 
-The TCL files under `/usr/share/svxlink` (`events.tcl`, `events.d/*.tcl`,
+In the `main` (daily) packages, the TCL files under `/usr/share/svxlink` (`events.tcl`, `events.d/*.tcl`,
 `modules.d/*.tcl`) are installed as dpkg `conffiles`, just like the `.conf`
 files under `/etc` (`install_files_if_not_exists` in the respective
 `CMakeLists.txt`, analogous to the existing `install_if_not_exists`
@@ -546,7 +608,10 @@ asks during the upgrade (or keeps the local state on unattended upgrades),
 instead of silently replacing the file. Unmodified files continue to be
 updated normally. This does not affect the already recommended path via
 `events.d/local/*.tcl` for own additions, since new files not shipped by
-the package are never touched by dpkg.
+the package are never touched by dpkg. This is a change of this fork; the
+`release` packages, built from unmodified upstream source, install these
+TCL files as regular files, so an upgrade there overwrites direct edits
+— use `events.d/local/*.tcl` for local changes on `release` systems.
 
 What dpkg actually does with a conffile on upgrade, depending on whether
 the admin and/or upstream touched it since the last install:
