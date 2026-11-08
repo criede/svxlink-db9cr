@@ -1,0 +1,228 @@
+name: Build Debian packages for one target
+
+# Reusable building block: builds and installation-tests the svxlink and
+# qtel .deb packages for exactly one suite/architecture and hands them
+# over as an Actions artifact. Called (as a matrix over
+# .github/build-targets.json) by build-and-publish.yml for the daily
+# packages and by build-releases.yml for upstream release tags. Publishing
+# is not done here: this job writes no shared state.
+#
+# Target notes (see .github/build-targets.json):
+# - armhf (32-bit Raspberry Pi OS, Debian armhf) is built in a Raspbian
+#   container (base: raspbian) rather than debian:* armhf, since Raspbian
+#   targets ARMv6+VFP and so also runs on the Raspberry Pi 1/Zero/Zero W,
+#   which Debian's ARMv7 armhf does not; the same package installs on
+#   Debian armhf too (tested below). GitHub's arm64 runners cannot execute
+#   32-bit ARM code natively, so these legs run under QEMU user-mode
+#   emulation on an amd64 runner, hence the longer timeout.
+# - i386 (Debian 12 on 32-bit PCs) runs natively on an amd64 runner.
+#   Debian 13 dropped i386 as an installable architecture (no kernel, no
+#   installer; only a multiarch userland for amd64 systems remains), so
+#   there is no trixie i386 target.
+
+on:
+  workflow_call:
+    inputs:
+      suite:
+        type: string
+        required: true
+      arch:
+        type: string
+        required: true
+      runner:
+        type: string
+        required: true
+      platform:
+        type: string
+        required: true
+      base:
+        description: debian or raspbian
+        type: string
+        required: true
+      timeout:
+        description: Job timeout in minutes.
+        type: number
+        default: 45
+      build_kind:
+        description: daily or release (see build-daily-deb.sh).
+        type: string
+        default: daily
+      source_repository:
+        description: Repository to build (owner/name). Empty = this repository.
+        type: string
+        default: ''
+      source_ref:
+        description: Commit SHA or tag of source_repository to build.
+        type: string
+        required: true
+      upstream_tag:
+        description: Release tag being built (build_kind release only).
+        type: string
+        default: ''
+      tools_ref:
+        description: >-
+          Commit of this repository whose .github/scripts and keys are used
+          for the build. Empty = the triggering commit.
+        type: string
+        default: ''
+      artifact_name:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: ${{ inputs.timeout }}
+    env:
+      # Image the leg builds in; for base: raspbian it is created locally
+      # by the "Create Raspbian build image" step below (there is no
+      # official Raspbian image on Docker Hub).
+      BUILD_IMAGE: ${{ inputs.base == 'raspbian' && format('local/raspbian:{0}', inputs.suite) || format('debian:{0}-slim', inputs.suite) }}
+    steps:
+      # Build scripts and keys always come from this repository, the source
+      # to build from source_repository/source_ref (for the daily build the
+      # same repository and commit; for a release build the upstream tag).
+      - name: Check out build tooling
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
+        with:
+          ref: ${{ inputs.tools_ref || github.sha }}
+          path: tools
+          persist-credentials: false
+
+      - name: Check out source to build
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
+        with:
+          repository: ${{ inputs.source_repository || github.repository }}
+          ref: ${{ inputs.source_ref }}
+          path: source
+          fetch-depth: 0
+          persist-credentials: false
+
+      # QEMU user-mode emulation via binfmt_misc, from Ubuntu's own
+      # qemu-user-static package (registers with the "F" flag, so the
+      # emulator also works inside containers) -- deliberately no
+      # third-party action or binfmt installer image. mmdebstrap creates
+      # the Raspbian root filesystem.
+      - name: Set up QEMU and mmdebstrap
+        if: inputs.base == 'raspbian'
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends qemu-user-static mmdebstrap
+          grep -qx 'enabled' /proc/sys/fs/binfmt_misc/qemu-arm
+          grep -q '^flags:.*F' /proc/sys/fs/binfmt_misc/qemu-arm
+
+      # Raspbian's archive signing key is vendored in the repository
+      # (.github/keys/raspbian-archive-keyring.asc, fingerprint
+      # A0DA38D0D76E8B5D638872819165938D90FDDD2E) rather than downloaded at
+      # build time, and copied into the image so apt inside it trusts the
+      # archive too. The mirror is plain HTTP (as in Raspberry Pi OS's own
+      # sources.list; it offers no HTTPS); integrity comes from the signed
+      # InRelease, as for any APT archive.
+      - name: Create Raspbian build image
+        if: inputs.base == 'raspbian'
+        shell: bash
+        env:
+          SUITE: ${{ inputs.suite }}
+          PLATFORM: ${{ inputs.platform }}
+        run: |
+          set -euo pipefail
+          keydir="$RUNNER_TEMP/raspbian-keyring"
+          mkdir -p "$keydir"
+          gpg --dearmor < tools/.github/keys/raspbian-archive-keyring.asc \
+            > "$keydir/raspbian-archive-keyring.gpg"
+          test "$(gpg --show-keys --with-colons "$keydir/raspbian-archive-keyring.gpg" \
+            | awk -F: '/^fpr:/{print $10; exit}')" = A0DA38D0D76E8B5D638872819165938D90FDDD2E
+          sudo mmdebstrap --variant=minbase --architectures=armhf \
+            --keyring="$keydir/raspbian-archive-keyring.gpg" \
+            --aptopt='Acquire::Retries "3"' \
+            --setup-hook='mkdir -p "$1/etc/apt/trusted.gpg.d"' \
+            --setup-hook="copy-in $keydir/raspbian-archive-keyring.gpg /etc/apt/trusted.gpg.d/" \
+            "$SUITE" "$RUNNER_TEMP/raspbian-rootfs.tar" \
+            "deb http://raspbian.raspberrypi.com/raspbian $SUITE main"
+          sudo cat "$RUNNER_TEMP/raspbian-rootfs.tar" \
+            | docker import --platform "$PLATFORM" - "$BUILD_IMAGE"
+          sudo rm -f "$RUNNER_TEMP/raspbian-rootfs.tar"
+          docker run --rm --pull never --platform "$PLATFORM" "$BUILD_IMAGE" \
+            sh -c 'grep -x "ID=raspbian" /etc/os-release && test "$(dpkg --print-architecture)" = armhf'
+
+      - name: Build Debian packages for ${{ inputs.suite }}/${{ inputs.arch }}
+        shell: bash
+        env:
+          PLATFORM: ${{ inputs.platform }}
+          BUILD_KIND: ${{ inputs.build_kind }}
+          UPSTREAM_TAG: ${{ inputs.upstream_tag }}
+          EXPECTED_ARCH: ${{ inputs.arch }}
+          EXPECTED_SUITE: ${{ inputs.suite }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/daily-deb"
+          docker run --rm --pull missing --platform "$PLATFORM" \
+            -v "$GITHUB_WORKSPACE/source:/source:ro" \
+            -v "$GITHUB_WORKSPACE/tools/.github/scripts:/scripts:ro" \
+            -v "$RUNNER_TEMP/daily-deb:/output" \
+            -e GITHUB_RUN_NUMBER -e GITHUB_RUN_ATTEMPT -e BUILD_KIND -e UPSTREAM_TAG \
+            "$BUILD_IMAGE" bash /scripts/build-daily-deb.sh
+          test "$(cat "$RUNNER_TEMP/daily-deb/ARCH")" = "$EXPECTED_ARCH"
+          test "$(cat "$RUNNER_TEMP/daily-deb/SUITE")" = "$EXPECTED_SUITE"
+
+      # Tested in the build image itself and, for Raspbian-built armhf
+      # packages, additionally in plain Debian armhf, which they are
+      # published for as well (same dists/<suite>/<component>/binary-armhf).
+      - name: Test installation in clean ${{ inputs.suite }}
+        shell: bash
+        env:
+          PLATFORM: ${{ inputs.platform }}
+          BASE: ${{ inputs.base }}
+          SUITE: ${{ inputs.suite }}
+          EXPECTED_ARCH: ${{ inputs.arch }}
+        run: |
+          set -euo pipefail
+          test_images=("$BUILD_IMAGE")
+          test_platforms=("$PLATFORM")
+          if [[ "$BASE" == raspbian ]]; then
+            test_images+=("debian:${SUITE}-slim")
+            test_platforms+=("linux/arm/v7")
+          fi
+          for i in "${!test_images[@]}"; do
+            echo "::group::Installation test in ${test_images[$i]} (${test_platforms[$i]})"
+            docker run --rm --pull missing --platform "${test_platforms[$i]}" \
+              -v "$RUNNER_TEMP/daily-deb:/packages:ro" \
+              -v "$GITHUB_WORKSPACE/tools/.github/scripts:/scripts:ro" \
+              -e EXPECTED_ARCH \
+              "${test_images[$i]}" bash /scripts/test-daily-deb.sh
+            echo "::endgroup::"
+          done
+
+      - name: Upload built packages for publishing
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2, Node.js 24
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: |
+            ${{ runner.temp }}/daily-deb/*.deb
+            ${{ runner.temp }}/daily-deb/SHA256SUMS-*
+            ${{ runner.temp }}/daily-deb/VERSION
+            ${{ runner.temp }}/daily-deb/SUITE
+            ${{ runner.temp }}/daily-deb/ARCH
+            ${{ runner.temp }}/daily-deb/KIND
+            ${{ runner.temp }}/daily-deb/SOURCE_SHA
+            ${{ runner.temp }}/daily-deb/UPSTREAM_TAG
+            ${{ runner.temp }}/daily-deb/BUILD-INFO.MD
+          if-no-files-found: error
+          retention-days: 3
+          # .deb files are already compressed.
+          compression-level: 0
+
+      - name: Remove temporary package files
+        if: always()
+        shell: bash
+        env:
+          SUITE: ${{ inputs.suite }}
+        run: |
+          docker run --rm -v "$RUNNER_TEMP/daily-deb:/output" \
+            "debian:${SUITE}-slim" sh -c 'find /output -mindepth 1 -delete'

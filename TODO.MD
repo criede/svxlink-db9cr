@@ -18,6 +18,8 @@ Open tasks for svxlink-db9cr. The following items serve as an initial plan.
 
 - [x] Publish the daily Debian package for Raspberry Pi OS arm64 directly as a prerelease.
 - [x] Build the daily packages for the 32-bit variants too (armhf via Raspbian, i386 for bookworm).
+- [x] Package the upstream releases (26.05 and newer) automatically, APT component `release`.
+- [ ] Verify the first run of `build-releases.yml` (backlog of 26.05, 26.05.1, 26.05.2 on all targets).
 - [ ] Verify the first CI run of the 32-bit legs (QEMU build time vs. the 300-minute timeout, Raspbian/Debian armhf installation tests).
 - [x] Implement the daily upstream sync as a GitHub Actions workflow.
 - [ ] Continuously record completed changes in `CHANGELOG.MD`.

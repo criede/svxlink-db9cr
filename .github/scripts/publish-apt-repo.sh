@@ -165,8 +165,17 @@ for d in "$REPO_DIR"/dists/*/; do
   archs="$(cd "$d" 2>/dev/null && find . -maxdepth 2 -type d -name 'binary-*' \
     -exec basename {} \; | sed 's/^binary-//' | sort -u | tr '\n' ' ')"
   archs="${archs% }"
+  # Per component ("main" = daily builds, "release" = upstream releases),
+  # since a component can lag behind while its builds are still pending.
+  component_cells=""
+  for comp in main release; do
+    comp_archs="$(cd "$d" 2>/dev/null && find "./$comp" -mindepth 1 -maxdepth 1 -type d \
+      -name 'binary-*' -exec basename {} \; 2>/dev/null | sed 's/^binary-//' | sort -u | tr '\n' ' ')"
+    comp_archs="${comp_archs% }"
+    component_cells="${component_cells}<td>${comp_archs:+<code>${comp_archs}</code>}${comp_archs:-&mdash;}</td>"
+  done
   label="${suite_labels[$s]:-}"
-  suite_rows="${suite_rows}<tr><td><code>${s}</code></td><td>${label}</td><td><code>${archs}</code></td></tr>
+  suite_rows="${suite_rows}<tr><td><code>${s}</code></td><td>${label}</td>${component_cells}</tr>
 "
   suite_list_items="${suite_list_items}<li>${s}: ${archs}</li>
 "
@@ -208,11 +217,19 @@ cat > "$REPO_DIR/index.html" <<EOF
 </head>
 <body>
 <h1>SvxLink DB9CR APT repository</h1>
-<p>Daily development packages of
+<p>Packages of
 <a href="https://github.com/${repo_slug}">svxlink-db9cr</a> for Raspberry Pi OS
-and Debian. These are daily builds from the latest source, not stable
-releases &mdash; see the
-<a href="https://github.com/${repo_slug}">source repository</a> for details.</p>
+and Debian, in two components &mdash; pick one:</p>
+<ul>
+<li><code>main</code>: daily development builds from the latest source of
+this fork, not stable releases.</li>
+<li><code>release</code>: the official upstream SvxLink releases (26.05 and
+newer), built from the unmodified upstream release source with the same
+build settings and features as the daily packages. Every release is kept;
+<code>apt upgrade</code> moves to each new upstream release.</li>
+</ul>
+<p>See the <a href="https://github.com/${repo_slug}">source repository</a>
+for details.</p>
 
 <h2>Upstream &amp; local changes</h2>
 <p>This is a daily-synced fork of
@@ -232,10 +249,13 @@ live on GitHub:
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \\
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
-# Add the repository source
+# Add the repository source. Choose the component:
+#   main     daily development builds
+#   release  official upstream releases (26.05 and newer)
+component=main
 codename=\$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=\$(dpkg --print-architecture)
-echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=\${arch}] https://criede.github.io/svxlink-db9cr \${codename} main" | \\
+echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=\${arch}] https://criede.github.io/svxlink-db9cr \${codename} \${component}" | \\
   sudo tee /etc/apt/sources.list.d/svxlink-db9cr.list
 
 sudo apt update
@@ -263,7 +283,11 @@ The service reads this path through <code>/etc/default/svxlink</code>.</p>
 system's codename isn't built yet (see the table below) &mdash; edit the
 codename in <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> to one of
 the supported ones instead. Afterwards, a regular <code>sudo apt upgrade</code>
-picks up new daily builds automatically.</p>
+picks up new daily builds (<code>main</code>) or new upstream releases
+(<code>release</code>) automatically.</p>
+<p class="note">Do not enable both components at once unless you want the
+daily builds: they always have the higher version, so apt would install them
+over the releases.</p>
 
 <h2>Applying configuration changes</h2>
 <p>After editing <code>/etc/svxlink/svxlink.conf</code> (or any
@@ -280,7 +304,8 @@ as which logic cores or sound devices are loaded, may need a full restart).</p>
 superseded (daily for a week, weekly for a month, monthly for a year --
 see "Retention" in
 <a href="https://github.com/${repo_slug}/blob/master/.github/UPSTREAM-SYNC.MD">UPSTREAM-SYNC.MD</a>),
-so a bad daily build can usually be rolled back:</p>
+so a bad daily build can usually be rolled back. Upstream release packages
+(<code>release</code> component) are never removed:</p>
 <pre><code>apt list -a svxlink   # or qtel; lists every version still in the repository
 sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
 sudo apt-mark hold svxlink   # optional: stop "apt upgrade" pulling it forward again
@@ -293,7 +318,7 @@ ${package_rows}</table>
 
 <h2>Supported systems</h2>
 <table>
-<tr><th>Codename</th><th>Matches</th><th>Architectures</th></tr>
+<tr><th>Codename</th><th>Matches</th><th>Architectures: <code>main</code> (daily)</th><th>Architectures: <code>release</code></th></tr>
 ${suite_rows}</table>
 <p class="note"><strong>32-bit systems:</strong> <code>armhf</code> packages
 are built against Raspbian (ARMv6+VFP), the base of 32-bit Raspberry Pi OS,
@@ -302,6 +327,8 @@ Zero&nbsp;W, and also install on Debian <code>armhf</code> (both are tested).
 <code>i386</code> (32-bit PCs) is built for Debian&nbsp;12 only: Debian&nbsp;13
 no longer supports installing i386 systems. The 32-bit packages contain the
 same features as the 64-bit ones.</p>
+
+<h2>Signing key</h2>
 <p><a href="pubkey.gpg">pubkey.gpg</a> &mdash; imported automatically by the
 quickstart commands above.</p>
 

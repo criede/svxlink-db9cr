@@ -42,201 +42,59 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  daily-deb:
-    name: ${{ matrix.suite }}/${{ matrix.arch }} daily package
-    strategy:
-      # Legs build in parallel; nothing here writes to shared state (the
-      # GitHub prerelease and the gh-pages APT repository are only touched
-      # by the single publish-daily-deb job below), so there is no push
-      # race to serialize against.
-      #
-      # fail-fast off: with emulated 32-bit ARM legs in the matrix, a
-      # failure that only hits one architecture (QEMU, 32-bit-specific
-      # compile issue, a package missing from Raspbian) is now realistic,
-      # and should not cancel and withhold the other, healthy legs. The
-      # run as a whole is still marked failed, and publish-daily-deb
-      # publishes whatever legs did succeed.
-      fail-fast: false
-      matrix:
-        include:
-          # Currently maintained Debian-based releases (Debian and
-          # Raspberry Pi OS use the same package base per codename, so one
-          # build per codename/architecture covers both), for 64-bit arm64
-          # (Raspberry Pi) and amd64 (Intel/AMD PCs and servers) plus every
-          # 32-bit variant those releases still ship as an installable OS:
-          #
-          # - armhf (32-bit Raspberry Pi OS, Debian armhf): built in a
-          #   Raspbian container (base: raspbian) rather than debian:*
-          #   armhf, since Raspbian targets ARMv6+VFP and so also runs on
-          #   the Raspberry Pi 1/Zero/Zero W, which Debian's ARMv7 armhf
-          #   does not; the same package installs on Debian armhf too
-          #   (tested below). GitHub's arm64 runners cannot execute 32-bit
-          #   ARM code natively, so these legs run under QEMU user-mode
-          #   emulation on an amd64 runner, hence the longer timeout.
-          # - i386 (Debian 12 on 32-bit PCs): runs natively on an amd64
-          #   runner. Debian 13 dropped i386 as an installable
-          #   architecture (no kernel, no installer; only a multiarch
-          #   userland for amd64 systems remains), so there is no trixie
-          #   i386 leg.
-          #
-          # Add further entries here for additional Debian/Ubuntu versions
-          # or architectures.
-          - suite: bookworm
-            arch: arm64
-            runner: ubuntu-24.04-arm
-            platform: linux/arm64
-            base: debian
-          - suite: trixie
-            arch: arm64
-            runner: ubuntu-24.04-arm
-            platform: linux/arm64
-            base: debian
-          - suite: bookworm
-            arch: amd64
-            runner: ubuntu-24.04
-            platform: linux/amd64
-            base: debian
-          - suite: trixie
-            arch: amd64
-            runner: ubuntu-24.04
-            platform: linux/amd64
-            base: debian
-          - suite: bookworm
-            arch: i386
-            runner: ubuntu-24.04
-            platform: linux/386
-            base: debian
-          - suite: bookworm
-            arch: armhf
-            runner: ubuntu-24.04
-            platform: linux/arm/v6
-            base: raspbian
-            timeout: 300
-          - suite: trixie
-            arch: armhf
-            runner: ubuntu-24.04
-            platform: linux/arm/v6
-            base: raspbian
-            timeout: 300
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: ${{ matrix.timeout || 45 }}
-    env:
-      # Image the leg builds in; for base: raspbian it is created locally
-      # by the "Create Raspbian build image" step below (there is no
-      # official Raspbian image on Docker Hub).
-      BUILD_IMAGE: ${{ matrix.base == 'raspbian' && format('local/raspbian:{0}', matrix.suite) || format('debian:{0}-slim', matrix.suite) }}
+  targets:
+    name: Read build targets
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.read.outputs.matrix }}
     steps:
-      - name: Check out source to build
+      - name: Check out build target list
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
         with:
           ref: ${{ inputs.source_sha || github.sha }}
-          fetch-depth: 0
+          sparse-checkout: .github/build-targets.json
+          sparse-checkout-cone-mode: false
           persist-credentials: false
 
-      # QEMU user-mode emulation via binfmt_misc, from Ubuntu's own
-      # qemu-user-static package (registers with the "F" flag, so the
-      # emulator also works inside containers) -- deliberately no
-      # third-party action or binfmt installer image. mmdebstrap creates
-      # the Raspbian root filesystem.
-      - name: Set up QEMU and mmdebstrap
-        if: matrix.base == 'raspbian'
+      # .github/build-targets.json is the single list of suites/
+      # architectures, shared with build-releases.yml; see build-deb.yml
+      # for what each kind of target means.
+      - name: Read build targets
+        id: read
         shell: bash
         run: |
           set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends qemu-user-static mmdebstrap
-          grep -qx 'enabled' /proc/sys/fs/binfmt_misc/qemu-arm
-          grep -q '^flags:.*F' /proc/sys/fs/binfmt_misc/qemu-arm
+          echo "matrix=$(jq -c '{include: .}' .github/build-targets.json)" >> "$GITHUB_OUTPUT"
 
-      # Raspbian's archive signing key is vendored in the repository
-      # (.github/keys/raspbian-archive-keyring.asc, fingerprint
-      # A0DA38D0D76E8B5D638872819165938D90FDDD2E) rather than downloaded at
-      # build time, and copied into the image so apt inside it trusts the
-      # archive too. The mirror is plain HTTP (as in Raspberry Pi OS's own
-      # sources.list; it offers no HTTPS); integrity comes from the signed
-      # InRelease, as for any APT archive.
-      - name: Create Raspbian build image
-        if: matrix.base == 'raspbian'
-        shell: bash
-        run: |
-          set -euo pipefail
-          keydir="$RUNNER_TEMP/raspbian-keyring"
-          mkdir -p "$keydir"
-          gpg --dearmor < .github/keys/raspbian-archive-keyring.asc \
-            > "$keydir/raspbian-archive-keyring.gpg"
-          test "$(gpg --show-keys --with-colons "$keydir/raspbian-archive-keyring.gpg" \
-            | awk -F: '/^fpr:/{print $10; exit}')" = A0DA38D0D76E8B5D638872819165938D90FDDD2E
-          sudo mmdebstrap --variant=minbase --architectures=armhf \
-            --keyring="$keydir/raspbian-archive-keyring.gpg" \
-            --aptopt='Acquire::Retries "3"' \
-            --setup-hook='mkdir -p "$1/etc/apt/trusted.gpg.d"' \
-            --setup-hook="copy-in $keydir/raspbian-archive-keyring.gpg /etc/apt/trusted.gpg.d/" \
-            "${{ matrix.suite }}" "$RUNNER_TEMP/raspbian-rootfs.tar" \
-            "deb http://raspbian.raspberrypi.com/raspbian ${{ matrix.suite }} main"
-          sudo cat "$RUNNER_TEMP/raspbian-rootfs.tar" \
-            | docker import --platform "${{ matrix.platform }}" - "$BUILD_IMAGE"
-          sudo rm -f "$RUNNER_TEMP/raspbian-rootfs.tar"
-          docker run --rm --pull never --platform "${{ matrix.platform }}" "$BUILD_IMAGE" \
-            sh -c 'grep -x "ID=raspbian" /etc/os-release && test "$(dpkg --print-architecture)" = armhf'
-
-      - name: Build Debian package for ${{ matrix.suite }}/${{ matrix.arch }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/daily-deb"
-          docker run --rm --pull missing --platform "${{ matrix.platform }}" \
-            -v "$GITHUB_WORKSPACE:/source:ro" \
-            -v "$RUNNER_TEMP/daily-deb:/output" \
-            -e GITHUB_RUN_NUMBER -e GITHUB_RUN_ATTEMPT \
-            "$BUILD_IMAGE" bash /source/.github/scripts/build-daily-deb.sh
-          test "$(cat "$RUNNER_TEMP/daily-deb/ARCH")" = "${{ matrix.arch }}"
-          test "$(cat "$RUNNER_TEMP/daily-deb/SUITE")" = "${{ matrix.suite }}"
-
-      # Tested in the build image itself and, for Raspbian-built armhf
-      # packages, additionally in plain Debian armhf, which they are
-      # published for as well (same dists/<suite>/main/binary-armhf).
-      - name: Test installation in clean ${{ matrix.suite }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          test_images=("$BUILD_IMAGE")
-          test_platforms=("${{ matrix.platform }}")
-          if [[ "${{ matrix.base }}" == raspbian ]]; then
-            test_images+=("debian:${{ matrix.suite }}-slim")
-            test_platforms+=("linux/arm/v7")
-          fi
-          for i in "${!test_images[@]}"; do
-            echo "::group::Installation test in ${test_images[$i]} (${test_platforms[$i]})"
-            docker run --rm --pull missing --platform "${test_platforms[$i]}" \
-              -v "$RUNNER_TEMP/daily-deb:/packages:ro" \
-              -v "$GITHUB_WORKSPACE/.github/scripts:/scripts:ro" \
-              -e EXPECTED_ARCH="${{ matrix.arch }}" \
-              "${test_images[$i]}" bash /scripts/test-daily-deb.sh
-            echo "::endgroup::"
-          done
-
-      - name: Upload built packages for publishing
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2, Node.js 24
-        with:
-          name: daily-deb-${{ matrix.suite }}-${{ matrix.arch }}
-          path: |
-            ${{ runner.temp }}/daily-deb/*.deb
-            ${{ runner.temp }}/daily-deb/SHA256SUMS-*
-            ${{ runner.temp }}/daily-deb/VERSION
-            ${{ runner.temp }}/daily-deb/SUITE
-            ${{ runner.temp }}/daily-deb/ARCH
-            ${{ runner.temp }}/daily-deb/BUILD-INFO.MD
-          if-no-files-found: error
-          retention-days: 3
-          # .deb files are already compressed.
-          compression-level: 0
-
-      - name: Remove temporary package files
-        if: always()
-        shell: bash
-        run: |
-          docker run --rm -v "$RUNNER_TEMP/daily-deb:/output" \
-            "debian:${{ matrix.suite }}-slim" sh -c 'find /output -mindepth 1 -delete'
+  daily-deb:
+    name: ${{ matrix.suite }}/${{ matrix.arch }} daily package
+    needs: targets
+    strategy:
+      # Legs build in parallel; nothing in them writes shared state (the
+      # GitHub prereleases and the gh-pages APT repository are only touched
+      # by the single publish-daily-deb job below).
+      #
+      # fail-fast off: with emulated 32-bit ARM legs in the matrix, a
+      # failure that only hits one architecture (QEMU, 32-bit-specific
+      # compile issue, a package missing from Raspbian) is realistic, and
+      # should not cancel and withhold the other, healthy legs. The run as
+      # a whole is still marked failed, and publish-daily-deb publishes
+      # whatever legs did succeed.
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.targets.outputs.matrix) }}
+    uses: ./.github/workflows/build-deb.yml
+    with:
+      suite: ${{ matrix.suite }}
+      arch: ${{ matrix.arch }}
+      runner: ${{ matrix.runner }}
+      platform: ${{ matrix.platform }}
+      base: ${{ matrix.base }}
+      timeout: ${{ matrix.timeout }}
+      build_kind: daily
+      source_ref: ${{ inputs.source_sha || github.sha }}
+      tools_ref: ${{ inputs.source_sha || github.sha }}
+      artifact_name: daily-deb-${{ matrix.suite }}-${{ matrix.arch }}
 
   publish-daily-deb:
     name: Publish daily packages
@@ -251,6 +109,7 @@ jobs:
       - name: Check out source
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
         with:
+          ref: ${{ inputs.source_sha || github.sha }}
           persist-credentials: false
 
       - name: Download built packages
@@ -259,49 +118,7 @@ jobs:
           pattern: daily-deb-*
           path: ${{ runner.temp }}/daily-debs
 
-      - name: Check for packages to publish
-        id: legs
-        shell: bash
-        run: |
-          set -euo pipefail
-          shopt -s nullglob
-          legs=("$RUNNER_TEMP"/daily-debs/daily-deb-*/)
-          if [[ "${#legs[@]}" -eq 0 ]]; then
-            echo 'No successfully built packages to publish.' >> "$GITHUB_STEP_SUMMARY"
-            echo "count=0" >> "$GITHUB_OUTPUT"
-          else
-            echo "count=${#legs[@]}" >> "$GITHUB_OUTPUT"
-          fi
-
-      # One leg after the other, so each suite's shared prerelease is
-      # created exactly once and later architectures are added to it.
-      - name: Publish daily prereleases directly
-        if: steps.legs.outputs.count != '0'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          SOURCE_SHA: ${{ inputs.source_sha || github.sha }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          for leg in "$RUNNER_TEMP"/daily-debs/daily-deb-*/; do
-            cd "$leg"
-            version=$(cat VERSION)
-            suite=$(cat SUITE)
-            tag="daily-${version//\~/-}"
-            if gh release view "$tag" >/dev/null 2>&1; then
-              gh release upload "$tag" ./*.deb ./SHA256SUMS-* --clobber
-            else
-              gh release create "$tag" ./*.deb ./SHA256SUMS-* \
-                --target "$SOURCE_SHA" \
-                --title "Daily ${version} — ${suite}" \
-                --notes-file BUILD-INFO.MD --prerelease --latest=false
-            fi
-            echo "$(cat SUITE)/$(cat ARCH): $(gh release view "$tag" --json url --jq .url)" >> "$GITHUB_STEP_SUMMARY"
-          done
-
       - name: Install APT repository tooling
-        if: steps.legs.outputs.count != '0'
         shell: bash
         run: |
           set -euo pipefail
@@ -309,7 +126,6 @@ jobs:
           sudo apt-get install -y --no-install-recommends gnupg dpkg-dev apt-utils
 
       - name: Import APT repository signing key
-        if: steps.legs.outputs.count != '0'
         id: gpgimport
         env:
           APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
@@ -322,53 +138,16 @@ jobs:
           echo "::add-mask::$fpr"
           echo "fingerprint=$fpr" >> "$GITHUB_OUTPUT"
 
-      - name: Publish packages to APT repository (GitHub Pages)
-        if: steps.legs.outputs.count != '0'
+      # Daily prereleases (one per suite, shared by its architectures) and
+      # the APT repository (component "main"); see publish-packages.sh.
+      - name: Publish daily packages (GitHub prereleases, APT repository)
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           GPG_KEY_FPR: ${{ steps.gpgimport.outputs.fingerprint }}
+          LEGS_DIR: ${{ runner.temp }}/daily-debs
         shell: bash
-        run: |
-          set -euo pipefail
-          checkout="$RUNNER_TEMP/gh-pages"
-          repo_url="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          if git ls-remote --exit-code --heads "https://github.com/${GITHUB_REPOSITORY}.git" gh-pages >/dev/null 2>&1; then
-            git clone --branch gh-pages --single-branch --depth 1 "$repo_url" "$checkout"
-          else
-            git clone --depth 1 "$repo_url" "$checkout"
-            git -C "$checkout" checkout --orphan gh-pages
-            git -C "$checkout" rm -rf . >/dev/null 2>&1 || true
-          fi
-          git -C "$checkout" config user.name 'github-actions[bot]'
-          git -C "$checkout" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-
-          # One or more .deb files per leg (currently svxlink and qtel);
-          # publish each in turn so all of them end up in their suite/arch
-          # pool and index. All legs go into one gh-pages commit.
-          shopt -s nullglob
-          published_legs=()
-          legs=("$RUNNER_TEMP"/daily-debs/daily-deb-*/)
-          for leg in "${legs[@]}"; do
-            SUITE=$(cat "$leg/SUITE")
-            ARCH=$(cat "$leg/ARCH")
-            for deb_file in "$leg"*.deb; do
-              REPO_DIR="$checkout" DEB_FILE="$deb_file" \
-                SUITE="$SUITE" ARCH="$ARCH" GPG_KEY_FPR="$GPG_KEY_FPR" \
-                bash "$GITHUB_WORKSPACE/.github/scripts/publish-apt-repo.sh"
-            done
-            published_legs+=("${SUITE}/${ARCH}")
-          done
-
-          cd "$checkout"
-          git add -A
-          if git diff --cached --quiet; then
-            echo 'APT repository unchanged.' >> "$GITHUB_STEP_SUMMARY"
-          else
-            version="$(cat "${legs[0]}VERSION")"
-            git commit -m "Add daily packages ${version%~*} for $(IFS=,; echo "${published_legs[*]}")" >/dev/null
-            git push origin HEAD:refs/heads/gh-pages
-            echo "Published ${published_legs[*]} to the APT repository (gh-pages)." >> "$GITHUB_STEP_SUMMARY"
-          fi
+        run: bash .github/scripts/publish-packages.sh
 
       - name: Remove imported signing key
         if: always()
@@ -381,6 +160,12 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Shared with build-releases.yml's deploy job: one Pages deployment at
+    # a time. A deployment still waiting here may be superseded by a newer
+    # one, which is fine -- each deploys the whole current gh-pages state.
+    concurrency:
+      group: pages-deploy-${{ github.repository }}
+      cancel-in-progress: false
     permissions:
       contents: read
       pages: write

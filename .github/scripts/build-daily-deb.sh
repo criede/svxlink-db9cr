@@ -8,6 +8,22 @@ set -euo pipefail
 # container itself, so the same script builds packages for other Raspberry
 # Pi OS/Debian/Ubuntu versions and architectures by simply running it in a
 # different --platform/base image.
+#
+# Two kinds of build, selected by BUILD_KIND:
+#   daily    (default) Daily development build of this repository's
+#            source; version <project>+daily<date>.<run>...-1~<suite>.
+#   release  Build of an unmodified upstream release tag (UPSTREAM_TAG,
+#            checked out at /source); version <tag>-1~<suite>.
+# The source tree is expected at /source (a git checkout).
+BUILD_KIND="${BUILD_KIND:-daily}"
+case "$BUILD_KIND" in
+  daily) ;;
+  release)
+    : "${UPSTREAM_TAG:?UPSTREAM_TAG is required for BUILD_KIND=release}"
+    [[ "$UPSTREAM_TAG" =~ ^[0-9]+(\.[0-9]+)*$ ]]
+    ;;
+  *) echo "Unknown BUILD_KIND: $BUILD_KIND" >&2; exit 1 ;;
+esac
 export DEBIAN_FRONTEND=noninteractive
 arch=$(dpkg --print-architecture)
 # Parsed as plain text rather than sourced: /etc/os-release is only meant
@@ -65,13 +81,27 @@ ldconfig
 git config --global --add safe.directory /source
 source_sha=$(git -C /source rev-parse HEAD)
 base_version=$(sed -n 's/^PROJECT=//p' /source/src/versions | tr -d '\r')
+if [[ "$BUILD_KIND" == release ]]; then
+  # A release tag's src/versions must name that very release; anything
+  # else means the wrong tree was checked out.
+  if [[ "$base_version" != "$UPSTREAM_TAG" ]]; then
+    echo "src/versions says PROJECT=${base_version}, expected ${UPSTREAM_TAG}." >&2
+    exit 1
+  fi
+  # Deliberately no date/run/commit part: one upstream release maps to
+  # exactly one package version per suite, built once and never rebuilt
+  # (the planning step only builds combinations missing from the pool).
+  # The "-1" Debian revision sorts below the "+daily" builds of the same
+  # project version, which are newer code.
+  version="${UPSTREAM_TAG}-1~${codename}"
+fi
 # Between releases upstream sets PROJECT=master instead of a number (it
 # alternates: "Prepare for release X" sets it, "Set PROJECT version to
 # master" resets it). Fall back to the highest numeric PROJECT value ever
 # recorded in src/versions' history (needs the full-depth checkout the
 # workflow already does), so daily builds keep a valid, monotonically
 # increasing Debian version instead of aborting the build.
-if [[ ! "$base_version" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
+if [[ "$BUILD_KIND" == daily && ! "$base_version" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
   echo "PROJECT=${base_version} in src/versions is not numeric; using the highest numeric PROJECT from its git history." >&2
   base_version=$(git -C /source log --format= -p -- src/versions \
     | sed -n 's/^[+-]\{0,1\}PROJECT=//p' | tr -d '\r' \
@@ -81,7 +111,9 @@ if [[ ! "$base_version" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
   echo "Could not determine a numeric project version from src/versions." >&2
   exit 1
 fi
-version="${base_version}+daily$(date -u +%Y%m%d).${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}.g${source_sha:0:12}-1~${codename}"
+if [[ "$BUILD_KIND" == daily ]]; then
+  version="${base_version}+daily$(date -u +%Y%m%d).${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}.g${source_sha:0:12}-1~${codename}"
+fi
 dpkg --validate-version "$version"
 
 # Copies the RTL-SDR Blog librtlsdr/rtl_tcp build (installed to /usr/local
@@ -173,6 +205,10 @@ grep -q '/SipLogic\.so' <<< "$package_contents"
 printf '%s\n' "$version" > /output/VERSION
 printf '%s\n' "$codename" > /output/SUITE
 printf '%s\n' "$arch" > /output/ARCH
+printf '%s\n' "$BUILD_KIND" > /output/KIND
+printf '%s\n' "$source_sha" > /output/SOURCE_SHA
+# Empty for daily builds; always written so the hand-over has a fixed shape.
+printf '%s\n' "${UPSTREAM_TAG:-}" > /output/UPSTREAM_TAG
 if [[ "$os_id" == raspbian ]]; then
   build_env_note="- Built in a clean Raspbian ${codename} (ARMv6+VFP) container, so it runs on
   every Raspberry Pi model with 32-bit Raspberry Pi OS (including Pi 1/Zero/
@@ -182,8 +218,18 @@ else
   build_env_note="- Built in a clean Debian ${codename} container; package installation is
   smoke-tested in a clean container."
 fi
+if [[ "$BUILD_KIND" == release ]]; then
+  build_headline="Package build of the unmodified upstream SvxLink release ${UPSTREAM_TAG}
+(sm0svx/svxlink tag \`${UPSTREAM_TAG}\`, same content as its source tgz/zip),
+packaged with the svxlink-db9cr build settings below. None of the
+svxlink-db9cr source changes are included."
+  apt_component=release
+else
+  build_headline="Daily development build of svxlink-db9cr, not a stable release."
+  apt_component=main
+fi
 cat > /output/BUILD-INFO.MD <<EOF
-Daily development build of svxlink-db9cr, not a stable release.
+${build_headline}
 
 - Target: Debian/Raspberry Pi OS ${codename} (${arch}).
 - Package version: ${version}
@@ -202,7 +248,7 @@ ${build_env_note}
 
 Install with \`sudo apt install ./svxlink_*.deb\` after downloading the package
 (add \`./qtel_*.deb\` too for the graphical EchoLink client), or via the APT
-repository: https://criede.github.io/svxlink-db9cr/
+repository (component \`${apt_component}\`): https://criede.github.io/svxlink-db9cr/
 Configure the station and install the appropriate sound pack before starting SvxLink.
 EOF
 # Build Qtel (graphical EchoLink client) as a second, separate package, the
@@ -220,8 +266,15 @@ EOF
 apt-get install -y --no-install-recommends \
   qt6-base-dev qt6-base-dev-tools qt6-tools-dev qt6-5compat-dev
 
+# -std=c++17 in CMAKE_CXX_FLAGS_RELEASE: upstream's src/CMakeLists.txt
+# appends FindSIGC's "--std=c++11" (libsigc++-2.0) to the global
+# CMAKE_CXX_FLAGS, but Qt6 needs C++17. CMake puts the per-config flags
+# after CMAKE_CXX_FLAGS on the compile line, so this wins without patching
+# the source -- needed for unmodified upstream release tags, which lack
+# this repository's per-target -std=c++17 fixes (harmless where present).
 cmake -S /source/src -B /build-qtel \
   -DCMAKE_BUILD_TYPE=Release -DUSE_QT=ON -DWITH_SYSTEMD=OFF -DDO_INSTALL_CHOWN=OFF \
+  '-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG -std=c++17' \
   -DWITH_CONTRIB_SIP_LOGIC=OFF \
   -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SYSCONFDIR=/etc \
   -DCMAKE_INSTALL_LOCALSTATEDIR=/var
@@ -305,8 +358,8 @@ dpkg-deb --build --root-owner-group "$qtel_pkgroot" \
 dpkg-deb -f "/output/qtel_${version}_${arch}.deb" Depends
 
 cd /output
-# Per-architecture name: all architectures of one suite share the same
-# daily prerelease (the tag is derived from the version, which carries the
-# suite but not the architecture), so a plain "SHA256SUMS" asset would be
-# overwritten by whichever architecture is published last.
-sha256sum ./*.deb > "SHA256SUMS-${arch}"
+# Per-suite/architecture name: several legs share one GitHub release (all
+# architectures of a suite share a daily prerelease; all suites and
+# architectures share an upstream release's), so a plain "SHA256SUMS"
+# asset would be overwritten by whichever leg is published last.
+sha256sum ./*.deb > "SHA256SUMS-${codename}-${arch}"

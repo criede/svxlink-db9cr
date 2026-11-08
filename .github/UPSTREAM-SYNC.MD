@@ -1,9 +1,15 @@
 # Daily upstream synchronization
 
-This lives across two workflow files with separate responsibilities:
+This lives across several workflow files with separate responsibilities:
 
-- `.github/workflows/sync-upstream.yml` merges upstream, then calls the
-  other workflow. Specific to this fork/repository.
+- `.github/workflows/sync-upstream.yml` merges upstream, then calls
+  `build-and-publish.yml`. Specific to this fork/repository.
+- `.github/workflows/build-deb.yml` is the reusable building block that
+  builds and installation-tests the packages for one suite/architecture
+  (see `.github/build-targets.json` for the list of targets) and hands
+  them over as an Actions artifact. Used by both workflows below.
+- `.github/workflows/build-releases.yml` builds packages of the upstream
+  release tags (see "Upstream release packages" below).
 - `.github/workflows/build-and-publish.yml` builds the daily packages and
   publishes them (GitHub prerelease, APT repository on GitHub Pages).
   Deliberately repository-agnostic: it takes the commit to build as an
@@ -73,8 +79,9 @@ library versions, same ABI); one build per suite/architecture therefore
 covers both at once (where Raspberry Pi OS supports that architecture),
 and a separate "Raspberry Pi OS" variant is not needed. As soon as one of
 these Debian versions changes support status (e.g. a new Debian version
-becomes stable), the matrix in `.github/workflows/build-and-publish.yml` is
-adjusted accordingly — older entries removed, new ones added.
+becomes stable), the target list in `.github/build-targets.json` (shared
+by the daily and the release builds) is adjusted accordingly — older
+entries removed, new ones added.
 
 32-bit specifics:
 
@@ -196,14 +203,15 @@ release.
 
 After package inspection and an installation test in a fresh container of
 the respective suite (`.github/scripts/test-daily-deb.sh`), each leg
-uploads its `.deb` files, `SHA256SUMS-<arch>` and metadata as an Actions
+uploads its `.deb` files, `SHA256SUMS-<suite>-<arch>` and metadata as an Actions
 artifact (3-day retention, only a hand-over to `publish-daily-deb`).
-That job uploads them with the GitHub CLI into the daily prerelease of
+That job (via `.github/scripts/publish-packages.sh`, shared with the
+release builds) uploads them with the GitHub CLI into the daily prerelease of
 the respective suite: the tag is derived from the version, which carries
 the suite but not the architecture, so all architectures of one suite
 share one prerelease (titled `Daily <version> — <suite>`), and the
-checksum file is named per architecture so they do not overwrite each
-other. The tag points to the built commit. No prerelease is marked as
+checksum file is named per suite/architecture so they do not overwrite
+each other. The tag points to the built commit. No prerelease is marked as
 "Latest". There is no build cache; temporary files are removed after the
 upload. A failed leg uploads no artifact and therefore publishes
 nothing. `cleanup-old-releases` and `deploy-pages` still run afterwards
@@ -220,6 +228,58 @@ calls the same script with a different `platform`/base image and a
 runner matching that architecture (e.g. `ubuntu:24.04` for Ubuntu
 Noble); the version scheme, conflicts and the subsequent publishing adapt
 automatically.
+
+## Upstream release packages
+
+Besides the daily builds, `.github/workflows/build-releases.yml` packages
+the official upstream releases: every published (non-draft,
+non-prerelease) `sm0svx/svxlink` release whose tag is numeric with major
+version 26 or newer (currently `26.05`, `26.05.1`, `26.05.2`; older
+releases are deliberately not built), for every target in
+`.github/build-targets.json`.
+
+- **Source:** the unmodified upstream release tag (the same content as
+  that release's source tgz/zip), checked out from `sm0svx/svxlink`. None
+  of this fork's source changes are applied; only the build settings
+  (RTL-SDR Blog librtlsdr, SipLogic with PJSIP, GPIOD, Speex/Opus/LADSPA,
+  systemd, the separate `qtel` package) are the same as for the daily
+  packages. Qt6 needs C++17 while upstream forces `--std=c++11` into the
+  global flags, so the qtel build passes `-std=c++17` via
+  `CMAKE_CXX_FLAGS_RELEASE` (which CMake places after the global flags)
+  instead of patching the source. The build checks that `src/versions`
+  of the checked-out tree really says `PROJECT=<tag>`.
+- **Version:** `<tag>-1~<suite>`, e.g. `26.05.2-1~trixie`. This sorts
+  below the daily builds of the same or later code (`26.05.2.99.0+daily…`).
+- **Publishing:** one GitHub release `release-<tag>` per upstream release
+  (not a prerelease; the highest version is marked "Latest"), holding
+  the packages of all suites/architectures, pointing to the upstream tag's
+  commit; and the APT repository's `release` component
+  (`dists/<suite>/release/…`, `pool/<suite>/release/…`). Neither is ever
+  pruned: `prune-daily-releases.sh` only touches `daily-*` releases, and
+  `publish-apt-repo.sh` only prunes files carrying a `+daily<date>`
+  version marker.
+- **When:** the workflow runs daily at 05:47 UTC (after the upstream sync)
+  and on manual dispatch. Its `plan` job (`plan-release-builds.sh`)
+  compares the upstream releases against the `release` pool on
+  `gh-pages` and builds only what is missing — the existing releases
+  once, then each newly published upstream release, and, for all kept
+  releases, any target added to `build-targets.json` later. On a normal
+  day it builds nothing. A release package is never rebuilt once it is
+  in the pool, so a given version always means the same bits.
+- **Failures:** a combination whose build failed or timed out within the
+  last 7 days (taken from this workflow's own run history, by job name
+  `<tag> <suite>/<arch>`) is not retried automatically, since an
+  emulated armhf build takes hours and a release that does not build on
+  some target usually keeps failing; dispatch the workflow with
+  `retry_failed` to retry it earlier. Other combinations are published
+  regardless (`fail-fast: false`).
+
+Users choose per system: `main` for the daily builds or `release` for
+the upstream releases. Enabling both makes apt prefer the daily builds,
+since they always carry the higher version. Both workflows push to the
+same `gh-pages` branch; `publish-packages.sh` re-clones and re-applies its
+packages if a push is rejected because the other one pushed in between,
+and both Pages deploy jobs share one concurrency group.
 
 ## APT repository on GitHub Pages
 
@@ -263,13 +323,14 @@ touching existing paths:
 dists/<suite>/InRelease
 dists/<suite>/Release
 dists/<suite>/Release.gpg
-dists/<suite>/main/binary-<arch>/Packages[.gz]
-pool/<suite>/main/<letter>/<package-name>/<package>.deb
+dists/<suite>/<component>/binary-<arch>/Packages[.gz]
+pool/<suite>/<component>/<letter>/<package-name>/<package>.deb
 pubkey.gpg                                   # public signing key
 ```
 
 `<suite>` is the distribution codename (currently `bookworm` and `trixie`,
-see matrix above), `<arch>` the Debian architecture (currently `arm64`,
+see matrix above), `<component>` either `main` (daily builds) or
+`release` (upstream releases, see "Upstream release packages"), `<arch>` the Debian architecture (currently `arm64`,
 `amd64`, `armhf` and, for bookworm only, `i386`). A later build for a
 further architecture or a new Debian version simply adds a further
 `binary-<arch>` or `dists/<new suite>/...` branch; existing suites/architectures remain unchanged. Separate paths are
@@ -414,10 +475,12 @@ curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
   sudo gpg --dearmor -o /usr/share/keyrings/svxlink-db9cr.gpg
 
 # Add the repository source, restricted to the key and to the local
-# codename/architecture combination
+# codename/architecture combination. Component: "main" for the daily
+# builds, "release" for the official upstream releases (26.05 and newer).
+component=main
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 arch=$(dpkg --print-architecture)
-echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} main" | \
+echo "deb [signed-by=/usr/share/keyrings/svxlink-db9cr.gpg arch=${arch}] https://criede.github.io/svxlink-db9cr ${codename} ${component}" | \
   sudo tee /etc/apt/sources.list.d/svxlink-db9cr.list
 
 sudo apt update

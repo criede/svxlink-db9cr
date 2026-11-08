@@ -1,0 +1,177 @@
+name: Build upstream releases
+
+# Builds .deb packages of the unmodified upstream SvxLink release tags
+# (major version 26 and newer) for every target in
+# .github/build-targets.json, publishes them as one GitHub release per
+# upstream release ("release-<tag>") and into the APT repository's
+# "release" component, and keeps them forever (no pruning).
+#
+# Runs daily, but only builds what is missing: the backlog of existing
+# releases once, then each newly published upstream release. See
+# plan-release-builds.sh for the exact rules, including why recently
+# failed combinations are not retried every day.
+
+on:
+  schedule:
+    - cron: '47 5 * * *' # 05:47 UTC, after the daily upstream sync
+  workflow_dispatch:
+    inputs:
+      retry_failed:
+        description: Also retry combinations whose build failed within the last 7 days.
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-releases-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    name: Plan release builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      count: ${{ steps.plan.outputs.count }}
+      upstream_repo: ${{ steps.plan.outputs.upstream_repo }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
+        with:
+          persist-credentials: false
+
+      - name: Determine missing release packages
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TARGETS_FILE: .github/build-targets.json
+          # The repository whose releases are packaged. Defined only here;
+          # the build jobs get it from this job's output.
+          UPSTREAM_REPO: sm0svx/svxlink
+          RETRY_FAILED: ${{ inputs.retry_failed || false }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash .github/scripts/plan-release-builds.sh
+          echo "upstream_repo=${UPSTREAM_REPO}" >> "$GITHUB_OUTPUT"
+
+  release-deb:
+    # Job name format "<tag> <suite>/<arch>" is parsed by
+    # plan-release-builds.sh (failed-build history) -- keep them in sync.
+    name: ${{ matrix.tag }} ${{ matrix.suite }}/${{ matrix.arch }}
+    needs: plan
+    if: needs.plan.outputs.count != '0'
+    strategy:
+      # Independent legs: one release failing on one target must not
+      # withhold the others.
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    uses: ./.github/workflows/build-deb.yml
+    with:
+      suite: ${{ matrix.suite }}
+      arch: ${{ matrix.arch }}
+      runner: ${{ matrix.runner }}
+      platform: ${{ matrix.platform }}
+      base: ${{ matrix.base }}
+      timeout: ${{ matrix.timeout }}
+      build_kind: release
+      source_repository: ${{ needs.plan.outputs.upstream_repo }}
+      source_ref: refs/tags/${{ matrix.tag }}
+      upstream_tag: ${{ matrix.tag }}
+      artifact_name: release-deb-${{ matrix.tag }}-${{ matrix.suite }}-${{ matrix.arch }}
+
+  publish-release-deb:
+    name: Publish release packages
+    needs: [plan, release-deb]
+    if: ${{ !cancelled() && needs.plan.outputs.count != '0' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
+        with:
+          persist-credentials: false
+
+      - name: Download built packages
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2, Node.js 24
+        with:
+          pattern: release-deb-*
+          path: ${{ runner.temp }}/release-debs
+
+      - name: Install APT repository tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gnupg dpkg-dev apt-utils
+
+      - name: Import APT repository signing key
+        id: gpgimport
+        env:
+          APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "$APT_SIGNING_KEY" | gpg --batch --import
+          fpr=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr:/{print $10; exit}')
+          test -n "$fpr"
+          echo "::add-mask::$fpr"
+          echo "fingerprint=$fpr" >> "$GITHUB_OUTPUT"
+
+      - name: Publish release packages (GitHub releases, APT repository)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          GPG_KEY_FPR: ${{ steps.gpgimport.outputs.fingerprint }}
+          LEGS_DIR: ${{ runner.temp }}/release-debs
+        shell: bash
+        run: bash .github/scripts/publish-packages.sh
+
+      - name: Remove imported signing key
+        if: always()
+        shell: bash
+        run: gpgconf --kill gpg-agent 2>/dev/null; rm -rf "$HOME/.gnupg"
+
+  deploy-pages:
+    name: Deploy APT repository to GitHub Pages
+    needs: publish-release-deb
+    if: ${{ !cancelled() && needs.publish-release-deb.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Shared with build-and-publish.yml's deploy job; see the comments
+    # there (and on the Pages source) for why it works this way.
+    concurrency:
+      group: pages-deploy-${{ github.repository }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out gh-pages content
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, Node.js 24
+        with:
+          ref: gh-pages
+          persist-credentials: false
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0, Node.js 24
+
+      - name: Upload APT repository as Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0, internally Node.js 24
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1, Node.js 24

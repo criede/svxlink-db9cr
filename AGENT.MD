@@ -22,6 +22,10 @@ still need to be documented.
   `build-and-publish.yml`.
 - `.github/workflows/build-and-publish.yml`: builds/tests/publishes the
   daily packages and APT repository; repository-agnostic, reusable.
+- `.github/workflows/build-releases.yml`: builds/publishes packages of the
+  upstream release tags (26.05+) into the APT component `release`.
+- `.github/workflows/build-deb.yml`: reusable per-target build/test job
+  used by both; targets are listed in `.github/build-targets.json`.
 - `.github/scripts/`: the shell scripts those workflows run.
 
 ## Working method

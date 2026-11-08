@@ -7,6 +7,26 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- Packages of the official upstream SvxLink releases: the new
+  `build-releases.yml` workflow builds every upstream release from 26.05
+  on (currently 26.05, 26.05.1, 26.05.2) from the unmodified upstream
+  release tag, with the same build settings and targets as the daily
+  packages, and from then on each newly published upstream release
+  automatically. They are published as GitHub releases `release-<tag>`
+  and in a new APT component `release` (alongside `main` for the daily
+  builds), and are never pruned. Only missing combinations are built;
+  recently failed ones are retried after 7 days or on manual dispatch.
+- The per-target build steps moved into the reusable workflow
+  `build-deb.yml`, the target list into `.github/build-targets.json`, and
+  publishing into `.github/scripts/publish-packages.sh`, all shared by the
+  daily and the release builds. Publishing retries on a rejected
+  `gh-pages` push, and both Pages deploy jobs share a concurrency group.
+- The qtel build now passes `-std=c++17` via `CMAKE_CXX_FLAGS_RELEASE`, so
+  Qt6 builds without source patches (needed for unmodified upstream tags).
+- Checksum files in GitHub releases are named `SHA256SUMS-<suite>-<arch>`.
+- The APT repository's `index.html` explains both components and lists
+  architectures per component; it had also lost its "Signing key"
+  heading in the 32-bit change, now restored.
 - Fixed daily builds aborting silently since 2026-10-10: after its 26.05.2
   release upstream set `PROJECT=master` in `src/versions`, which the
   version check rejected, so no package was published after 2026-09-13.
