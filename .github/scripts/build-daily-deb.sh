@@ -11,9 +11,12 @@ set -euo pipefail
 #
 # Two kinds of build, selected by BUILD_KIND:
 #   daily    (default) Daily development build of this repository's
-#            source; version <project>+daily<date>.<run>...-1~<suite>.
+#            source; version <project>+daily<date>.<run>...-1~deb<N>.
 #   release  Build of an unmodified upstream release tag (UPSTREAM_TAG,
-#            checked out at /source); version <tag>-1~<suite>.
+#            checked out at /source); version <tag>-<revision>~deb<N>,
+#            <revision> from release-debian-revision next to this script.
+# <N> is the Debian major version of the build container (12 = bookworm,
+# 13 = trixie; Raspbian uses the same numbers), see below.
 # The source tree is expected at /source (a git checkout).
 BUILD_KIND="${BUILD_KIND:-daily}"
 case "$BUILD_KIND" in
@@ -31,6 +34,21 @@ arch=$(dpkg --print-architecture)
 # shell code if it ever contained anything else.
 codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release | tr -d '"')
 [[ "$codename" =~ ^[a-z0-9]+$ ]]
+# Debian major version (VERSION_ID="13" on trixie, also on Raspbian). It,
+# not the codename, goes into the package version suffix ("~deb13"), like
+# Debian's own backports: dpkg compares codenames alphabetically, so after
+# a distribution upgrade e.g. "~trixie" would sort above "~forky" and apt
+# would keep the old suite's package instead of replacing it. The codename
+# is still used for the APT suite (dists/<codename>/), SUITE and file names.
+debian_major=$(sed -n 's/^VERSION_ID=//p' /etc/os-release | tr -d '"' | cut -d. -f1)
+[[ "$debian_major" =~ ^[1-9][0-9]*$ ]]
+# The workflow passes the expected value from .github/build-targets.json,
+# so a target whose image does not match its matrix entry fails here
+# rather than publishing a package with a wrong version suffix.
+if [[ -n "${EXPECTED_DEBIAN_MAJOR:-}" && "$debian_major" != "$EXPECTED_DEBIAN_MAJOR" ]]; then
+  echo "Container is Debian ${debian_major}, expected ${EXPECTED_DEBIAN_MAJOR}." >&2
+  exit 1
+fi
 # "debian" or "raspbian": 32-bit ARM (armhf) is built in a Raspbian
 # container rather than Debian's own armhf, since Raspbian targets
 # ARMv6+VFP and so also runs on the Raspberry Pi 1/Zero/Zero W, which
@@ -147,9 +165,18 @@ if [[ "$BUILD_KIND" == release ]]; then
   # Deliberately no date/run/commit part: one upstream release maps to
   # exactly one package version per suite, built once and never rebuilt
   # (the planning step only builds combinations missing from the pool).
-  # The "-1" Debian revision sorts below the "+daily" builds of the same
-  # project version, which are newer code.
-  version="${UPSTREAM_TAG}-1~${codename}"
+  # The Debian revision comes from release-debian-revision: since release
+  # packages are never rebuilt, raising it is how a packaging change
+  # reaches the releases -- every release is then built once more under a
+  # new, higher version, while the old packages stay in the pool untouched.
+  # Revision 2 was the first under the "~deb<N>" suffix: "26.05.2-2~deb13"
+  # sorts above the earlier "26.05.2-1~trixie", whereas "26.05.2-1~deb13"
+  # would sort below it ("d" < "t") and never be installed as an upgrade.
+  # Any revision sorts below the "+daily" builds of the same project
+  # version, which are newer code.
+  release_revision="$(tr -d '[:space:]' < /scripts/release-debian-revision)"
+  [[ "$release_revision" =~ ^[1-9][0-9]*$ ]]
+  version="${UPSTREAM_TAG}-${release_revision}~deb${debian_major}"
 fi
 # Between releases upstream sets PROJECT=master instead of a number (it
 # alternates: "Prepare for release X" sets it, "Set PROJECT version to
@@ -168,7 +195,7 @@ if [[ ! "$base_version" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
   exit 1
 fi
 if [[ "$BUILD_KIND" == daily ]]; then
-  version="${base_version}+daily$(date -u +%Y%m%d).${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}.g${source_sha:0:12}-1~${codename}"
+  version="${base_version}+daily$(date -u +%Y%m%d).${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}.g${source_sha:0:12}-1~deb${debian_major}"
 fi
 dpkg --validate-version "$version"
 

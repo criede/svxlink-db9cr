@@ -2,7 +2,7 @@
 <html lang="ca">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repositori APT de SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -102,7 +102,7 @@ a <code>release</code>, canvia el component a
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, executa
 <code>sudo apt update</code> i després instal·la explícitament la versió release
 (és un downgrade, és a dir, una versió inferior), per exemple
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Tingues en compte que, als paquets
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Tingues en compte que, als paquets
 <code>release</code> (codi font original sense modificar), els scripts TCL
 de <code>/usr/share/svxlink</code> no estan protegits com a fitxers de
 configuració; desa els canvis locals a <code>events.d/local/</code>.</p>
@@ -125,7 +125,7 @@ vegis «Retention» (retenció) a
 de manera que normalment es pot tornar enrere després d'una compilació diària defectuosa. Els paquets de les versions del projecte original
 (component <code>release</code>) no s'eliminen mai:</p>
 <pre><code>apt list -a svxlink   # o qtel; mostra totes les versions que encara són al repositori
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # opcional: evita que "apt upgrade" la torni a actualitzar
 # sudo apt-mark unhold svxlink   # més endavant, per reprendre les actualitzacions automàtiques</code></pre>
 

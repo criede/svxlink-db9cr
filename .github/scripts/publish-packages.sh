@@ -47,6 +47,18 @@ fi
 : "${EXPECTED_KIND:?}"
 [[ "$EXPECTED_KIND" == daily || "$EXPECTED_KIND" == release ]]
 
+# Expected version suffix "~deb<N>" per suite and the release revision,
+# both from this (trusted) checkout -- .github/build-targets.json and
+# release-debian-revision -- never from the artifact.
+targets_file="${script_dir}/../build-targets.json"
+release_revision="$(tr -d '[:space:]' < "${script_dir}/release-debian-revision")"
+[[ "$release_revision" =~ ^[1-9][0-9]*$ ]]
+declare -A suite_major
+while IFS=$'\t' read -r s m; do
+  [[ "$s" =~ ^[a-z0-9]+$ && "$m" =~ ^[1-9][0-9]*$ ]]
+  suite_major["$s"]="$m"
+done < <(jq -r '.[] | [.suite, (.debian_major | tostring)] | @tsv' "$targets_file" | sort -u)
+
 fail_leg() {
   echo "::error::Refusing to publish $(basename "$1"): $2"
   exit 1
@@ -86,11 +98,13 @@ validate_leg() {
   fi
 
   version="$(cat "${leg}VERSION")"
+  local major="${suite_major[$suite]:-}"
+  [[ -n "$major" ]] || fail_leg "$leg" "suite ${suite} has no debian_major in build-targets.json"
   if [[ "$EXPECTED_KIND" == daily ]]; then
-    [[ "$version" =~ ^[0-9]+(\.[0-9]+)*\+daily[0-9]{8}\.[0-9]+\.[0-9]+\.g[0-9a-f]{12}-1~${suite}$ ]] \
+    [[ "$version" =~ ^[0-9]+(\.[0-9]+)*\+daily[0-9]{8}\.[0-9]+\.[0-9]+\.g[0-9a-f]{12}-1~deb${major}$ ]] \
       || fail_leg "$leg" "unexpected daily version: $version"
   else
-    want_version="${tag}-1~${suite}"
+    want_version="${tag}-${release_revision}~deb${major}"
     [[ "$version" == "$want_version" ]] || fail_leg "$leg" "unexpected release version: $version"
   fi
 

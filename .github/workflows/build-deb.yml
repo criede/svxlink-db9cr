@@ -26,6 +26,13 @@ on:
       suite:
         type: string
         required: true
+      debian_major:
+        description: >-
+          Debian major version of the target (12 = bookworm, 13 = trixie;
+          also for Raspbian). Goes into the package version as "~deb<N>";
+          the build fails if the container reports a different one.
+        type: number
+        required: true
       arch:
         type: string
         required: true
@@ -173,6 +180,7 @@ jobs:
           UPSTREAM_TAG: ${{ inputs.upstream_tag }}
           EXPECTED_ARCH: ${{ inputs.arch }}
           EXPECTED_SUITE: ${{ inputs.suite }}
+          EXPECTED_DEBIAN_MAJOR: ${{ inputs.debian_major }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/daily-deb"
@@ -181,6 +189,7 @@ jobs:
             -v "$GITHUB_WORKSPACE/tools/.github/scripts:/scripts:ro" \
             -v "$RUNNER_TEMP/daily-deb:/output" \
             -e GITHUB_RUN_NUMBER -e GITHUB_RUN_ATTEMPT -e BUILD_KIND -e UPSTREAM_TAG \
+            -e EXPECTED_DEBIAN_MAJOR \
             "$BUILD_IMAGE" bash /scripts/build-daily-deb.sh
           test "$(cat "$RUNNER_TEMP/daily-deb/ARCH")" = "$EXPECTED_ARCH"
           test "$(cat "$RUNNER_TEMP/daily-deb/SUITE")" = "$EXPECTED_SUITE"

@@ -21,6 +21,10 @@ Open tasks for svxlink-db9cr. The following items serve as an initial plan.
 - [x] Package the upstream releases (26.05 and newer) automatically, APT component `release`.
 - [x] Start page in all European languages with AI-translation notice.
 - [ ] Have native speakers review the AI-generated start page translations.
+- [ ] After the `~deb<N>` version scheme change: run `Sync upstream` and
+  `Build upstream releases` with `retry_failed=true`; verify that the
+  published versions end in `~deb12`/`~deb13` and that release packages
+  are `-2~deb<N>`.
 - [ ] Verify the first run of `build-releases.yml` (backlog of 26.05, 26.05.1, 26.05.2 on all targets).
 - [ ] Verify the first CI run of the 32-bit legs (QEMU build time vs. the 300-minute timeout, Raspbian/Debian armhf installation tests).
 - [x] Implement the daily upstream sync as a GitHub Actions workflow.

@@ -2,7 +2,7 @@
 <html lang="bs">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT repozitorij SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -102,7 +102,7 @@ na <code>release</code>, promijeni komponentu u
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, pokreni
 <code>sudo apt update</code>, a zatim izričito instaliraj verziju izdanja
 (radi se o vraćanju na nižu verziju), npr.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Imaj na umu da u paketima
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Imaj na umu da u paketima
 <code>release</code> (neizmijenjeni izvorni kod izvornog projekta) TCL skripte
 u <code>/usr/share/svxlink</code> nisu zaštićene kao konfiguracijske
 datoteke; lokalne izmjene čuvaj u <code>events.d/local/</code>.</p>
@@ -125,7 +125,7 @@ pogledaj odjeljak „Retention“ (zadržavanje) u
 pa se loš dnevni build obično može vratiti na prethodni. Paketi izdanja izvornog projekta
 (komponenta <code>release</code>) nikada se ne uklanjaju:</p>
 <pre><code>apt list -a svxlink   # ili qtel; prikazuje sve verzije koje su još u repozitoriju
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # opcionalno: sprečava da ga "apt upgrade" ponovo ažurira
 # sudo apt-mark unhold svxlink   # kasnije, za nastavak automatskih ažuriranja</code></pre>
 

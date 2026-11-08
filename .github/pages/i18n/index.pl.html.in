@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repozytorium APT SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -102,7 +102,7 @@ na <code>release</code>, zmień komponent w
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, uruchom
 <code>sudo apt update</code>, a następnie jawnie zainstaluj wersję wydania
 (jest to obniżenie wersji), np.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Pamiętaj, że w pakietach
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Pamiętaj, że w pakietach
 <code>release</code> (niezmieniony kod źródłowy projektu macierzystego) skrypty TCL
 w <code>/usr/share/svxlink</code> nie są chronione jako pliki
 konfiguracyjne; zmiany lokalne przechowuj w <code>events.d/local/</code>.</p>
@@ -125,7 +125,7 @@ zobacz sekcję „Retention” (przechowywanie) w
 dzięki czemu wadliwą kompilację codzienną zwykle można wycofać. Pakiety wydań projektu macierzystego
 (komponent <code>release</code>) nigdy nie są usuwane:</p>
 <pre><code>apt list -a svxlink   # lub qtel; wyświetla wszystkie wersje, które są jeszcze w repozytorium
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # opcjonalnie: zapobiega ponownej aktualizacji przez "apt upgrade"
 # sudo apt-mark unhold svxlink   # później, aby wznowić automatyczne aktualizacje</code></pre>
 

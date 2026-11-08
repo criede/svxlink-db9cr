@@ -206,12 +206,43 @@ installation test additionally runs `ldd` on the `svxlink` binary and on
 `SipLogic.so` to catch a broken or missing link at the earliest point.
 
 The Debian version follows the scheme
-`26.05.1+daily20260912.42.1.g0123456789ab-1~trixie`: project version from
+`26.05.1+daily20260912.42.1.g0123456789ab-1~deb13`: project version from
 `src/versions`, UTC date, workflow run number, attempt, commit short hash
-and target suite. It increases within a project version with every new
-daily run; the next higher project version sorts after it. `Release` as
-the CMake build type only means optimized machine code, not a stable
-release.
+and the target's Debian major version. It increases within a project
+version with every new daily run; the next higher project version sorts
+after it. `Release` as the CMake build type only means optimized machine
+code, not a stable release.
+
+### Why `~deb<N>` and not the codename
+
+The suffix is the Debian major version (`~deb12` = bookworm, `~deb13` =
+trixie; Raspbian uses the same numbers), the same convention as Debian's
+own backports. It used to be the codename (`~bookworm`, `~trixie`), but
+dpkg compares codenames as plain text, i.e. alphabetically, not in release
+order: `~forky` (Debian 14) sorts *below* `~trixie`. After a distribution
+upgrade, apt would therefore consider the old trixie package newer than
+the forky build and never replace it (for release packages, not until the
+next upstream release). bookworm → trixie only worked by accident
+(`b` < `t`). Numbers sort in release order: `~deb14` > `~deb13` > `~deb12`.
+
+`build-daily-deb.sh` reads the number from `VERSION_ID` in the build
+container's `/etc/os-release` (parsed as text, not sourced, like
+`VERSION_CODENAME`) and fails unless it equals the target's `debian_major`
+in `.github/build-targets.json` (passed in as `EXPECTED_DEBIAN_MAJOR` by
+`build-deb.yml`), so an image that does not match its matrix entry cannot
+publish a package with a wrong suffix. The codename is still used
+everywhere else: the APT suite (`dists/<codename>/`), the `SUITE` file,
+the `SHA256SUMS-<codename>-<arch>` file names and the release titles. Only
+the package version changed.
+
+Packages built before the switch (`…-1~bookworm`, `…-1~trixie`) stay in
+the pool until retention removes them (daily) or permanently (releases),
+and sort below their successors under the new scheme, so `apt upgrade`
+moves past them normally: for the dailies because the date part of a
+newer build is higher, for the releases because of the revision bump
+described under "Upstream release packages".
+
+### Publishing the daily packages
 
 After package inspection and an installation test in a fresh container of
 the respective suite (`.github/scripts/test-daily-deb.sh`), each leg
@@ -264,8 +295,26 @@ releases are deliberately not built), for every target in
   that appends `-std=c++17` as the last argument of every C++ compile
   (the last `-std` wins for gcc) instead of patching the source. The build checks that `src/versions`
   of the checked-out tree really says `PROJECT=<tag>`.
-- **Version:** `<tag>-1~<suite>`, e.g. `26.05.2-1~trixie`. This sorts
-  below the daily builds of the same or later code (`26.05.2.99.0+daily…`).
+- **Version:** `<tag>-<revision>~deb<N>`, e.g. `26.05.2-2~deb13`, with
+  `<N>` the Debian major version as for the daily builds (see "Why
+  `~deb<N>` and not the codename" above). This sorts below the daily builds
+  of the same or later code (`26.05.2.99.0+daily…`).
+- **Revision:** `<revision>` is the Debian revision from
+  `.github/scripts/release-debian-revision`. Release packages are never
+  rebuilt, so a packaging change (build flags, bundled libraries,
+  maintainer scripts, the version scheme itself) only reaches the releases
+  by raising this number: every kept release is then built once more under
+  a new, higher version (`26.05.2-3~deb13` > `26.05.2-2~deb13`), and the
+  previous packages stay unchanged in the pool. Raise it with every
+  packaging change that should apply to the releases. Revision `1` was
+  the original scheme with codename suffixes (`26.05.2-1~trixie`).
+  Revision `2` introduced `~deb<N>`, and it had to be a bump: `26.05.2-2~deb13`
+  sorts above `26.05.2-1~trixie`, whereas `26.05.2-1~deb13` would sort
+  below it (`d` < `t`) and never be installed as an upgrade. The planning
+  step (`plan-release-builds.sh`) and the publish job check for exactly
+  this file name/version, so after raising the revision the next run
+  builds all releases again (dispatch with `retry_failed` if some of
+  those combinations failed within the last 7 days).
 - **Publishing:** one GitHub release `release-<tag>` per upstream release
   (not a prerelease; the highest version is marked "Latest"), holding
   the packages of all suites/architectures; and the APT repository's
@@ -550,7 +599,7 @@ Use `release` for a station that should run a known, released version
 start page); use `main` to follow current development. Configure only one of them:
 with both enabled, apt always prefers `main`, since a daily build always
 carries a higher version than the release it is based on (e.g.
-`26.05.2.99.0+daily…` > `26.05.2-1~trixie`).
+`26.05.2.99.0+daily…` > `26.05.2-2~deb13`).
 
 On the target system, pick up the matching codename automatically and set
 up the repository:
@@ -619,7 +668,7 @@ version), so request the release version explicitly:
 sudo sed -i 's/ main$/ release/' /etc/apt/sources.list.d/svxlink-db9cr.list
 sudo apt update
 apt list -a svxlink   # shows the release versions now available
-sudo apt install svxlink=26.05.2-1~trixie qtel=26.05.2-1~trixie   # qtel only if installed
+sudo apt install svxlink=26.05.2-2~deb13 qtel=26.05.2-2~deb13   # qtel only if installed
 ```
 
 Moving from `release` to `main` is a normal upgrade:
@@ -644,12 +693,12 @@ specific one explicitly (`apt` will offer to downgrade):
 
 ```sh
 apt list -a svxlink   # substitute qtel to roll that package back instead
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 ```
 
 With the `release` component, every published upstream release stays
 installable permanently, so going back to an earlier release works the
-same way, e.g. `sudo apt install svxlink=26.05.1-1~trixie`.
+same way, e.g. `sudo apt install svxlink=26.05.1-2~deb13`.
 
 To pin a package at that version so `apt upgrade` does not pull it
 forward again until you decide to, add `apt-mark hold svxlink` (and

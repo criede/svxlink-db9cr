@@ -2,7 +2,7 @@
 <html lang="mt">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repożitorju APT SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -102,7 +102,7 @@ għal <code>release</code>, biddel il-komponent
 f'<code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, ħaddem
 <code>sudo apt update</code>, imbagħad installa l-verżjoni release b'mod espliċitu
 (hija downgrade, jiġifieri tmur għal verżjoni eqdem), eż.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Innota li fil-pakketti
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Innota li fil-pakketti
 <code>release</code> (kodiċi sors upstream mhux modifikat) l-iskripts TCL
 taħt <code>/usr/share/svxlink</code> mhumiex protetti bħala fajls tal-konfigurazzjoni;
 żomm il-bidliet lokali f'<code>events.d/local/</code>.</p>
@@ -125,7 +125,7 @@ f'<a href="https://github.com/@@REPO_SLUG@@/blob/master/.github/UPSTREAM-SYNC.MD
 u għalhekk build ħażin ta' kuljum normalment jista' jitreġġa' lura. Il-pakketti tar-rilaxxi upstream
 (il-komponent <code>release</code>) qatt ma jitneħħew:</p>
 <pre><code>apt list -a svxlink   # jew qtel; juri l-verżjonijiet kollha li għadhom fir-repożitorju
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # fakultattiv: ma jħallix lil "apt upgrade" jaġġornah mill-ġdid
 # sudo apt-mark unhold svxlink   # aktar tard, biex jerġgħu jibdew l-aġġornamenti awtomatiċi</code></pre>
 

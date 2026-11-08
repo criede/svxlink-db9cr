@@ -2,7 +2,7 @@
 <html lang="fi">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR -APT-pakettivarasto</title>
 @@HREFLANG_LINKS@@
@@ -102,7 +102,7 @@ komponenttiin <code>release</code>, vaihda komponentti tiedostossa
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, suorita
 <code>sudo apt update</code> ja asenna sitten julkaisuversio erikseen
 (kyseessä on paluu vanhempaan versioon eli downgrade), esim.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Huomaa, että
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Huomaa, että
 <code>release</code>-paketeissa (muuttamaton upstream-lähdekoodi) hakemiston
 <code>/usr/share/svxlink</code> TCL-skriptejä ei ole suojattu asetustiedostoina;
 säilytä paikalliset muutokset hakemistossa <code>events.d/local/</code>.</p>
@@ -125,7 +125,7 @@ katso kohta "Retention" (säilytys) tiedostossa
 joten huonon päivittäisen version voi yleensä perua. Upstream-julkaisupaketteja
 (<code>release</code>-komponentti) ei koskaan poisteta:</p>
 <pre><code>apt list -a svxlink   # tai qtel; näyttää kaikki arkistossa vielä olevat versiot
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # valinnainen: estää "apt upgrade" -komentoa päivittämästä sitä uudelleen
 # sudo apt-mark unhold svxlink   # myöhemmin, kun haluat jatkaa automaattisia päivityksiä</code></pre>
 

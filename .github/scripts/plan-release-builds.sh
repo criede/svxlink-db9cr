@@ -41,6 +41,22 @@ command -v jq >/dev/null
 target_count="$(jq 'length' "$TARGETS_FILE")"
 [[ "$target_count" =~ ^[1-9][0-9]*$ ]]
 
+# Release package versions are "<tag>-<revision>~deb<debian_major>" (see
+# build-daily-deb.sh), so the pool is checked for exactly that file name.
+# Both parts must be valid, or every combination would look unpublished
+# (or, worse, published) and be rebuilt or skipped wrongly.
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+release_revision="$(tr -d '[:space:]' < "$script_dir/release-debian-revision")"
+if [[ ! "$release_revision" =~ ^[1-9][0-9]*$ ]]; then
+  echo "Invalid release revision '${release_revision}' in release-debian-revision." >&2
+  exit 1
+fi
+bad_targets="$(jq -r '.[] | select((.debian_major | type) != "number" or .debian_major < 1 or (.debian_major | floor) != .debian_major) | "\(.suite)/\(.arch)"' "$TARGETS_FILE")"
+if [[ -n "$bad_targets" ]]; then
+  echo "Targets without a valid debian_major in ${TARGETS_FILE}: ${bad_targets//$'\n'/ }" >&2
+  exit 1
+fi
+
 mapfile -t tags < <(
   gh api --paginate "repos/${UPSTREAM_REPO}/releases" \
     --jq '.[] | select(.draft | not) | select(.prerelease | not) | .tag_name' \
@@ -81,15 +97,16 @@ fi
 entries=()
 skipped=()
 for tag in "${tags[@]}"; do
-  while IFS=$'\t' read -r suite arch target_json; do
-    deb="svxlink_${tag}-1~${suite}_${arch}.deb"
+  while IFS=$'\t' read -r suite arch debian_major target_json; do
+    [[ "$debian_major" =~ ^[1-9][0-9]*$ ]]
+    deb="svxlink_${tag}-${release_revision}~deb${debian_major}_${arch}.deb"
     [[ -n "${published[$deb]:-}" ]] && continue
     if [[ -n "${failed["$tag $suite $arch"]:-}" ]]; then
       skipped+=("$tag $suite/$arch")
       continue
     fi
     entries+=("$(jq -c --arg tag "$tag" '. + {tag: $tag}' <<< "$target_json")")
-  done < <(jq -r '.[] | [.suite, .arch, (. | tojson)] | @tsv' "$TARGETS_FILE")
+  done < <(jq -r '.[] | [.suite, .arch, (.debian_major | tostring), (. | tojson)] | @tsv' "$TARGETS_FILE")
 done
 
 if [[ "${#skipped[@]}" -gt 0 ]]; then

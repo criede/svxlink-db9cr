@@ -86,6 +86,7 @@ jobs:
     uses: ./.github/workflows/build-deb.yml
     with:
       suite: ${{ matrix.suite }}
+      debian_major: ${{ matrix.debian_major }}
       arch: ${{ matrix.arch }}
       runner: ${{ matrix.runner }}
       platform: ${{ matrix.platform }}

@@ -7,6 +7,20 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- Package versions now end in the Debian major version (`~deb12`,
+  `~deb13`) instead of the codename (`~bookworm`, `~trixie`), like Debian's
+  backports: dpkg sorts codenames alphabetically, so after an upgrade to
+  Debian 14 (`~forky` < `~trixie`) apt would have kept the old suite's
+  package. The number comes from the build container's `VERSION_ID` and is
+  checked against the new `debian_major` field of each target in
+  `.github/build-targets.json`. Release packages use a Debian revision from
+  the new `.github/scripts/release-debian-revision`, now `2`, so that
+  `26.05.2-2~deb13` sorts above the earlier `26.05.2-1~trixie`; all
+  releases are built once more under the new versions. Daily release tags
+  of both schemes share one retention series (`prune-daily-releases.sh`);
+  the planning and publish steps check the new versions. Example versions
+  in UPSTREAM-SYNC.MD and on the start page (all languages) updated.
+
 - Security hardening of the packaging and publishing pipeline:
   - `postinst` no longer follows symlinks when changing the owner of the
     state directories (a symlinked directory planted by the `svxlink` user

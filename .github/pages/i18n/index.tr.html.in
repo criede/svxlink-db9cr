@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT deposu</title>
 @@HREFLANG_LINKS@@
@@ -102,7 +102,7 @@ bileşeninden <code>release</code> bileşenine geçirmek için
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code> dosyasındaki bileşeni değiştir,
 <code>sudo apt update</code> komutunu çalıştır, ardından release sürümünü açıkça kur
 (bu bir sürüm düşürmedir, yani downgrade), örn.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Şunu unutma:
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Şunu unutma:
 <code>release</code> paketlerinde (değiştirilmemiş upstream kaynak kodu)
 <code>/usr/share/svxlink</code> altındaki TCL betikleri yapılandırma dosyası
 olarak korunmaz; yerel değişikliklerini <code>events.d/local/</code> içinde tut.</p>
@@ -125,7 +125,7 @@ bkz. "Retention" (saklama) bölümü,
 bu nedenle hatalı bir günlük derleme genellikle geri alınabilir. Upstream sürüm paketleri
 (<code>release</code> bileşeni) hiçbir zaman kaldırılmaz:</p>
 <pre><code>apt list -a svxlink   # veya qtel; depoda hâlâ bulunan tüm sürümleri listeler
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # isteğe bağlı: "apt upgrade" komutunun onu yeniden yükseltmesini engeller
 # sudo apt-mark unhold svxlink   # daha sonra, otomatik güncellemeleri sürdürmek için</code></pre>
 

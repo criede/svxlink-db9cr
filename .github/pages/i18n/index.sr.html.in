@@ -2,7 +2,7 @@
 <html lang="sr">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT репозиторијум</title>
 @@HREFLANG_LINKS@@
@@ -101,7 +101,7 @@ journalctl -u svxlink.service -f
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, покрени
 <code>sudo apt update</code>, а затим изричито инсталирај верзију издања
 (то је враћање на старију верзију), нпр.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Имај у виду да у
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Имај у виду да у
 пакетима <code>release</code> (неизмењен upstream изворни код) TCL скрипте
 у <code>/usr/share/svxlink</code> нису заштићене као конфигурационе
 датотеке; локалне измене чувај у <code>events.d/local/</code>.</p>
@@ -124,7 +124,7 @@ journalctl -u svxlink.service -f
 тако да се лоша дневна верзија обично може вратити. Пакети upstream издања
 (компонента <code>release</code>) се никада не уклањају:</p>
 <pre><code>apt list -a svxlink   # или qtel; приказује све верзије које су још у репозиторијуму
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # опционо: спречава да је "apt upgrade" поново ажурира
 # sudo apt-mark unhold svxlink   # касније, за наставак аутоматских ажурирања</code></pre>
 

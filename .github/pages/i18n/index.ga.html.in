@@ -2,7 +2,7 @@
 <html lang="ga">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Stór APT SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -102,7 +102,7 @@ go <code>release</code>, athraigh an chomhpháirt in
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, rith
 <code>sudo apt update</code>, ansin suiteáil leagan na heisiúna go sainráite
 (is íosghrádú é), m.sh.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Tabhair faoi deara, i bpacáistí
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Tabhair faoi deara, i bpacáistí
 <code>release</code> (cód foinseach neamhathraithe ón mbuntionscadal), nach bhfuil na scripteanna TCL
 faoi <code>/usr/share/svxlink</code> cosanta mar chomhaid
 chumraíochta; coinnigh athruithe áitiúla in <code>events.d/local/</code>.</p>
@@ -125,7 +125,7 @@ féach "Retention" (coinneáil) in
 mar sin is féidir droch-thógáil laethúil a rolladh siar de ghnáth. Ní bhaintear pacáistí eisiúna
 ón mbuntionscadal (comhpháirt <code>release</code>) choíche:</p>
 <pre><code>apt list -a svxlink   # nó qtel; liostaíonn sé gach leagan atá fós sa stór
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # roghnach: cuireann sé cosc ar "apt upgrade" é a uasghrádú arís
 # sudo apt-mark unhold svxlink   # níos déanaí, chun nuashonruithe uathoibríocha a atosú</code></pre>
 

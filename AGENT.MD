@@ -87,6 +87,15 @@ still need to be documented.
   each other: informally, in the second person singular (German "du",
   French "tu", Spanish "tú", Dutch "je", Polish "ty", Russian "ты", ...),
   never with a formal or plural form (German "Sie", French "vous", ...).
+- Package versions end in `~deb<N>` (the Debian major version, e.g.
+  `~deb13` for trixie), never in a codename: dpkg sorts codenames
+  alphabetically, so a codename suffix breaks upgrades across Debian
+  releases (`~forky` < `~trixie`). Every target in
+  `.github/build-targets.json` needs a `debian_major`; the build fails if
+  it does not match the container's `VERSION_ID`. Release packages are
+  never rebuilt, so raise `.github/scripts/release-debian-revision` with
+  every packaging change that should reach the upstream release packages
+  (see "Upstream release packages" in `UPSTREAM-SYNC.MD`).
 - Before adding an `apt-get install` package name in a workflow/build
   script, verify it actually exists for the target suite (and provides
   what is needed, e.g. a specific `.cmake` file) rather than guessing from

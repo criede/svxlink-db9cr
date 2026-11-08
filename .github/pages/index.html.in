@@ -101,7 +101,7 @@ to <code>release</code>, change the component in
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, run
 <code>sudo apt update</code>, then install the release version explicitly
 (it is a downgrade), e.g.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Note that in
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Note that in
 <code>release</code> packages (unmodified upstream source) the TCL scripts
 under <code>/usr/share/svxlink</code> are not protected as configuration
 files; keep local changes in <code>events.d/local/</code>.</p>
@@ -124,7 +124,7 @@ see "Retention" in
 so a bad daily build can usually be rolled back. Upstream release packages
 (<code>release</code> component) are never removed:</p>
 <pre><code>apt list -a svxlink   # or qtel; lists every version still in the repository
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # optional: stop "apt upgrade" pulling it forward again
 # sudo apt-mark unhold svxlink   # later, to resume automatic updates</code></pre>
 

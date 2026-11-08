@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-förråd</title>
 @@HREFLANG_LINKS@@
@@ -102,7 +102,7 @@ till <code>release</code>, ändra komponenten i
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, kör
 <code>sudo apt update</code> och installera sedan utgåveversionen uttryckligen
 (det är en nedgradering), t.ex.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Observera att i
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Observera att i
 <code>release</code>-paket (oförändrad upstream-källkod) är TCL-skripten
 under <code>/usr/share/svxlink</code> inte skyddade som konfigurationsfiler;
 lägg lokala ändringar i <code>events.d/local/</code>.</p>
@@ -125,7 +125,7 @@ se ”Retention” (lagringstid) i
 så ett dåligt dagligt bygge kan oftast rullas tillbaka. Paket med upstream-utgåvor
 (komponenten <code>release</code>) tas aldrig bort:</p>
 <pre><code>apt list -a svxlink   # eller qtel; listar alla versioner som fortfarande finns i förrådet
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # valfritt: hindrar "apt upgrade" från att uppgradera den igen
 # sudo apt-mark unhold svxlink   # senare, för att återuppta automatiska uppdateringar</code></pre>
 

@@ -2,7 +2,7 @@
 <html lang="el">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="0ea33cae52b0c0574f619cb8b5c78e3faa06c35e000e0b75f625bc8c8838a669">
+<meta name="source-sha256" content="36ae230c44e2c3c1a02118df2064b7f1c33f081bcc631f7f96fbb78397a7826e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Αποθετήριο APT του SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -104,7 +104,7 @@ journalctl -u svxlink.service -f
 <code>/etc/apt/sources.list.d/svxlink-db9cr.list</code>, εκτέλεσε
 <code>sudo apt update</code> και στη συνέχεια εγκατάστησε ρητά την έκδοση release
 (πρόκειται για υποβάθμιση έκδοσης, downgrade), π.χ.
-<code>sudo apt install svxlink=26.05.2-1~trixie</code>. Σημείωσε ότι στα πακέτα
+<code>sudo apt install svxlink=26.05.2-2~deb13</code>. Σημείωσε ότι στα πακέτα
 <code>release</code> (αμετάβλητος πηγαίος κώδικας upstream) τα σενάρια TCL
 κάτω από το <code>/usr/share/svxlink</code> δεν προστατεύονται ως αρχεία
 ρυθμίσεων· κράτα τις τοπικές αλλαγές στο <code>events.d/local/</code>.</p>
@@ -127,7 +127,7 @@ journalctl -u svxlink.service -f
 οπότε μια προβληματική καθημερινή έκδοση μπορεί συνήθως να αναιρεθεί (rollback). Τα πακέτα
 των εκδόσεων upstream (συνιστώσα <code>release</code>) δεν αφαιρούνται ποτέ:</p>
 <pre><code>apt list -a svxlink   # ή qtel· εμφανίζει όλες τις εκδόσεις που υπάρχουν ακόμη στο αποθετήριο
-sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~trixie
+sudo apt install svxlink=26.05.1+daily20260910.5.1.gabcdef012345-1~deb13
 sudo apt-mark hold svxlink   # προαιρετικά: εμποδίζει το "apt upgrade" να την αναβαθμίσει ξανά
 # sudo apt-mark unhold svxlink   # αργότερα, για να συνεχιστούν οι αυτόματες ενημερώσεις</code></pre>
 
