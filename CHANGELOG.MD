@@ -7,6 +7,9 @@ project's existing release notes are located under `src/doc/`.
 
 ### Changed
 
+- `README.adoc` links the APT repository quickstart under "Resources"
+  (https://criede.github.io/svxlink-db9cr/#quickstart); the quickstart
+  heading on the start page (all languages) got the anchor `quickstart`.
 - All start page translations address the reader the way radio amateurs
   address each other: informally, second person singular (du/tu/tú/je/
   ty/ты, ...), never formal or plural forms; recorded in the translation

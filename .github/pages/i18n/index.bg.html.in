@@ -2,7 +2,7 @@
 <html lang="bg">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="c00736cfe9ab652c77c3cc1c822b13e4188abe328095c00aa64607a8220e551e">
+<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APT хранилище на SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -48,7 +48,7 @@
 състояние в GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;master на този форк</a>.</p>
 
-<h2>Бърз старт</h2>
+<h2 id="quickstart">Бърз старт</h2>
 <p>Изпълни на целевата система (правилните кодово име и архитектура се откриват автоматично):</p>
 <pre><code># Импортиране на публичния ключ за подписване
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \

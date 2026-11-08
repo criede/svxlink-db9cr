@@ -53,3 +53,6 @@ These are some of the resources connected to SvxLink:
   SvxLink Server from here
 * {gh_main}[GitHub Main Page] -- The project site on GitHub
 * {gi_svxlink}[Groups.io SvxLink] -- Communicate with other SvxLink users
+* https://criede.github.io/svxlink-db9cr/#quickstart[APT Repository Quickstart]
+  -- Install svxlink-db9cr packages (upstream releases or daily builds) for
+  Raspberry Pi OS and Debian via apt

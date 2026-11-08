@@ -2,7 +2,7 @@
 <html lang="sl">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="c00736cfe9ab652c77c3cc1c822b13e4188abe328095c00aa64607a8220e551e">
+<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Repozitorij APT SvxLink DB9CR</title>
 @@HREFLANG_LINKS@@
@@ -49,7 +49,7 @@ ne da bi se zanašal na zastarel posnetek na tem mestu, primerjaj
 v živo na GitHubu:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">master izvornega projekta&nbsp;&hellip;&nbsp;master tega forka</a>.</p>
 
-<h2>Hiter začetek</h2>
+<h2 id="quickstart">Hiter začetek</h2>
 <p>Zaženi na ciljnem sistemu (pravilno kodno ime in arhitektura se zaznata samodejno):</p>
 <pre><code># Uvoz javnega podpisnega ključa
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \

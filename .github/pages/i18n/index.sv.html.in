@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
 <meta charset="utf-8">
-<meta name="source-sha256" content="c00736cfe9ab652c77c3cc1c822b13e4188abe328095c00aa64607a8220e551e">
+<meta name="source-sha256" content="1245f311f6cadcc9fe361454cef16e2fa1495a280986178b0f3205c625ca2b01">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SvxLink DB9CR APT-förråd</title>
 @@HREFLANG_LINKS@@
@@ -49,7 +49,7 @@ utan att förlita dig på en ögonblicksbild här som blir inaktuell, kan du jä
 live på GitHub:
 <a href="https://github.com/sm0svx/svxlink/compare/master...criede:svxlink-db9cr:master">upstream master&nbsp;&hellip;&nbsp;denna forks master</a>.</p>
 
-<h2>Snabbstart</h2>
+<h2 id="quickstart">Snabbstart</h2>
 <p>Kör på målsystemet (identifierar automatiskt rätt kodnamn/arkitektur):</p>
 <pre><code># Importera den publika signeringsnyckeln
 curl -fsSL https://criede.github.io/svxlink-db9cr/pubkey.gpg | \
