@@ -83,6 +83,8 @@ still need to be documented.
   English original; the generator inserts it from the notice column of
   `languages.tsv`, so a new language needs its notice text there too.
   Do not put that notice into the templates themselves.
+  The German translation addresses the reader informally with "du",
+  never "Sie".
 - Before adding an `apt-get install` package name in a workflow/build
   script, verify it actually exists for the target suite (and provides
   what is needed, e.g. a specific `.cmake` file) rather than guessing from
