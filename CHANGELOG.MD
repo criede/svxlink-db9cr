@@ -24,6 +24,14 @@ project's existing release notes are located under `src/doc/`.
 - The qtel build now forces `-std=c++17` through a tiny compiler launcher (`CMAKE_CXX_COMPILER_LAUNCHER`), so
   Qt6 builds without source patches (needed for unmodified upstream tags).
 - Checksum files in GitHub releases are named `SHA256SUMS-<suite>-<arch>`.
+- Publishing falls back to the nearest ancestor commit that changes no
+  workflow file when GitHub refuses to create a release tag on the build
+  commit itself (the `GITHUB_TOKEN` lacks the `workflows` permission;
+  only affects manual builds of workflow-changing commits).
+- Raspbian build image: explicitly include `apt` (only "important" in
+  Raspbian bookworm, so missing from minbase), set `PATH` on the
+  imported image, and give the build keyring a name that does not clash
+  with the `raspbian-archive-keyring` package's conffile.
 - The APT repository's `index.html` explains both components and lists
   architectures per component; it had also lost its "Signing key"
   heading in the 32-bit change, now restored.

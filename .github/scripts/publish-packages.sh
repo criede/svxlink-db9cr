@@ -59,10 +59,41 @@ latest_release=""
 # always do; an upstream release tag's commit normally does too (upstream
 # master, which this fork merges, contains it), but fall back to the
 # default branch rather than fail if it does not.
-target_args() {
-  if gh api "repos/${GH_REPO}/commits/$1" --silent >/dev/null 2>&1; then
-    printf '%s\n' --target "$1"
+#
+# The GITHUB_TOKEN may also not create a tag on a commit that itself
+# changes files under .github/workflows/ (HTTP 403 "Resource not
+# accessible by integration"; it lacks the "workflows" permission). The
+# daily builds of synced upstream merges never hit this (the sync never
+# touches workflows), but a manual build of a commit that changes a
+# workflow does. Then the tag goes to the nearest ancestor that changes
+# no workflow; the release notes still name the exact source commit.
+commit_exists() {
+  gh api "repos/${GH_REPO}/commits/$1" --silent >/dev/null 2>&1
+}
+workflow_free_ancestor() {
+  local c
+  while IFS= read -r c; do
+    if [[ "$(gh api "repos/${GH_REPO}/commits/$c" \
+        --jq '[.files[].filename | startswith(".github/workflows/")] | any')" == false ]]; then
+      printf '%s\n' "$c"
+      return 0
+    fi
+  done < <(gh api "repos/${GH_REPO}/commits?sha=$1&per_page=20" --jq '.[].sha')
+  return 1
+}
+create_release() {
+  # $1 = source commit; remaining arguments = gh release create arguments.
+  local sha="$1" fallback
+  shift
+  if commit_exists "$sha"; then
+    if gh release create "$@" --target "$sha"; then return 0; fi
+    echo "Could not create the tag on ${sha}; trying the nearest ancestor that changes no workflow." >&2
+    if fallback="$(workflow_free_ancestor "$sha")" && [[ "$fallback" != "$sha" ]]; then
+      if gh release create "$@" --target "$fallback"; then return 0; fi
+    fi
+    echo "Falling back to the default branch for the tag." >&2
   fi
+  gh release create "$@"
 }
 
 for leg in "${legs[@]}"; do
@@ -94,8 +125,7 @@ for leg in "${legs[@]}"; do
   if gh release view "$tag" >/dev/null 2>&1; then
     gh release upload "$tag" "${assets[@]}" --clobber
   else
-    mapfile -t target < <(target_args "$source_sha")
-    gh release create "$tag" "${assets[@]}" "${target[@]}" \
+    create_release "$source_sha" "$tag" "${assets[@]}" \
       --title "$title" --notes-file "${leg}BUILD-INFO.MD" "${create_args[@]}"
   fi
   echo "${kind} ${suite}/${arch}: $(gh release view "$tag" --json url --jq .url)" >> "$summary"
